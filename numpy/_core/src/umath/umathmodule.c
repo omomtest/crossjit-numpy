@@ -35,6 +35,9 @@
 #include "extobj.h"  /* for _extobject_contextvar exposure */
 #include "ufunc_type_resolution.h"
 
+/* JIT adapter for CPython's JIT extension hook API */
+NPY_NO_EXPORT int jit_adapter_init(PyObject *m);
+
 /* Automatically generated code to define all ufuncs: */
 #include "funcs.inc"
 #include "__umath_generated.c"
@@ -289,6 +292,11 @@ int initumath(PyObject *m)
 
     if (init_argparse_mutex() < 0) {
         return -1;
+    }
+
+    /* JIT adapter (non-fatal: module works without JIT support) */
+    if (jit_adapter_init(m) < 0) {
+        PyErr_Clear();
     }
 
     return 0;
