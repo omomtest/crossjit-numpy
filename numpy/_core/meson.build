@@ -1281,6 +1281,30 @@ src_umath = umath_gen_headers + [
   'src/umath/_scaled_float_dtype.c',
 ]
 
+# CrossJIT compute kernels are kept in their own optimized build artifact,
+# mirroring CPython's copy-and-patch split between build-time optimized
+# stencils and runtime plan dispatch.
+numpy_jit_kernel_lib = static_library('np_jit_kernels',
+  [
+    config_h,
+    _numpyconfig_h,
+    'src/umath/jit_kernel.c',
+  ],
+  c_args: c_args_common + max_opt,
+  include_directories: [
+    'include',
+    'src/common',
+    'src/multiarray',
+    'src/npymath',
+    'src/umath',
+  ],
+  dependencies: [
+    py_dep,
+    np_core_dep,
+  ],
+  pic: true,
+)
+
 # SVML object files. If functionality is migrated to universal intrinsics and
 # the object files are no longer needed, comment out the relevant object files
 # here. Note that this migration is desirable; we then get the performance
@@ -1358,6 +1382,7 @@ py.extension_module('_multiarray_umath',
   link_with: [
     npymath_lib,
     unique_hash_so,
+    numpy_jit_kernel_lib,
     multiarray_umath_mtargets.static_lib('_multiarray_umath_mtargets')
   ] + highway_lib,
   install: true,
