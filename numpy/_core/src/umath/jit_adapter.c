@@ -16,7 +16,7 @@
 #include "jit_kernel.h"
 
 #ifndef PYJIT_EXT_ABI_VERSION
-#define PYJIT_EXT_ABI_VERSION 1u
+#define PYJIT_EXT_ABI_VERSION 2u
 
 typedef enum {
     PYJIT_EXT_HIT = 1,
@@ -121,6 +121,10 @@ typedef enum {
     PYJIT_EXT_STENCIL_VALUE_ERROR_TARGET,
     PYJIT_EXT_STENCIL_VALUE_RECORD_EXT_HIT,
     PYJIT_EXT_STENCIL_VALUE_RECORD_EXT_MISS,
+    PYJIT_EXT_STENCIL_VALUE_CUSTOM0,
+    PYJIT_EXT_STENCIL_VALUE_CUSTOM1,
+    PYJIT_EXT_STENCIL_VALUE_CUSTOM2,
+    PYJIT_EXT_STENCIL_VALUE_CUSTOM3,
 } PyJitExtStencilValueKind;
 
 typedef enum {
@@ -146,6 +150,10 @@ typedef struct {
     size_t data_size;
     const PyJitExtStencilHole *holes;
     size_t hole_count;
+    const void *custom0;
+    const void *custom1;
+    const void *custom2;
+    const void *custom3;
 } PyJitExtStencil;
 
 typedef const PyJitExtStencil *(*PyJitExtGetStencilFunc)(
@@ -211,6 +219,9 @@ PyAPI_FUNC(int) PyJit_RegisterCallableProvider(
     PyJitExtProvider *provider);
 #endif
 
+static PyJitExtResult numpy_jit_prepare_binary_contig_f64(
+    void *payload, PyObject *left, PyObject *right, void *run_state);
+
 #include "jit_stencils_generated.h"
 
 extern PyTypeObject PyUFunc_Type;
@@ -269,6 +280,14 @@ typedef struct {
     int fused_op;
     uint32_t fused_flags;
 } NumpyJitPlanPayload;
+
+typedef struct {
+    const double *left_data;
+    const double *right_data;
+    double *out_data;
+    npy_intp size;
+    PyObject *out;
+} NumpyJitBinaryContigF64RunState;
 
 static PyJitExtPlan *numpy_jit_try_plan(
     const PyJitExtTraceRequest *request, PyJitExtSiteState *site);
@@ -1271,7 +1290,14 @@ static const PyJitExtStencil *
 numpy_jit_get_stencil(const PyJitExtPlan *plan, int NPY_UNUSED(opcode))
 {
 #if NUMPY_JIT_HAS_EXT_BINARY_R23_STENCIL
-    if (plan != NULL && plan->kind == PYJIT_EXT_PLAN_BINARY) {
+    NumpyJitPlanPayload *payload = plan != NULL ?
+        (NumpyJitPlanPayload *)plan->payload : NULL;
+    if (plan != NULL && plan->kind == PYJIT_EXT_PLAN_BINARY &&
+        payload != NULL &&
+        payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE &&
+        payload->left_dtype == NPY_DOUBLE &&
+        payload->right_dtype == NPY_DOUBLE &&
+        payload->result_dtype == NPY_DOUBLE) {
         return &numpy_jit_ext_binary_r23_stencil;
     }
 #endif
@@ -1681,6 +1707,77 @@ numpy_elemwise_strided_same_shape_loop(NumpyJitPlanPayload *payload,
         PyArray_DIMS(a), PyArray_STRIDES(a), PyArray_STRIDES(b),
         PyArray_BYTES(a), PyArray_BYTES(b), PyArray_BYTES(out)) ?
         PYJIT_EXT_HIT : PYJIT_EXT_MISS;
+}
+
+static PyJitExtResult
+numpy_jit_prepare_binary_contig_f64(void *payload_raw, PyObject *left,
+                                    PyObject *right, void *run_state_raw)
+{
+    NumpyJitPlanPayload *payload = (NumpyJitPlanPayload *)payload_raw;
+    NumpyJitBinaryContigF64RunState *run =
+        (NumpyJitBinaryContigF64RunState *)run_state_raw;
+    if (payload == NULL || run == NULL) {
+        return PYJIT_EXT_MISS;
+    }
+    if (payload->layout != NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE ||
+        payload->left_dtype != NPY_DOUBLE ||
+        payload->right_dtype != NPY_DOUBLE ||
+        payload->result_dtype != NPY_DOUBLE) {
+        return PYJIT_EXT_MISS;
+    }
+    if (!PyArray_CheckExact(left) || !PyArray_CheckExact(right)) {
+        numpy_jit_guard_fail(payload, NUMPY_JIT_GUARD_NOT_EXACT_ARRAY);
+        return PYJIT_EXT_MISS;
+    }
+
+    PyArrayObject *a = (PyArrayObject *)left;
+    PyArrayObject *b = (PyArrayObject *)right;
+    if (PyArray_TYPE(a) != NPY_DOUBLE || PyArray_TYPE(b) != NPY_DOUBLE) {
+        numpy_jit_record_dtype_miss(payload, left, right);
+        numpy_jit_guard_fail(payload, NUMPY_JIT_GUARD_DTYPE_MISMATCH);
+        return PYJIT_EXT_MISS;
+    }
+    int ndim = PyArray_NDIM(a);
+    if (ndim == 0 || ndim != PyArray_NDIM(b)) {
+        numpy_jit_guard_fail(payload, NUMPY_JIT_GUARD_NDIM_MISMATCH);
+        return PYJIT_EXT_MISS;
+    }
+
+    npy_intp size = 1;
+    npy_intp *adims = PyArray_DIMS(a);
+    npy_intp *bdims = PyArray_DIMS(b);
+    for (int i = 0; i < ndim; i++) {
+        if (adims[i] != bdims[i]) {
+            numpy_jit_maybe_disable_static_miss(
+                payload, "numpy_shape_mismatch");
+            numpy_jit_guard_fail(payload, NUMPY_JIT_GUARD_SHAPE_MISMATCH);
+            return PYJIT_EXT_MISS;
+        }
+        size *= adims[i];
+    }
+    if (!PyArray_IS_C_CONTIGUOUS(a) || !PyArray_IS_C_CONTIGUOUS(b)) {
+        numpy_jit_record_layout_miss(payload, left, right);
+        numpy_jit_guard_fail(payload, NUMPY_JIT_GUARD_NOT_C_CONTIGUOUS);
+        return PYJIT_EXT_MISS;
+    }
+    numpy_jit_record_element_count(payload, size);
+    if (size < payload->min_elements) {
+        numpy_jit_guard_fail(payload, NUMPY_JIT_GUARD_MIN_ELEMENTS);
+        return PYJIT_EXT_MISS;
+    }
+
+    PyArrayObject *out = (PyArrayObject *)PyArray_EMPTY(ndim, adims,
+                                                        NPY_DOUBLE, 0);
+    if (out == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+
+    run->left_data = (const double *)PyArray_BYTES(a);
+    run->right_data = (const double *)PyArray_BYTES(b);
+    run->out_data = (double *)PyArray_BYTES(out);
+    run->size = size;
+    run->out = (PyObject *)out;
+    return PYJIT_EXT_HIT;
 }
 
 static PyJitExtResult
