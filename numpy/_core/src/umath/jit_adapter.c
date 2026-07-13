@@ -51,9 +51,13 @@ typedef struct {
         struct {
             PyJitExtPlan *first_plan;
             PyJitExtPlan *second_plan;
+            uint32_t flags;
         } fused_binary2;
     } u;
 } PyJitExtTraceRequest;
+
+#define PYJIT_EXT_FUSED_BINARY2_SECOND_CONSUMES_LEFT   (1u << 0)
+#define PYJIT_EXT_FUSED_BINARY2_SECOND_CONSUMES_RIGHT  (1u << 1)
 
 typedef struct {
     uint32_t abi_version;
@@ -101,6 +105,47 @@ typedef PyJitExtResult (*PyJitExtFusedBinary2EvalFunc)(
     void *payload, PyObject *first_left, PyObject *first_right,
     PyObject *second_other, PyObject **result);
 
+typedef enum {
+    PYJIT_EXT_STENCIL_PATCH_ABS64,
+    PYJIT_EXT_STENCIL_PATCH_REL32,
+} PyJitExtStencilPatchKind;
+
+typedef enum {
+    PYJIT_EXT_STENCIL_VALUE_PLAN,
+    PYJIT_EXT_STENCIL_VALUE_PAYLOAD,
+    PYJIT_EXT_STENCIL_VALUE_BINARY_EVAL,
+    PYJIT_EXT_STENCIL_VALUE_CALL_EVAL,
+    PYJIT_EXT_STENCIL_VALUE_FUSED_BINARY2_EVAL,
+    PYJIT_EXT_STENCIL_VALUE_NEXT_INSTRUCTION,
+    PYJIT_EXT_STENCIL_VALUE_TARGET,
+    PYJIT_EXT_STENCIL_VALUE_ERROR_TARGET,
+} PyJitExtStencilValueKind;
+
+typedef enum {
+    PYJIT_EXT_STENCIL_SECTION_CODE,
+    PYJIT_EXT_STENCIL_SECTION_DATA,
+} PyJitExtStencilSection;
+
+typedef struct {
+    uint32_t offset;
+    uint16_t section;
+    uint16_t patch_kind;
+    uint16_t value_kind;
+    uint16_t reserved;
+    int64_t addend;
+} PyJitExtStencilHole;
+
+typedef struct {
+    uint32_t abi_version;
+    uint32_t struct_size;
+    const unsigned char *code;
+    size_t code_size;
+    const unsigned char *data;
+    size_t data_size;
+    const PyJitExtStencilHole *holes;
+    size_t hole_count;
+} PyJitExtStencil;
+
 struct _PyJitExtPlan {
     uint32_t abi_version;
     uint32_t struct_size;
@@ -117,6 +162,7 @@ struct _PyJitExtPlan {
     void (*free_payload)(void *payload);
     const char *debug_name;
     PyJitExtSiteState *site;
+    const PyJitExtStencil *stencil;
 };
 
 #define PYJIT_EXT_GUARD_FAIL_REASON_COUNT 9
