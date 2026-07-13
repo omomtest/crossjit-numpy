@@ -119,6 +119,8 @@ typedef enum {
     PYJIT_EXT_STENCIL_VALUE_NEXT_INSTRUCTION,
     PYJIT_EXT_STENCIL_VALUE_TARGET,
     PYJIT_EXT_STENCIL_VALUE_ERROR_TARGET,
+    PYJIT_EXT_STENCIL_VALUE_RECORD_EXT_HIT,
+    PYJIT_EXT_STENCIL_VALUE_RECORD_EXT_MISS,
 } PyJitExtStencilValueKind;
 
 typedef enum {
@@ -146,6 +148,10 @@ typedef struct {
     size_t hole_count;
 } PyJitExtStencil;
 
+typedef const PyJitExtStencil *(*PyJitExtGetStencilFunc)(
+    const PyJitExtPlan *plan,
+    int opcode);
+
 struct _PyJitExtPlan {
     uint32_t abi_version;
     uint32_t struct_size;
@@ -163,6 +169,7 @@ struct _PyJitExtPlan {
     const char *debug_name;
     PyJitExtSiteState *site;
     const PyJitExtStencil *stencil;
+    PyJitExtGetStencilFunc get_stencil;
 };
 
 #define PYJIT_EXT_GUARD_FAIL_REASON_COUNT 9
@@ -203,6 +210,8 @@ PyAPI_FUNC(int) PyJit_RegisterCallableProvider(
     PyObject *callable,
     PyJitExtProvider *provider);
 #endif
+
+#include "jit_stencils_generated.h"
 
 extern PyTypeObject PyUFunc_Type;
 
@@ -266,6 +275,8 @@ static PyJitExtPlan *numpy_jit_try_plan(
 static void numpy_jit_free_plan(PyJitExtPlan *plan);
 static int numpy_jit_describe_plan(
     const PyJitExtPlan *plan, PyJitExtPlanInfo *info);
+static const PyJitExtStencil *numpy_jit_get_stencil(
+    const PyJitExtPlan *plan, int opcode);
 
 static PyJitExtProvider numpy_jit_provider = {
     .abi_version = PYJIT_EXT_ABI_VERSION,
@@ -1256,6 +1267,17 @@ resolve_known_ufunc(PyObject *callable, NumpyJitOp *op)
     return 0;
 }
 
+static const PyJitExtStencil *
+numpy_jit_get_stencil(const PyJitExtPlan *plan, int NPY_UNUSED(opcode))
+{
+#if NUMPY_JIT_HAS_EXT_BINARY_R23_STENCIL
+    if (plan != NULL && plan->kind == PYJIT_EXT_PLAN_BINARY) {
+        return &numpy_jit_ext_binary_r23_stencil;
+    }
+#endif
+    return NULL;
+}
+
 static const NumpyJitCandidate *
 find_candidate(NumpyJitOp op, int left_dtype, int right_dtype,
                NumpyJitLayoutKind layout)
@@ -1314,6 +1336,7 @@ make_numpy_plan(const NumpyJitCandidate *candidate, PyObject *callable,
     plan->payload = payload;
     if (plan->kind == PYJIT_EXT_PLAN_BINARY) {
         plan->eval.binary_eval = candidate->binary_eval;
+        plan->get_stencil = numpy_jit_get_stencil;
     }
     else {
         plan->eval.call_eval = candidate->call_eval;
