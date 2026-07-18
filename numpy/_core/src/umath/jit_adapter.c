@@ -994,7 +994,8 @@ numpy_jit_guard_fail(NumpyJitPlanPayload *payload,
 static void
 numpy_jit_record_element_count(NumpyJitPlanPayload *payload, npy_intp size)
 {
-    if (payload == NULL || payload->site == NULL || size < 0) {
+    if (!numpy_jit_stats_enabled() || payload == NULL ||
+        payload->site == NULL || size < 0) {
         return;
     }
     PyJitExtSiteState *site = payload->site;
@@ -1285,20 +1286,6 @@ resolve_known_ufunc(PyObject *callable, NumpyJitOp *op)
     return 0;
 }
 
-static int
-numpy_jit_stencil_site_size_ok(const NumpyJitPlanPayload *payload)
-{
-    if (payload == NULL || payload->site == NULL) {
-        return 0;
-    }
-    PyJitExtSiteState *site = payload->site;
-    if (site->element_count_min != site->element_count_max ||
-        site->element_count_last != site->element_count_min) {
-        return 0;
-    }
-    return site->element_count_last >= payload->min_elements;
-}
-
 static const PyJitExtStencil *
 numpy_jit_get_stencil(const PyJitExtPlan *plan, int NPY_UNUSED(opcode))
 {
@@ -1310,8 +1297,7 @@ numpy_jit_get_stencil(const PyJitExtPlan *plan, int NPY_UNUSED(opcode))
         payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE &&
         payload->left_dtype == NPY_DOUBLE &&
         payload->right_dtype == NPY_DOUBLE &&
-        payload->result_dtype == NPY_DOUBLE &&
-        numpy_jit_stencil_site_size_ok(payload)) {
+        payload->result_dtype == NPY_DOUBLE) {
         return &numpy_jit_ext_binary_r23_stencil;
     }
 #endif
@@ -1926,7 +1912,26 @@ numpy_ufunc2_f64_call_eval(void *payload, PyObject *callable,
     if (nargs != 2 || callable != plan->expected_callable) {
         return PYJIT_EXT_MISS;
     }
-    return numpy_elemwise_eval_common(plan, args[0], args[1], result);
+    if (PyArray_CheckExact(args[0]) && PyArray_CheckExact(args[1])) {
+        return numpy_elemwise_eval_common(plan, args[0], args[1], result);
+    }
+    if (PyArray_CheckExact(args[0]) &&
+        (PyFloat_CheckExact(args[1]) || PyLong_CheckExact(args[1])) &&
+        numpy_jit_array_scalar_enabled()) {
+        NumpyJitPlanPayload scalar_plan = *plan;
+        scalar_plan.layout = NUMPY_JIT_LAYOUT_C_CONTIG_ARRAY_SCALAR;
+        return numpy_elemwise_array_scalar_eval_common(
+            &scalar_plan, args[0], args[1], 0, result);
+    }
+    if ((PyFloat_CheckExact(args[0]) || PyLong_CheckExact(args[0])) &&
+        PyArray_CheckExact(args[1]) &&
+        numpy_jit_scalar_array_enabled()) {
+        NumpyJitPlanPayload scalar_plan = *plan;
+        scalar_plan.layout = NUMPY_JIT_LAYOUT_C_CONTIG_SCALAR_ARRAY;
+        return numpy_elemwise_array_scalar_eval_common(
+            &scalar_plan, args[1], args[0], 1, result);
+    }
+    return PYJIT_EXT_MISS;
 }
 
 static int
