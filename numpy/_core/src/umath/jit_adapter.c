@@ -994,8 +994,7 @@ numpy_jit_guard_fail(NumpyJitPlanPayload *payload,
 static void
 numpy_jit_record_element_count(NumpyJitPlanPayload *payload, npy_intp size)
 {
-    if (!numpy_jit_stats_enabled() || payload == NULL ||
-        payload->site == NULL || size < 0) {
+    if (payload == NULL || payload->site == NULL || size < 0) {
         return;
     }
     PyJitExtSiteState *site = payload->site;
@@ -1286,6 +1285,20 @@ resolve_known_ufunc(PyObject *callable, NumpyJitOp *op)
     return 0;
 }
 
+static int
+numpy_jit_stencil_site_size_ok(const NumpyJitPlanPayload *payload)
+{
+    if (payload == NULL || payload->site == NULL) {
+        return 0;
+    }
+    PyJitExtSiteState *site = payload->site;
+    if (site->element_count_min != site->element_count_max ||
+        site->element_count_last != site->element_count_min) {
+        return 0;
+    }
+    return site->element_count_last >= payload->min_elements;
+}
+
 static const PyJitExtStencil *
 numpy_jit_get_stencil(const PyJitExtPlan *plan, int NPY_UNUSED(opcode))
 {
@@ -1297,7 +1310,8 @@ numpy_jit_get_stencil(const PyJitExtPlan *plan, int NPY_UNUSED(opcode))
         payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE &&
         payload->left_dtype == NPY_DOUBLE &&
         payload->right_dtype == NPY_DOUBLE &&
-        payload->result_dtype == NPY_DOUBLE) {
+        payload->result_dtype == NPY_DOUBLE &&
+        numpy_jit_stencil_site_size_ok(payload)) {
         return &numpy_jit_ext_binary_r23_stencil;
     }
 #endif
