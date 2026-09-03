@@ -33,6 +33,12 @@ _check_ufunc_fperr(int errmask, const char *ufunc_name);
 NPY_NO_EXPORT int
 _get_bufsize_errmask(int *buffersize, int *errormask);
 
+/* Read only the current error mask without retaining the callback object.
+ * This is useful for hot guards which never consume the buffer size or
+ * callback. */
+NPY_NO_EXPORT int
+_get_errmask_fast(int *errormask);
+
 
 NPY_NO_EXPORT int
 init_extobj(void);

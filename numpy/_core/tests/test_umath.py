@@ -1521,6 +1521,20 @@ class TestExp:
                     nulp=2,
                 )
 
+    @pytest.mark.parametrize("dtype", [np.complex64, np.complex128])
+    def test_exp_pure_imaginary(self, dtype):
+        angles = np.array(
+            [-np.pi, -1.0, -0.0, 0.0, 1.0, np.pi],
+            dtype=np.empty((), dtype=dtype).real.dtype,
+        )
+        values = np.zeros(angles.shape, dtype=dtype)
+        values.imag = angles
+        expected = np.cos(angles) + 1j * np.sin(angles)
+
+        assert_array_almost_equal_nulp(np.exp(values), expected, nulp=2)
+        assert np.signbit(np.exp(values[2]).imag)
+
+
 class TestSpecialFloats:
     def test_exp_values(self):
         with np.errstate(under='raise', over='raise'):

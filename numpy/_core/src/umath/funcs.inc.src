@@ -316,7 +316,15 @@ nc_log1p@c@(@ctype@ *x, @ctype@ *r)
 static void
 nc_exp@c@(@ctype@ *x, @ctype@ *r)
 {
-    *r = npy_cexp@c@(*x);
+    @ftype@ real = npy_creal@c@(*x);
+    @ftype@ imag = npy_cimag@c@(*x);
+    if (real == 0 && npy_isfinite(imag)) {
+        npy_csetreal@c@(r, npy_cos@c@(imag));
+        npy_csetimag@c@(r, npy_sin@c@(imag));
+    }
+    else {
+        *r = npy_cexp@c@(*x);
+    }
     return;
 }
 

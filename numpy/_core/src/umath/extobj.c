@@ -561,3 +561,23 @@ _get_bufsize_errmask(int *buffersize, int *errormask)
 {
     return _extract_pyvals(buffersize, errormask, NULL);
 }
+
+
+NPY_NO_EXPORT int
+_get_errmask_fast(int *errormask)
+{
+    PyObject *capsule;
+    if (PyContextVar_Get(
+            npy_static_pydata.npy_extobj_contextvar,
+            npy_static_pydata.default_extobj_capsule, &capsule) < 0) {
+        return -1;
+    }
+    npy_extobj *obj = PyCapsule_GetPointer(capsule, "numpy.ufunc.extobj");
+    if (obj == NULL) {
+        Py_DECREF(capsule);
+        return -1;
+    }
+    *errormask = obj->errmask;
+    Py_DECREF(capsule);
+    return 0;
+}
