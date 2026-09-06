@@ -12,9 +12,9 @@ typedef enum {
     NUMPY_JIT_KERNEL_OP_NEGATIVE,
 } NumpyJitKernelOp;
 
-#define NUMPY_JIT_KERNEL_REGION_MAX_NODES 4
-#define NUMPY_JIT_KERNEL_REGION_MAX_INPUTS 6
-#define NUMPY_JIT_KERNEL_REGION_MAX_SLOTS 10
+#define NUMPY_JIT_KERNEL_REGION_MAX_NODES 6
+#define NUMPY_JIT_KERNEL_REGION_MAX_INPUTS 8
+#define NUMPY_JIT_KERNEL_REGION_MAX_SLOTS 14
 
 typedef enum {
     NUMPY_JIT_KERNEL_REGION_ADD,
@@ -92,5 +92,38 @@ int numpy_jit_kernel_fused_contig_or_strided(
 int numpy_jit_kernel_add3_contig(
     int dtype, const void *a, const void *b, const void *c,
     void *out, npy_intp size, int order);
+
+int numpy_jit_kernel_add3_strided(
+    int dtype, int ndim, const npy_intp *dims,
+    const char *a, const npy_intp *astrides,
+    const char *b, const npy_intp *bstrides,
+    const char *c, const npy_intp *cstrides,
+    void *out, npy_intp size, int order);
+
+int numpy_jit_kernel_axpby_plus_scalar_contig(
+    int dtype, const void *a, double alpha, const void *b, double beta,
+    double gamma, void *out, npy_intp size);
+
+int numpy_jit_kernel_scale_sub_sum4_contig(
+    int dtype, const void *a, double scale, const void *b, const void *c,
+    const void *d, const void *e, int scaled_first, void *out,
+    npy_intp size);
+
+int numpy_jit_kernel_square_addsub_contig(
+    int dtype, const void *array, const void *other, double other_scalar,
+    int other_is_scalar, int internal_first, int subtract, void *out,
+    npy_intp size);
+
+int numpy_jit_kernel_sum3_squares_contig(
+    int dtype, const void *a, const void *b, const void *c,
+    void *out, npy_intp size);
+
+int numpy_jit_kernel_mul_arrays_scalar_contig(
+    int dtype, const void *a, const void *b, double scalar,
+    int scalar_first, void *out, npy_intp size);
+
+int numpy_jit_kernel_scaled_array_add_inplace_contig(
+    int dtype, void *out, const void *array, double scalar,
+    int scalar_first, npy_intp size);
 
 #endif

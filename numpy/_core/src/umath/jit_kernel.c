@@ -12,6 +12,27 @@
 #define NUMPY_JIT_ALWAYS_INLINE
 #endif
 
+static inline double
+numpy_jit_region_scalar_double(double value)
+{
+    return value;
+}
+
+static inline float
+numpy_jit_region_scalar_float(double value)
+{
+    return (float)value;
+}
+
+static inline npy_uint64
+numpy_jit_region_scalar_uint64(double value)
+{
+    /* Integer Region admission guarantees an exactly represented signed
+       value.  Compute in the corresponding unsigned type so add/sub/mul
+       retain NumPy's two's-complement wraparound without signed-overflow UB. */
+    return (npy_uint64)(npy_int64)value;
+}
+
 #define DEFINE_REGION_CHUNK(TYPE, NAME)                                      \
 NUMPY_JIT_REGION_OPTIMIZED                                                    \
 static inline NUMPY_JIT_ALWAYS_INLINE int                                    \
@@ -24,7 +45,8 @@ numpy_jit_region_chunk_##NAME(                                               \
     TYPE slots[NUMPY_JIT_KERNEL_REGION_MAX_SLOTS][8];                        \
     for (int input = 0; input < input_count; input++) {                      \
         if (input_is_scalar[input]) {                                        \
-            TYPE value = (TYPE)scalar_values[input];                         \
+            TYPE value = numpy_jit_region_scalar_##NAME(                    \
+                scalar_values[input]);                                      \
             for (int lane = 0; lane < lanes; lane++) {                       \
                 slots[input][lane] = value;                                  \
             }                                                                \
@@ -88,6 +110,7 @@ numpy_jit_region_chunk_##NAME(                                               \
 
 DEFINE_REGION_CHUNK(double, double)
 DEFINE_REGION_CHUNK(float, float)
+DEFINE_REGION_CHUNK(npy_uint64, uint64)
 
 NUMPY_JIT_REGION_OPTIMIZED
 int
@@ -113,12 +136,237 @@ numpy_jit_kernel_region_contig(
             dtype == NPY_FLOAT ?
             numpy_jit_region_chunk_float(
                 nodes, node_count, input_count, output_slot, input_data,
-                scalar_values, input_is_scalar, (float *)out, base, lanes) : 0;
+                scalar_values, input_is_scalar, (float *)out, base, lanes) :
+            (dtype == NPY_LONG || dtype == NPY_LONGLONG) ?
+            numpy_jit_region_chunk_uint64(
+                nodes, node_count, input_count, output_slot, input_data,
+                scalar_values, input_is_scalar, (npy_uint64 *)out,
+                base, lanes) : 0;
         if (!ok) {
             return 0;
         }
     }
     return 1;
+}
+
+int
+numpy_jit_kernel_axpby_plus_scalar_contig(
+    int dtype, const void *a_data, double alpha, const void *b_data,
+    double beta, double gamma, void *out_data, npy_intp size)
+{
+    if (dtype == NPY_DOUBLE) {
+        const double *a = (const double *)a_data;
+        const double *b = (const double *)b_data;
+        double *out = (double *)out_data;
+        for (npy_intp i = 0; i < size; i++) {
+            /* Keep the source evaluation order: two multiplies, their add,
+               then the scalar add.  The loop is schedule-specific, so the C
+               compiler can vectorize it without per-node/lane dispatch. */
+            double left = a[i] * alpha;
+            double right = b[i] * beta;
+            out[i] = (left + right) + gamma;
+        }
+        return 1;
+    }
+    if (dtype == NPY_FLOAT) {
+        const float *a = (const float *)a_data;
+        const float *b = (const float *)b_data;
+        float *out = (float *)out_data;
+        float af = (float)alpha;
+        float bf = (float)beta;
+        float gf = (float)gamma;
+        for (npy_intp i = 0; i < size; i++) {
+            float left = a[i] * af;
+            float right = b[i] * bf;
+            out[i] = (left + right) + gf;
+        }
+        return 1;
+    }
+    if (dtype == NPY_LONG || dtype == NPY_LONGLONG) {
+        const npy_uint64 *a = (const npy_uint64 *)a_data;
+        const npy_uint64 *b = (const npy_uint64 *)b_data;
+        npy_uint64 *out = (npy_uint64 *)out_data;
+        npy_uint64 ai = numpy_jit_region_scalar_uint64(alpha);
+        npy_uint64 bi = numpy_jit_region_scalar_uint64(beta);
+        npy_uint64 gi = numpy_jit_region_scalar_uint64(gamma);
+        for (npy_intp i = 0; i < size; i++) {
+            npy_uint64 left = a[i] * ai;
+            npy_uint64 right = b[i] * bi;
+            out[i] = (left + right) + gi;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+int
+numpy_jit_kernel_scale_sub_sum4_contig(
+    int dtype, const void *a_data, double scale, const void *b_data,
+    const void *c_data, const void *d_data, const void *e_data,
+    int scaled_first, void *out_data, npy_intp size)
+{
+#define SCALE_SUB_SUM4_LOOP(TYPE, SCALE_VALUE)                               \
+    do {                                                                     \
+        const TYPE *a = (const TYPE *)a_data;                               \
+        const TYPE *b = (const TYPE *)b_data;                               \
+        const TYPE *c = (const TYPE *)c_data;                               \
+        const TYPE *d = (const TYPE *)d_data;                               \
+        const TYPE *e = (const TYPE *)e_data;                               \
+        TYPE *out = (TYPE *)out_data;                                       \
+        TYPE factor = (SCALE_VALUE);                                        \
+        for (npy_intp i = 0; i < size; i++) {                              \
+            TYPE scaled = a[i] * factor;                                    \
+            TYPE sum = ((b[i] + c[i]) + d[i]) + e[i];                       \
+            out[i] = scaled_first ? scaled - sum : sum - scaled;            \
+        }                                                                    \
+        return 1;                                                            \
+    } while (0)
+    if (dtype == NPY_DOUBLE) {
+        SCALE_SUB_SUM4_LOOP(double, scale);
+    }
+    if (dtype == NPY_FLOAT) {
+        SCALE_SUB_SUM4_LOOP(float, (float)scale);
+    }
+    if (dtype == NPY_LONG || dtype == NPY_LONGLONG) {
+        SCALE_SUB_SUM4_LOOP(
+            npy_uint64, numpy_jit_region_scalar_uint64(scale));
+    }
+#undef SCALE_SUB_SUM4_LOOP
+    return 0;
+}
+
+int
+numpy_jit_kernel_square_addsub_contig(
+    int dtype, const void *array_data, const void *other_data,
+    double other_scalar, int other_is_scalar, int internal_first,
+    int subtract, void *out_data, npy_intp size)
+{
+#define SQUARE_ADDSUB_LOOP(TYPE, CONVERT)                                    \
+    do {                                                                     \
+        const TYPE *array = (const TYPE *)array_data;                       \
+        const TYPE *other = (const TYPE *)other_data;                       \
+        TYPE scalar = (CONVERT)(other_scalar);                              \
+        TYPE *out = (TYPE *)out_data;                                       \
+        for (npy_intp i = 0; i < size; i++) {                              \
+            TYPE square = array[i] * array[i];                              \
+            TYPE rhs = other_is_scalar ? scalar : other[i];                 \
+            out[i] = subtract ?                                             \
+                (internal_first ? square - rhs : rhs - square) :            \
+                (internal_first ? square + rhs : rhs + square);             \
+        }                                                                    \
+        return 1;                                                            \
+    } while (0)
+    if (array_data == NULL || out_data == NULL ||
+        (!other_is_scalar && other_data == NULL)) {
+        return 0;
+    }
+    if (dtype == NPY_DOUBLE) {
+        SQUARE_ADDSUB_LOOP(double, numpy_jit_region_scalar_double);
+    }
+    if (dtype == NPY_FLOAT) {
+        SQUARE_ADDSUB_LOOP(float, numpy_jit_region_scalar_float);
+    }
+    if (dtype == NPY_LONG || dtype == NPY_LONGLONG) {
+        SQUARE_ADDSUB_LOOP(npy_uint64, numpy_jit_region_scalar_uint64);
+    }
+#undef SQUARE_ADDSUB_LOOP
+    return 0;
+}
+
+int
+numpy_jit_kernel_sum3_squares_contig(
+    int dtype, const void *a_data, const void *b_data, const void *c_data,
+    void *out_data, npy_intp size)
+{
+#define SUM3_SQUARES_LOOP(TYPE)                                              \
+    do {                                                                     \
+        const TYPE *a = (const TYPE *)a_data;                               \
+        const TYPE *b = (const TYPE *)b_data;                               \
+        const TYPE *c = (const TYPE *)c_data;                               \
+        TYPE *out = (TYPE *)out_data;                                       \
+        for (npy_intp i = 0; i < size; i++) {                              \
+            TYPE a2 = a[i] * a[i];                                         \
+            TYPE b2 = b[i] * b[i];                                         \
+            TYPE ab = a2 + b2;                                             \
+            TYPE c2 = c[i] * c[i];                                         \
+            out[i] = ab + c2;                                               \
+        }                                                                    \
+        return 1;                                                            \
+    } while (0)
+    if (a_data == NULL || b_data == NULL || c_data == NULL ||
+        out_data == NULL) {
+        return 0;
+    }
+    if (dtype == NPY_DOUBLE) {
+        SUM3_SQUARES_LOOP(double);
+    }
+    if (dtype == NPY_FLOAT) {
+        SUM3_SQUARES_LOOP(float);
+    }
+    if (dtype == NPY_LONG || dtype == NPY_LONGLONG) {
+        SUM3_SQUARES_LOOP(npy_uint64);
+    }
+#undef SUM3_SQUARES_LOOP
+    return 0;
+}
+
+int
+numpy_jit_kernel_mul_arrays_scalar_contig(
+    int dtype, const void *a_data, const void *b_data, double scalar,
+    int scalar_first, void *out_data, npy_intp size)
+{
+#define MUL_ARRAYS_SCALAR_LOOP(TYPE, CONVERT)                                \
+    do {                                                                     \
+        const TYPE *a = (const TYPE *)a_data;                               \
+        const TYPE *b = (const TYPE *)b_data;                               \
+        TYPE factor = (CONVERT)(scalar);                                    \
+        TYPE *restrict out = (TYPE *)out_data;                              \
+        for (npy_intp i = 0; i < size; i++) {                              \
+            TYPE product = a[i] * b[i];                                    \
+            out[i] = scalar_first ? factor * product : product * factor;    \
+        }                                                                    \
+        return 1;                                                            \
+    } while (0)
+    if (dtype == NPY_DOUBLE) {
+        MUL_ARRAYS_SCALAR_LOOP(double, numpy_jit_region_scalar_double);
+    }
+    if (dtype == NPY_FLOAT) {
+        MUL_ARRAYS_SCALAR_LOOP(float, numpy_jit_region_scalar_float);
+    }
+    if (dtype == NPY_LONG || dtype == NPY_LONGLONG) {
+        MUL_ARRAYS_SCALAR_LOOP(npy_uint64, numpy_jit_region_scalar_uint64);
+    }
+#undef MUL_ARRAYS_SCALAR_LOOP
+    return 0;
+}
+
+int
+numpy_jit_kernel_scaled_array_add_inplace_contig(
+    int dtype, void *out_data, const void *array_data, double scalar,
+    int scalar_first, npy_intp size)
+{
+    if (dtype == NPY_DOUBLE) {
+        double *out = (double *)out_data;
+        const double *array = (const double *)array_data;
+        for (npy_intp i = 0; i < size; i++) {
+            double scaled = scalar_first ?
+                scalar * array[i] : array[i] * scalar;
+            out[i] = out[i] + scaled;
+        }
+        return 1;
+    }
+    if (dtype == NPY_FLOAT) {
+        float *out = (float *)out_data;
+        const float *array = (const float *)array_data;
+        float factor = (float)scalar;
+        for (npy_intp i = 0; i < size; i++) {
+            float scaled = scalar_first ?
+                factor * array[i] : array[i] * factor;
+            out[i] = out[i] + scaled;
+        }
+        return 1;
+    }
+    return 0;
 }
 
 #define DEFINE_REGION_STRIDED(TYPE, NAME)                                    \
@@ -287,6 +535,53 @@ numpy_jit_kernel_add3_contig(int dtype, const void *a, const void *b,
         }
         return 1;
     }
+    return 0;
+}
+
+int
+numpy_jit_kernel_add3_strided(
+    int dtype, int ndim, const npy_intp *dims,
+    const char *abase, const npy_intp *astrides,
+    const char *bbase, const npy_intp *bstrides,
+    const char *cbase, const npy_intp *cstrides,
+    void *out_data, npy_intp size, int order)
+{
+    if (ndim <= 0 || ndim > NPY_MAXDIMS || size <= 0) {
+        return 0;
+    }
+#define ADD3_STRIDED_LOOP(TYPE)                                              \
+    do {                                                                     \
+        TYPE *out = (TYPE *)out_data;                                       \
+        npy_intp coords[NPY_MAXDIMS] = {0};                                 \
+        for (npy_intp i = 0; i < size; i++) {                              \
+            npy_intp ao = 0, bo = 0, co = 0;                               \
+            for (int dim = 0; dim < ndim; dim++) {                         \
+                ao += coords[dim] * astrides[dim];                          \
+                bo += coords[dim] * bstrides[dim];                          \
+                co += coords[dim] * cstrides[dim];                          \
+            }                                                                \
+            TYPE av = *(const TYPE *)(abase + ao);                          \
+            TYPE bv = *(const TYPE *)(bbase + bo);                          \
+            TYPE cv = *(const TYPE *)(cbase + co);                          \
+            TYPE sum = av + bv;                                             \
+            out[i] = order == 2 ? cv + sum : sum + cv;                      \
+            for (int dim = ndim - 1; dim >= 0; dim--) {                    \
+                coords[dim]++;                                              \
+                if (coords[dim] < dims[dim]) {                              \
+                    break;                                                   \
+                }                                                            \
+                coords[dim] = 0;                                            \
+            }                                                                \
+        }                                                                    \
+        return 1;                                                            \
+    } while (0)
+    if (dtype == NPY_DOUBLE) {
+        ADD3_STRIDED_LOOP(double);
+    }
+    if (dtype == NPY_FLOAT) {
+        ADD3_STRIDED_LOOP(float);
+    }
+#undef ADD3_STRIDED_LOOP
     return 0;
 }
 
@@ -1097,6 +1392,48 @@ numpy_jit_kernel_fused_contig_or_strided(
                         (npy_intp)sizeof(double) :
                         (npy_intp)sizeof(float);
     char *out_bytes = (char *)out;
+
+    /* A plane such as ``a[:, :, k]`` has a positive stride in both
+       dimensions but no contiguous inner row.  Keep the dispatch outside
+       the nested loop so this layout remains a compiled schedule rather
+       than falling back to the per-node Region interpreter. */
+    if (ndim == 2 &&
+        (astrides[1] != itemsize || bstrides[1] != itemsize)) {
+#define FUSED_STRIDED_2D_LOOP(TYPE, EXPR)                                    \
+        do {                                                                 \
+            TYPE *typed_out = (TYPE *)out;                                  \
+            TYPE factor = (TYPE)alpha;                                      \
+            for (npy_intp row = 0; row < dims[0]; row++) {                  \
+                for (npy_intp col = 0; col < dims[1]; col++) {              \
+                    TYPE av = *(const TYPE *)(abase +                       \
+                        row * astrides[0] + col * astrides[1]);              \
+                    TYPE bv = *(const TYPE *)(bbase +                       \
+                        row * bstrides[0] + col * bstrides[1]);              \
+                    typed_out[row * dims[1] + col] = (EXPR);                 \
+                }                                                            \
+            }                                                                \
+            return 1;                                                        \
+        } while (0)
+#define FUSED_STRIDED_2D_CASES(TYPE)                                         \
+        switch (fused_op) {                                                  \
+            case NUMPY_JIT_KERNEL_FUSED_ADD_ARRAY_MUL_SCALAR:               \
+                FUSED_STRIDED_2D_LOOP(TYPE, (av + bv) * factor);             \
+            case NUMPY_JIT_KERNEL_FUSED_SUB_ARRAY_MUL_SCALAR:               \
+                FUSED_STRIDED_2D_LOOP(TYPE, (av - bv) * factor);             \
+            case NUMPY_JIT_KERNEL_FUSED_ADD_ARRAY_DIV_SCALAR:               \
+                FUSED_STRIDED_2D_LOOP(TYPE, (av + bv) / factor);             \
+            case NUMPY_JIT_KERNEL_FUSED_SUB_ARRAY_DIV_SCALAR:               \
+                FUSED_STRIDED_2D_LOOP(TYPE, (av - bv) / factor);             \
+            default:                                                         \
+                return 0;                                                    \
+        }
+        if (dtype == NPY_DOUBLE) {
+            FUSED_STRIDED_2D_CASES(double);
+        }
+        FUSED_STRIDED_2D_CASES(float);
+#undef FUSED_STRIDED_2D_CASES
+#undef FUSED_STRIDED_2D_LOOP
+    }
 
     /* Common stencil case: positive-strided rows, contiguous inner loop. */
     if (ndim == 2) {

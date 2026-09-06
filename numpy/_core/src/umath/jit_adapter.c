@@ -20,9 +20,10 @@
 #include "jit_kernel.h"
 
 #ifndef PYJIT_EXT_ABI_VERSION
-#define PYJIT_EXT_ABI_VERSION 5u
-#define PYJIT_EXT_REGION_MAX_NODES 4u
-#define PYJIT_EXT_REGION_MAX_INPUTS 6u
+#define PYJIT_EXT_ABI_VERSION 7u
+#define PYJIT_EXT_CORE_IR_VERSION 1u
+#define PYJIT_EXT_REGION_MAX_NODES 6u
+#define PYJIT_EXT_REGION_MAX_INPUTS 8u
 #define PYJIT_EXT_REGION_MAX_NODE_INPUTS 3u
 #define PYJIT_EXT_REGION_PIC_SIZE 4u
 #define PYJIT_EXT_UNARY_NEGATIVE 1
@@ -47,6 +48,14 @@ typedef struct _PyJitExtPlan PyJitExtPlan;
 typedef struct _PyJitExtSiteState PyJitExtSiteState;
 typedef struct _PyJitExtLoweredRegion PyJitExtLoweredRegion;
 typedef uint16_t PyJitExtValueId;
+typedef uint64_t PyJitExtDialectId;
+typedef enum {
+    PYJIT_EXT_OP_DOMAIN_OPAQUE = 0,
+    PYJIT_EXT_OP_DOMAIN_ELEMENTWISE = 1,
+    PYJIT_EXT_OP_DOMAIN_REDUCTION = 2,
+    PYJIT_EXT_OP_DOMAIN_CONTRACTION = 3,
+    PYJIT_EXT_OP_DOMAIN_VIEW = 4,
+} PyJitExtOpDomain;
 
 typedef struct {
     PyJitExtValueId value_id;
@@ -62,6 +71,12 @@ typedef struct {
     uint8_t input_count;
     PyJitExtValueId output;
     uint32_t bytecode_target;
+    PyJitExtDialectId dialect_id;
+    uint16_t semantic_version;
+    uint8_t domain;
+    uint8_t output_count;
+    const void *attributes;
+    uint32_t attributes_size;
 } PyJitExtRegionNode;
 
 typedef struct {
@@ -75,6 +90,9 @@ typedef struct {
     uint32_t last_target;
     uint64_t graph_hash;
     uint32_t flags;
+    uint16_t ir_version;
+    uint16_t reserved;
+    uint32_t required_features;
 } PyJitExtRegionRequest;
 
 typedef PyJitExtResult (*PyJitExtRegionEvalFunc)(
@@ -105,6 +123,7 @@ typedef struct {
         } unary;
         struct {
             PyObject *callable;
+            PyObject *receiver;
             Py_ssize_t nargs;
             uint32_t call_flags;
             PyObject *kwnames;
@@ -160,6 +179,10 @@ struct _PyJitExtProvider {
         const PyJitExtPlan *region, PyObject *const *args,
         Py_ssize_t nargs, uint64_t signature);
     void (*free_lowered_region)(PyJitExtLoweredRegion *lowered);
+    PyJitExtDialectId dialect_id;
+    uint16_t dialect_version;
+    uint16_t core_ir_version;
+    uint32_t core_ir_features;
 };
 
 typedef enum {
@@ -175,7 +198,8 @@ typedef PyJitExtResult (*PyJitExtBinaryEvalFunc)(
 typedef PyJitExtResult (*PyJitExtUnaryEvalFunc)(
     void *payload, PyObject *operand, PyObject **result);
 typedef PyJitExtResult (*PyJitExtCallEvalFunc)(
-    void *payload, PyObject *callable, PyObject *const *args,
+    void *payload, PyObject *callable, PyObject *receiver,
+    PyObject *const *args,
     Py_ssize_t nargs, PyObject **result);
 typedef PyJitExtResult (*PyJitExtFusedBinary2EvalFunc)(
     void *payload, PyObject *first_left, PyObject *first_right,
@@ -261,6 +285,9 @@ struct _PyJitExtPlan {
     uint32_t effect_flags;
     int8_t mutation_input;
     uint8_t region_input_count;
+    uint8_t op_domain;
+    uint8_t output_count;
+    uint16_t semantic_version;
 };
 
 #define PYJIT_EXT_GUARD_FAIL_REASON_COUNT 9
@@ -292,6 +319,7 @@ struct _PyJitExtSiteState {
     uint8_t region_node_count;
     uint8_t region_input_count;
     uint64_t region_graph_hash;
+    uint64_t region_op_signature;
     uint8_t region_disabled;
     const char *region_disable_reason;
     uint16_t region_pic_hit_count;
@@ -302,11 +330,14 @@ struct _PyJitExtSiteState {
     uint16_t region_saturated_count;
     const char *region_lowering_name;
     const char *region_guard_fail_reason;
+    void *provider_data;
+    void (*free_provider_data)(void *provider_data);
 };
 
 #define PYJIT_EXT_PLAN_REQUIRES_GIL          (1u << 0)
 #define PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK    (1u << 2)
 #define PYJIT_EXT_PLAN_REGION_ANCHOR_ONLY    (1u << 7)
+#define PYJIT_EXT_PLAN_ENTRY_PROFITABLE      (1u << 8)
 #define PYJIT_EXT_PLAN_ALLOCATES_RESULT      (1u << 3)
 #define PYJIT_CALL_HAS_KWARGS                (1u << 0)
 #define PYJIT_EXT_EFFECT_PURE                (1u << 0)
@@ -329,12 +360,20 @@ PyAPI_FUNC(int) PyJit_RegisterCallableProvider(
     PyJitExtProvider *provider);
 #endif
 
+/* Stable public dialect identity for the NumPy Region operation schema.
+   It is deliberately independent of module addresses and Python objects so
+   producers written in another implementation language can emit compatible
+   Core IR. */
+#define NUMPY_JIT_DIALECT_ID UINT64_C(0x6e756d7079000001)
+
 static PyJitExtResult numpy_jit_prepare_binary_contig_f64(
     void *payload, PyObject *left, PyObject *right, void *run_state);
 
 #include "jit_stencils_generated.h"
 
 extern PyTypeObject PyUFunc_Type;
+NPY_NO_EXPORT int PyUFunc_GiveFloatingpointErrors(
+    const char *name, int fpe_errors);
 
 typedef enum {
     NUMPY_JIT_OP_ADD,
@@ -344,6 +383,13 @@ typedef enum {
     NUMPY_JIT_OP_POWER,
     NUMPY_JIT_OP_NEGATIVE,
     NUMPY_JIT_OP_MATMUL,
+    NUMPY_JIT_OP_OUTER_ADD,
+    NUMPY_JIT_OP_MINIMUM,
+    NUMPY_JIT_OP_LESS,
+    NUMPY_JIT_OP_LESS_EQUAL,
+    NUMPY_JIT_OP_LOGICAL_AND,
+    NUMPY_JIT_OP_BOOLEAN_SUBSCRIPT,
+    NUMPY_JIT_OP_MEAN,
 } NumpyJitOp;
 
 typedef enum {
@@ -412,6 +458,8 @@ typedef struct NumpyJitPlanPayload {
     int itemsize;
     npy_intp min_elements;
     PyObject *expected_callable;
+    PyObject *expected_receiver;
+    PyCFunction expected_call_target;
     const NumpyJitCandidate *candidate;
     PyJitExtSiteState *site;
     int fused_op;
@@ -424,6 +472,11 @@ typedef struct NumpyJitPlanPayload {
     int region_runtime_other_first;
     uint8_t region_generic;
     uint8_t region_matmul_epilogue;
+    uint8_t region_outer_minimum;
+    uint8_t region_compare_logical;
+    uint8_t region_masked_mean;
+    uint8_t region_compiled_kind;
+    uint8_t region_runtime_miss_on_decline;
     uint8_t region_node_count;
     uint8_t region_input_count;
     uint8_t region_output_slot;
@@ -438,8 +491,11 @@ typedef struct NumpyJitPlanPayload {
     uint32_t region_execution_count;
     uint8_t region_pic_count;
     uint8_t region_pic_saturated;
+    /* One-based index of the property-independent positive lowering. */
+    uint8_t region_fast_pic;
     NumpyJitRegionPICEntry region_pic[PYJIT_EXT_REGION_PIC_SIZE];
     NumpyJitResultCache result_cache;
+    NumpyJitResultCache *shared_result_cache;
     struct NumpyJitPlanPayload *stats_next;
 } NumpyJitPlanPayload;
 
@@ -480,6 +536,10 @@ static PyJitExtProvider numpy_jit_provider = {
     .region_property_signature = numpy_jit_region_property_signature,
     .specialize_region = numpy_jit_specialize_region,
     .free_lowered_region = numpy_jit_free_lowered_region,
+    .dialect_id = NUMPY_JIT_DIALECT_ID,
+    .dialect_version = 1,
+    .core_ir_version = PYJIT_EXT_CORE_IR_VERSION,
+    .core_ir_features = 0,
 };
 
 static NumpyJitOpDef numpy_jit_ops[] = {
@@ -489,19 +549,35 @@ static NumpyJitOpDef numpy_jit_ops[] = {
     { NUMPY_JIT_OP_TRUE_DIVIDE, NB_TRUE_DIVIDE, NULL, 2, "true_divide" },
     { NUMPY_JIT_OP_POWER, NB_POWER, NULL, 2, "power" },
     { NUMPY_JIT_OP_MATMUL, NB_MATRIX_MULTIPLY, NULL, 2, "matmul" },
+    { NUMPY_JIT_OP_MINIMUM, -1, NULL, 2, "minimum" },
+    { NUMPY_JIT_OP_LOGICAL_AND, -1, NULL, 2, "logical_and" },
 };
+
+static PyObject *numpy_jit_mean_descriptor;
 
 static int
 numpy_jit_itemsize_for_dtype(int dtype)
 {
-    switch (dtype) {
-        case NPY_FLOAT:
-            return (int)sizeof(float);
-        case NPY_DOUBLE:
-            return (int)sizeof(double);
-        default:
-            return 0;
+    if (dtype == NPY_FLOAT) {
+        return (int)sizeof(float);
     }
+    if (dtype == NPY_DOUBLE) {
+        return (int)sizeof(double);
+    }
+    if (dtype == NPY_LONG || dtype == NPY_LONGLONG) {
+        return (int)sizeof(npy_int64);
+    }
+    if (dtype == NPY_INT) {
+        return (int)sizeof(npy_int32);
+    }
+    return 0;
+}
+
+static int
+numpy_jit_is_signed_integer_scalar_type(PyTypeObject *type)
+{
+    return type == &PyLongArrType_Type ||
+           type == &PyLongLongArrType_Type;
 }
 
 static int
@@ -532,8 +608,22 @@ static PyJitExtResult numpy_matmul_binary_eval(
 static PyJitExtResult numpy_negative_unary_eval(
     void *payload, PyObject *operand, PyObject **result);
 static PyJitExtResult numpy_ufunc2_f64_call_eval(
-    void *payload, PyObject *callable, PyObject *const *args,
+    void *payload, PyObject *callable, PyObject *receiver,
+    PyObject *const *args,
     Py_ssize_t nargs, PyObject **result);
+static PyJitExtResult numpy_outer_add_call_eval(
+    void *payload, PyObject *callable, PyObject *receiver,
+    PyObject *const *args, Py_ssize_t nargs, PyObject **result);
+static PyJitExtResult numpy_passthrough_binary_call_eval(
+    void *payload, PyObject *callable, PyObject *receiver,
+    PyObject *const *args, Py_ssize_t nargs, PyObject **result);
+static PyJitExtResult numpy_compare_binary_eval(
+    void *payload, PyObject *left, PyObject *right, PyObject **result);
+static PyJitExtResult numpy_boolean_subscript_binary_eval(
+    void *payload, PyObject *left, PyObject *right, PyObject **result);
+static PyJitExtResult numpy_mean_call_eval(
+    void *payload, PyObject *callable, PyObject *receiver,
+    PyObject *const *args, Py_ssize_t nargs, PyObject **result);
 static PyJitExtResult numpy_fused_binary2_eval(
     void *payload, PyObject *first_left, PyObject *first_right,
     PyObject *second_other, PyObject **result);
@@ -543,6 +633,12 @@ static PyJitExtResult numpy_region_eval(
 static PyJitExtResult numpy_region_fallback_eval(
     void *payload, PyObject *const *args, Py_ssize_t nargs,
     PyObject **result);
+static PyJitExtResult numpy_outer_minimum_region_eval(
+    NumpyJitPlanPayload *payload, PyObject *const *args,
+    Py_ssize_t nargs, PyObject **result);
+static PyJitExtResult numpy_compare_logical_region_eval(
+    NumpyJitPlanPayload *payload, PyObject *const *args,
+    Py_ssize_t nargs, PyObject **result);
 static int numpy_jit_region_layout_class(PyArrayObject *array);
 static PyObject *numpy_jit_fused_mul_scalar_add_array(
     PyObject *NPY_UNUSED(self), PyObject *args);
@@ -1371,12 +1467,12 @@ numpy_jit_unlink_plan_stats(NumpyJitPlanPayload *payload)
 }
 
 static void
-numpy_jit_record_result_cache_stats(NumpyJitPlanPayload *payload)
+numpy_jit_record_result_cache_stats(NumpyJitPlanPayload *payload,
+                                    NumpyJitResultCache *cache)
 {
-    if (payload == NULL) {
+    if (payload == NULL || cache == NULL) {
         return;
     }
-    NumpyJitResultCache *cache = &payload->result_cache;
     if (cache->hit == 0 && cache->miss == 0 && cache->refcnt_miss == 0 &&
         cache->shape_miss == 0 && !cache->disabled && cache->bytes == 0) {
         return;
@@ -1426,6 +1522,53 @@ numpy_jit_record_result_cache_stats(NumpyJitPlanPayload *payload)
     numpy_jit_result_cache_stats = entry;
 }
 
+static void
+numpy_jit_free_site_result_cache(void *provider_data)
+{
+    NumpyJitResultCache *cache =
+        (NumpyJitResultCache *)provider_data;
+    if (cache == NULL) {
+        return;
+    }
+    Py_XDECREF(cache->result);
+    PyMem_Free(cache);
+}
+
+static NumpyJitResultCache *
+numpy_jit_result_cache_for_payload(NumpyJitPlanPayload *payload)
+{
+    if (payload->shared_result_cache != NULL) {
+        return payload->shared_result_cache;
+    }
+
+    PyJitExtSiteState *site = payload->site;
+    if (site == NULL || payload->region_owner_plan == NULL ||
+        !(payload->region_owner_plan->flags &
+          PYJIT_EXT_PLAN_ENTRY_PROFITABLE)) {
+        return &payload->result_cache;
+    }
+    if (site->provider_data == NULL) {
+        NumpyJitResultCache *cache =
+            PyMem_Calloc(1, sizeof(NumpyJitResultCache));
+        if (cache == NULL) {
+            /* Result caching is only an optimization.  Preserve execution
+               through the plan-local cache when site allocation fails. */
+            return &payload->result_cache;
+        }
+        site->provider_data = cache;
+        site->free_provider_data = numpy_jit_free_site_result_cache;
+    }
+    if (site->free_provider_data == numpy_jit_free_site_result_cache) {
+        payload->shared_result_cache =
+            (NumpyJitResultCache *)site->provider_data;
+        return payload->shared_result_cache;
+    }
+    /* A bytecode site has one provider owner.  If a foreign provider already
+       claimed this optional slot, keep the local cache instead of assuming
+       its payload layout. */
+    return &payload->result_cache;
+}
+
 static int
 numpy_jit_result_cache_shape_matches(PyArrayObject *cached, int ndim,
                                      npy_intp *dims, int dtype)
@@ -1443,9 +1586,8 @@ numpy_jit_result_cache_shape_matches(PyArrayObject *cached, int ndim,
 }
 
 static void
-numpy_jit_result_cache_maybe_disable(NumpyJitPlanPayload *payload)
+numpy_jit_result_cache_maybe_disable(NumpyJitResultCache *cache)
 {
-    NumpyJitResultCache *cache = &payload->result_cache;
     if (!cache->disabled && cache->miss >= 8 && cache->hit < 4) {
         cache->disabled = 1;
         cache->disable_reason = "low_hit_rate";
@@ -1458,28 +1600,36 @@ static PyArrayObject *
 numpy_jit_get_or_alloc_result(NumpyJitPlanPayload *payload, int ndim,
                               npy_intp *dims, int dtype, npy_intp size)
 {
-    if (payload == NULL || !numpy_jit_result_cache_enabled() ||
-        payload->result_cache.disabled || size < 0) {
+    if (payload == NULL || !numpy_jit_result_cache_enabled() || size < 0) {
         return (PyArrayObject *)PyArray_EMPTY(ndim, dims, dtype, 0);
     }
 
-    if (payload->itemsize <= 0 ||
-        (uint64_t)size > UINT64_MAX / (uint64_t)payload->itemsize) {
+    NumpyJitResultCache *cache =
+        numpy_jit_result_cache_for_payload(payload);
+    if (cache->disabled) {
         return (PyArrayObject *)PyArray_EMPTY(ndim, dims, dtype, 0);
     }
-    uint64_t bytes = (uint64_t)size * (uint64_t)payload->itemsize;
+
+    int itemsize = numpy_jit_itemsize_for_dtype(dtype);
+    if (itemsize <= 0) {
+        itemsize = payload->itemsize;
+    }
+    if (itemsize <= 0 ||
+        (uint64_t)size > UINT64_MAX / (uint64_t)itemsize) {
+        return (PyArrayObject *)PyArray_EMPTY(ndim, dims, dtype, 0);
+    }
+    uint64_t bytes = (uint64_t)size * (uint64_t)itemsize;
     if (bytes > numpy_jit_result_cache_max_bytes()) {
         return (PyArrayObject *)PyArray_EMPTY(ndim, dims, dtype, 0);
     }
 
-    NumpyJitResultCache *cache = &payload->result_cache;
     if (cache->result != NULL) {
         if (Py_REFCNT(cache->result) != 1) {
             cache->miss++;
             cache->refcnt_miss++;
             Py_CLEAR(cache->result);
             cache->bytes = 0;
-            numpy_jit_result_cache_maybe_disable(payload);
+            numpy_jit_result_cache_maybe_disable(cache);
             if (cache->disabled) {
                 return (PyArrayObject *)PyArray_EMPTY(ndim, dims, dtype, 0);
             }
@@ -1495,7 +1645,7 @@ numpy_jit_get_or_alloc_result(NumpyJitPlanPayload *payload, int ndim,
             cache->shape_miss++;
             Py_CLEAR(cache->result);
             cache->bytes = 0;
-            numpy_jit_result_cache_maybe_disable(payload);
+            numpy_jit_result_cache_maybe_disable(cache);
             if (cache->disabled) {
                 return (PyArrayObject *)PyArray_EMPTY(ndim, dims, dtype, 0);
             }
@@ -1503,7 +1653,7 @@ numpy_jit_get_or_alloc_result(NumpyJitPlanPayload *payload, int ndim,
     }
     else {
         cache->miss++;
-        numpy_jit_result_cache_maybe_disable(payload);
+        numpy_jit_result_cache_maybe_disable(cache);
         if (cache->disabled) {
             return (PyArrayObject *)PyArray_EMPTY(ndim, dims, dtype, 0);
         }
@@ -1517,6 +1667,47 @@ numpy_jit_get_or_alloc_result(NumpyJitPlanPayload *payload, int ndim,
     cache->bytes = bytes;
     Py_INCREF(out);
     return out;
+}
+
+static PyArrayObject *
+numpy_jit_get_or_alloc_workspace(NumpyJitPlanPayload *payload, int ndim,
+                                 npy_intp *dims, int dtype,
+                                 npy_intp size)
+{
+    int itemsize = numpy_jit_itemsize_for_dtype(dtype);
+    if (payload == NULL || itemsize <= 0 || size < 0 ||
+        (uint64_t)size > UINT64_MAX / (uint64_t)itemsize) {
+        return NULL;
+    }
+    uint64_t bytes = (uint64_t)size * (uint64_t)itemsize;
+    /* Workspaces are never exposed to Python and remove a full temporary
+       allocation from contraction prologues.  Bound them independently of
+       returned-result caches, whose much smaller default limits retained
+       user-visible buffers at ordinary elementwise sites. */
+    if (bytes > 64ull * 1024ull * 1024ull) {
+        return NULL;
+    }
+    NumpyJitResultCache *cache = &payload->result_cache;
+    if (cache->result != NULL &&
+        !numpy_jit_result_cache_shape_matches(
+            cache->result, ndim, dims, dtype)) {
+        cache->shape_miss++;
+        Py_CLEAR(cache->result);
+        cache->bytes = 0;
+    }
+    if (cache->result == NULL) {
+        cache->miss++;
+        cache->result = (PyArrayObject *)PyArray_EMPTY(
+            ndim, dims, dtype, 0);
+        if (cache->result == NULL) {
+            return NULL;
+        }
+        cache->bytes = bytes;
+    }
+    else {
+        cache->hit++;
+    }
+    return cache->result;
 }
 
 static void
@@ -1695,7 +1886,21 @@ numpy_jit_dump_stats(void)
         }
         for (NumpyJitPlanPayload *payload = numpy_jit_plan_stats_list;
              payload != NULL; payload = payload->stats_next) {
-            NumpyJitResultCache *cache = &payload->result_cache;
+            NumpyJitResultCache *cache = payload->shared_result_cache != NULL ?
+                payload->shared_result_cache : &payload->result_cache;
+            if (payload->shared_result_cache != NULL) {
+                int already_dumped = 0;
+                for (NumpyJitPlanPayload *prior = numpy_jit_plan_stats_list;
+                     prior != payload; prior = prior->stats_next) {
+                    if (prior->shared_result_cache == cache) {
+                        already_dumped = 1;
+                        break;
+                    }
+                }
+                if (already_dumped) {
+                    continue;
+                }
+            }
             if (cache->hit == 0 && cache->miss == 0 &&
                 cache->refcnt_miss == 0 && cache->shape_miss == 0 &&
                 !cache->disabled && cache->bytes == 0) {
@@ -1878,6 +2083,12 @@ numpy_jit_known_ufunc(NumpyJitOp op)
 static const PyJitExtStencil *
 numpy_jit_get_stencil(const PyJitExtPlan *plan, int NPY_UNUSED(opcode))
 {
+#if PYJIT_EXT_ABI_VERSION >= 6
+    /* ABI v6 uses the Core IR-aware generic external-op emitter.  The v5
+       hand-authored r23 blob remains available to old runtimes, but must not
+       be mixed with the enlarged plan/provider contracts. */
+    return NULL;
+#else
 #if NUMPY_JIT_HAS_EXT_BINARY_R23_STENCIL
     NumpyJitPlanPayload *payload = plan != NULL ?
         (NumpyJitPlanPayload *)plan->payload : NULL;
@@ -1892,6 +2103,7 @@ numpy_jit_get_stencil(const PyJitExtPlan *plan, int NPY_UNUSED(opcode))
     }
 #endif
     return NULL;
+#endif
 }
 
 static const NumpyJitCandidate *
@@ -1939,6 +2151,7 @@ make_numpy_plan(const NumpyJitCandidate *candidate, PyObject *callable,
     if (plan == NULL) {
         numpy_jit_unlink_plan_stats(payload);
         Py_XDECREF(payload->expected_callable);
+        Py_XDECREF(payload->expected_receiver);
         PyMem_Free(payload);
         PyErr_NoMemory();
         return NULL;
@@ -1953,6 +2166,11 @@ make_numpy_plan(const NumpyJitCandidate *candidate, PyObject *callable,
     plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
                          PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK;
     plan->mutation_input = -1;
+    plan->op_domain = candidate->op == NUMPY_JIT_OP_MATMUL ?
+        PYJIT_EXT_OP_DOMAIN_CONTRACTION :
+        PYJIT_EXT_OP_DOMAIN_ELEMENTWISE;
+    plan->output_count = 1;
+    plan->semantic_version = 1;
     plan->op_id = (uint32_t)candidate->op;
     plan->payload = payload;
     if (plan->kind == PYJIT_EXT_PLAN_BINARY) {
@@ -1971,6 +2189,82 @@ static PyJitExtPlan *
 numpy_jit_try_binary_plan(const PyJitExtTraceRequest *request,
                           PyJitExtSiteState *site)
 {
+    if (request->u.binary.binary_oparg == NB_SUBSCR &&
+        (request->u.binary.left_type == NULL ||
+         request->u.binary.left_type == &PyArray_Type) &&
+        (request->u.binary.right_type == NULL ||
+         request->u.binary.right_type == &PyArray_Type)) {
+        NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
+        PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+        if (payload == NULL || plan == NULL) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            PyErr_NoMemory();
+            return NULL;
+        }
+        payload->op = NUMPY_JIT_OP_BOOLEAN_SUBSCRIPT;
+        payload->site = site;
+        numpy_jit_link_plan_stats(payload);
+        plan->abi_version = PYJIT_EXT_ABI_VERSION;
+        plan->struct_size = sizeof(*plan);
+        plan->kind = PYJIT_EXT_PLAN_BINARY;
+        plan->provider = &numpy_jit_provider;
+        plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                      PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                      PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                      PYJIT_EXT_PLAN_REGION_ANCHOR_ONLY;
+        /* Anchor restoration uses op_id as the original NB_* argument. */
+        plan->op_id = NB_SUBSCR;
+        plan->payload = payload;
+        plan->eval.binary_eval = numpy_boolean_subscript_binary_eval;
+        plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                             PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK;
+        plan->mutation_input = -1;
+        plan->region_input_count = 2;
+        plan->op_domain = PYJIT_EXT_OP_DOMAIN_VIEW;
+        plan->output_count = 1;
+        plan->semantic_version = 1;
+        plan->debug_name = "numpy.boolean_subscript.region_anchor";
+        return plan;
+    }
+    int richcompare = request->u.binary.binary_oparg -
+                      PYJIT_EXT_BINARY_RICHCOMPARE_BASE;
+    if (richcompare == Py_LT || richcompare == Py_LE) {
+        NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
+        PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+        if (payload == NULL || plan == NULL) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            PyErr_NoMemory();
+            return NULL;
+        }
+        payload->op = richcompare == Py_LT ?
+            NUMPY_JIT_OP_LESS : NUMPY_JIT_OP_LESS_EQUAL;
+        payload->site = site;
+        numpy_jit_link_plan_stats(payload);
+        plan->abi_version = PYJIT_EXT_ABI_VERSION;
+        plan->struct_size = sizeof(*plan);
+        plan->kind = PYJIT_EXT_PLAN_BINARY;
+        plan->provider = &numpy_jit_provider;
+        plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                      PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                      PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                      PYJIT_EXT_PLAN_REGION_ANCHOR_ONLY;
+        /* Keep the original COMPARE_OP encoding for anchor restoration;
+           the payload remains the semantic Core IR operation. */
+        plan->op_id = (uint32_t)(richcompare << 5);
+        plan->payload = payload;
+        plan->eval.binary_eval = numpy_compare_binary_eval;
+        plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                             PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK;
+        plan->mutation_input = -1;
+        plan->region_input_count = 2;
+        plan->op_domain = PYJIT_EXT_OP_DOMAIN_ELEMENTWISE;
+        plan->output_count = 1;
+        plan->semantic_version = 1;
+        plan->debug_name = "numpy.richcompare.region_anchor";
+        return plan;
+    }
     NumpyJitOp op;
     if (!resolve_binary_oparg(request->u.binary.binary_oparg, &op)) {
         return NULL;
@@ -1985,7 +2279,9 @@ numpy_jit_try_binary_plan(const PyJitExtTraceRequest *request,
              (request->u.binary.right_type == &PyFloat_Type ||
               request->u.binary.right_type == &PyLong_Type ||
               request->u.binary.right_type == &PyFloatArrType_Type ||
-              request->u.binary.right_type == &PyDoubleArrType_Type)) {
+              request->u.binary.right_type == &PyDoubleArrType_Type ||
+              numpy_jit_is_signed_integer_scalar_type(
+                  request->u.binary.right_type))) {
         if (!numpy_jit_array_scalar_enabled()) {
             return NULL;
         }
@@ -1994,7 +2290,9 @@ numpy_jit_try_binary_plan(const PyJitExtTraceRequest *request,
     else if ((request->u.binary.left_type == &PyFloat_Type ||
               request->u.binary.left_type == &PyLong_Type ||
               request->u.binary.left_type == &PyFloatArrType_Type ||
-              request->u.binary.left_type == &PyDoubleArrType_Type) &&
+              request->u.binary.left_type == &PyDoubleArrType_Type ||
+              numpy_jit_is_signed_integer_scalar_type(
+                  request->u.binary.left_type)) &&
              request->u.binary.right_type == &PyArray_Type) {
         if (!numpy_jit_scalar_array_enabled()) {
             return NULL;
@@ -2073,6 +2371,9 @@ numpy_jit_try_unary_plan(const PyJitExtTraceRequest *request,
     plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
                          PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK;
     plan->mutation_input = -1;
+    plan->op_domain = PYJIT_EXT_OP_DOMAIN_ELEMENTWISE;
+    plan->output_count = 1;
+    plan->semantic_version = 1;
     plan->debug_name = "numpy.negative.region_anchor";
     return plan;
 }
@@ -2081,16 +2382,161 @@ static PyJitExtPlan *
 numpy_jit_try_call_plan(const PyJitExtTraceRequest *request,
                         PyJitExtSiteState *site)
 {
+    if (request->u.call.nargs == 0 &&
+        !(request->u.call.call_flags & PYJIT_CALL_HAS_KWARGS) &&
+        request->u.call.callable == numpy_jit_mean_descriptor) {
+        NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
+        PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+        if (payload == NULL || plan == NULL) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            PyErr_NoMemory();
+            return NULL;
+        }
+        payload->op = NUMPY_JIT_OP_MEAN;
+        payload->expected_callable = request->u.call.callable;
+        Py_INCREF(payload->expected_callable);
+        payload->site = site;
+        numpy_jit_link_plan_stats(payload);
+        plan->abi_version = PYJIT_EXT_ABI_VERSION;
+        plan->struct_size = sizeof(*plan);
+        plan->kind = PYJIT_EXT_PLAN_CALL;
+        plan->provider = &numpy_jit_provider;
+        plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                      PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                      PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                      PYJIT_EXT_PLAN_REGION_ANCHOR_ONLY;
+        plan->op_id = NUMPY_JIT_OP_MEAN;
+        plan->payload = payload;
+        plan->eval.call_eval = numpy_mean_call_eval;
+        plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                             PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK;
+        plan->mutation_input = -1;
+        /* For a method call the receiver is the semantic Region operand. */
+        plan->region_input_count = 1;
+        plan->op_domain = PYJIT_EXT_OP_DOMAIN_REDUCTION;
+        plan->output_count = 1;
+        plan->semantic_version = 1;
+        plan->debug_name = "numpy.ndarray.mean.region_anchor";
+        return plan;
+    }
     if (request->u.call.nargs != 2 ||
         (request->u.call.call_flags & PYJIT_CALL_HAS_KWARGS)) {
         return NULL;
     }
 
+    PyObject *resolved_callable = request->u.call.callable;
+    PyObject *owned_resolved_callable = NULL;
+    if (resolved_callable == NULL) {
+        owned_resolved_callable = PyObject_GetAttrString(
+            (PyObject *)&PyUFunc_Type, "outer");
+        resolved_callable = owned_resolved_callable;
+    }
+    if (resolved_callable == NULL) {
+        return NULL;
+    }
+
+    if (PyCFunction_Check(resolved_callable) ||
+        request->u.call.receiver ==
+            numpy_jit_known_ufunc(NUMPY_JIT_OP_ADD)) {
+        PyObject *name = PyObject_GetAttrString(
+            resolved_callable, "__name__");
+        int is_outer = name != NULL && PyUnicode_Check(name) &&
+            PyUnicode_CompareWithASCIIString(name, "outer") == 0;
+        Py_XDECREF(name);
+        if (!is_outer) {
+            Py_XDECREF(owned_resolved_callable);
+            PyErr_Clear();
+            return NULL;
+        }
+        NumpyJitPlanPayload *payload =
+            PyMem_Calloc(1, sizeof(*payload));
+        PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+        if (payload == NULL || plan == NULL) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            Py_XDECREF(owned_resolved_callable);
+            PyErr_NoMemory();
+            return NULL;
+        }
+        payload->op = NUMPY_JIT_OP_OUTER_ADD;
+        payload->expected_callable = resolved_callable;
+        payload->expected_receiver =
+            numpy_jit_known_ufunc(NUMPY_JIT_OP_ADD);
+        Py_INCREF(payload->expected_callable);
+        Py_INCREF(payload->expected_receiver);
+        if (PyCFunction_Check(resolved_callable)) {
+            payload->expected_call_target =
+                PyCFunction_GET_FUNCTION(resolved_callable);
+        }
+        payload->site = site;
+        numpy_jit_link_plan_stats(payload);
+        plan->abi_version = PYJIT_EXT_ABI_VERSION;
+        plan->struct_size = sizeof(*plan);
+        plan->kind = PYJIT_EXT_PLAN_CALL;
+        plan->provider = &numpy_jit_provider;
+        plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                      PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                      PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                      PYJIT_EXT_PLAN_REGION_ANCHOR_ONLY;
+        plan->op_id = NUMPY_JIT_OP_OUTER_ADD;
+        plan->payload = payload;
+        plan->eval.call_eval = numpy_outer_add_call_eval;
+        plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                             PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK;
+        plan->mutation_input = -1;
+        plan->region_input_count = 2;
+        plan->op_domain = PYJIT_EXT_OP_DOMAIN_ELEMENTWISE;
+        plan->output_count = 1;
+        plan->semantic_version = 1;
+        plan->debug_name = "numpy.add.outer.region_anchor";
+        Py_XDECREF(owned_resolved_callable);
+        return plan;
+    }
+
+    Py_XDECREF(owned_resolved_callable);
+
     NumpyJitOp op;
     if (!resolve_known_ufunc(request->u.call.callable, &op)) {
         return NULL;
     }
-
+    if (op == NUMPY_JIT_OP_MINIMUM || op == NUMPY_JIT_OP_LOGICAL_AND) {
+        NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
+        PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+        if (payload == NULL || plan == NULL) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            PyErr_NoMemory();
+            return NULL;
+        }
+        payload->op = op;
+        payload->expected_callable = request->u.call.callable;
+        Py_INCREF(payload->expected_callable);
+        payload->site = site;
+        numpy_jit_link_plan_stats(payload);
+        plan->abi_version = PYJIT_EXT_ABI_VERSION;
+        plan->struct_size = sizeof(*plan);
+        plan->kind = PYJIT_EXT_PLAN_CALL;
+        plan->provider = &numpy_jit_provider;
+        plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                      PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                      PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                      PYJIT_EXT_PLAN_REGION_ANCHOR_ONLY;
+        plan->op_id = op;
+        plan->payload = payload;
+        plan->eval.call_eval = numpy_passthrough_binary_call_eval;
+        plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                             PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK;
+        plan->mutation_input = -1;
+        plan->region_input_count = 2;
+        plan->op_domain = PYJIT_EXT_OP_DOMAIN_ELEMENTWISE;
+        plan->output_count = 1;
+        plan->semantic_version = 1;
+        plan->debug_name = op == NUMPY_JIT_OP_MINIMUM ?
+            "numpy.minimum.region_anchor" :
+            "numpy.logical_and.region_anchor";
+        return plan;
+    }
     const NumpyJitCandidate *candidate = find_candidate(
         op, NPY_DOUBLE, NPY_DOUBLE, NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE);
     if (candidate == NULL) {
@@ -2439,6 +2885,212 @@ numpy_jit_build_matmul_epilogue_region(
     return plan;
 }
 
+/* Lower ``(array * scalar) @ other`` (and the reflected scalar multiply)
+   while preserving NumPy's exact operation order.  The multiply ufunc still
+   performs the original elementwise computation, but writes into a bounded
+   provider workspace reused by the Region plan; matmul then consumes that
+   workspace directly. */
+static PyJitExtPlan *
+numpy_jit_build_matmul_prologue_region(
+        const PyJitExtRegionRequest *request, PyJitExtSiteState *site)
+{
+    if (request->node_count != 2 || request->input_count != 3) {
+        return NULL;
+    }
+    PyJitExtPlan *multiply_plan =
+        (PyJitExtPlan *)request->nodes[0].atomic_plan;
+    PyJitExtPlan *matmul_plan =
+        (PyJitExtPlan *)request->nodes[1].atomic_plan;
+    if (multiply_plan == NULL || matmul_plan == NULL ||
+        multiply_plan->provider != &numpy_jit_provider ||
+        matmul_plan->provider != &numpy_jit_provider ||
+        multiply_plan->payload == NULL || matmul_plan->payload == NULL ||
+        ((NumpyJitPlanPayload *)multiply_plan->payload)->op !=
+            NUMPY_JIT_OP_MULTIPLY ||
+        ((NumpyJitPlanPayload *)matmul_plan->payload)->op !=
+            NUMPY_JIT_OP_MATMUL ||
+        request->nodes[0].input_count != 2 ||
+        request->nodes[1].input_count != 2) {
+        return NULL;
+    }
+    int consumes_left =
+        request->nodes[1].inputs[0] == request->nodes[0].output;
+    int consumes_right =
+        request->nodes[1].inputs[1] == request->nodes[0].output;
+    if (consumes_left == consumes_right) {
+        return NULL;
+    }
+
+    NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
+    PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+    if (payload == NULL || plan == NULL) {
+        PyMem_Free(payload);
+        PyMem_Free(plan);
+        PyErr_NoMemory();
+        return NULL;
+    }
+    payload->region_matmul_epilogue = 3;
+    payload->region_runtime_miss_on_decline = 1;
+    payload->region_node_count = 2;
+    payload->region_input_count = 3;
+    payload->region_output_slot = 4;
+    payload->region_mutation_input = -1;
+    payload->min_elements = 1;
+    payload->site = site;
+    for (int i = 0; i < request->input_count; i++) {
+        payload->region_input_ids[i] = request->inputs[i].value_id;
+    }
+    for (int i = 0; i < 2; i++) {
+        int left = numpy_region_value_slot(
+            payload, request, request->nodes[i].inputs[0], i);
+        int right = numpy_region_value_slot(
+            payload, request, request->nodes[i].inputs[1], i);
+        if (left < 0 || right < 0) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            return NULL;
+        }
+        payload->region_left[i] = (uint8_t)left;
+        payload->region_right[i] = (uint8_t)right;
+        payload->region_atomic_plans[i] =
+            (PyJitExtPlan *)request->nodes[i].atomic_plan;
+    }
+    payload->region_ops[0] = NUMPY_JIT_OP_MULTIPLY;
+    payload->region_ops[1] = NUMPY_JIT_OP_MATMUL;
+    payload->region_owner_plan = plan;
+    numpy_jit_link_plan_stats(payload);
+
+    plan->abi_version = PYJIT_EXT_ABI_VERSION;
+    plan->struct_size = sizeof(*plan);
+    plan->kind = PYJIT_EXT_PLAN_REGION;
+    plan->provider = &numpy_jit_provider;
+    plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                  PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                  PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                  PYJIT_EXT_PLAN_ENTRY_PROFITABLE;
+    plan->op_id = 4200u;
+    plan->payload = payload;
+    plan->eval.region_eval = numpy_region_eval;
+    plan->region_fallback_eval = numpy_region_fallback_eval;
+    plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                         PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK |
+                         PYJIT_EXT_EFFECT_PRESERVES_FP_POLICY |
+                         PYJIT_EXT_EFFECT_OWNS_ATOMIC_PLANS;
+    plan->mutation_input = -1;
+    plan->region_input_count = 3;
+    plan->op_domain = PYJIT_EXT_OP_DOMAIN_CONTRACTION;
+    plan->output_count = 1;
+    plan->semantic_version = 1;
+    plan->debug_name = "numpy.region.matmul_prologue";
+    return plan;
+}
+
+/* Lower ``matmul(a, b) + (array * scalar)`` without materializing the
+   scaled-array and add temporaries.  Matmul still observes its original
+   operands and evaluation order; only the independent elementwise branch is
+   scheduled into the fresh matmul output. */
+static PyJitExtPlan *
+numpy_jit_build_matmul_scaled_add_region(
+        const PyJitExtRegionRequest *request, PyJitExtSiteState *site)
+{
+    if (request->node_count != 3 || request->input_count != 4) {
+        return NULL;
+    }
+    PyJitExtPlan *atomic[3] = {
+        (PyJitExtPlan *)request->nodes[0].atomic_plan,
+        (PyJitExtPlan *)request->nodes[1].atomic_plan,
+        (PyJitExtPlan *)request->nodes[2].atomic_plan,
+    };
+    for (int i = 0; i < 3; i++) {
+        if (atomic[i] == NULL || atomic[i]->provider != &numpy_jit_provider ||
+            atomic[i]->kind != PYJIT_EXT_PLAN_BINARY ||
+            atomic[i]->payload == NULL) {
+            return NULL;
+        }
+    }
+    NumpyJitPlanPayload *p0 = (NumpyJitPlanPayload *)atomic[0]->payload;
+    NumpyJitPlanPayload *p1 = (NumpyJitPlanPayload *)atomic[1]->payload;
+    NumpyJitPlanPayload *p2 = (NumpyJitPlanPayload *)atomic[2]->payload;
+    const PyJitExtRegionNode *matmul = &request->nodes[0];
+    const PyJitExtRegionNode *multiply = &request->nodes[1];
+    const PyJitExtRegionNode *add = &request->nodes[2];
+    int add_joins =
+        ((add->inputs[0] == matmul->output &&
+          add->inputs[1] == multiply->output) ||
+         (add->inputs[1] == matmul->output &&
+          add->inputs[0] == multiply->output));
+    if (p0->op != NUMPY_JIT_OP_MATMUL ||
+        p1->op != NUMPY_JIT_OP_MULTIPLY ||
+        p2->op != NUMPY_JIT_OP_ADD || !add_joins ||
+        matmul->input_count != 2 || multiply->input_count != 2 ||
+        add->input_count != 2) {
+        return NULL;
+    }
+
+    NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
+    PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+    if (payload == NULL || plan == NULL) {
+        PyMem_Free(payload);
+        PyMem_Free(plan);
+        PyErr_NoMemory();
+        return NULL;
+    }
+    payload->region_matmul_epilogue = 2;
+    payload->region_runtime_miss_on_decline = 1;
+    payload->region_node_count = 3;
+    payload->region_input_count = 4;
+    payload->region_output_slot = 6;
+    payload->region_mutation_input = -1;
+    payload->min_elements = 1;
+    payload->site = site;
+    for (int i = 0; i < request->input_count; i++) {
+        payload->region_input_ids[i] = request->inputs[i].value_id;
+    }
+    for (int i = 0; i < 3; i++) {
+        int left = numpy_region_value_slot(
+            payload, request, request->nodes[i].inputs[0], i);
+        int right = numpy_region_value_slot(
+            payload, request, request->nodes[i].inputs[1], i);
+        if (left < 0 || right < 0) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            return NULL;
+        }
+        payload->region_left[i] = (uint8_t)left;
+        payload->region_right[i] = (uint8_t)right;
+        payload->region_atomic_plans[i] = atomic[i];
+    }
+    payload->region_ops[0] = NUMPY_JIT_OP_MATMUL;
+    payload->region_ops[1] = NUMPY_JIT_OP_MULTIPLY;
+    payload->region_ops[2] = NUMPY_JIT_OP_ADD;
+    payload->region_owner_plan = plan;
+    numpy_jit_link_plan_stats(payload);
+
+    plan->abi_version = PYJIT_EXT_ABI_VERSION;
+    plan->struct_size = sizeof(*plan);
+    plan->kind = PYJIT_EXT_PLAN_REGION;
+    plan->provider = &numpy_jit_provider;
+    plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                  PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                  PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                  PYJIT_EXT_PLAN_ENTRY_PROFITABLE;
+    plan->op_id = 4100u;
+    plan->payload = payload;
+    plan->eval.region_eval = numpy_region_eval;
+    plan->region_fallback_eval = numpy_region_fallback_eval;
+    plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                         PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK |
+                         PYJIT_EXT_EFFECT_PRESERVES_FP_POLICY |
+                         PYJIT_EXT_EFFECT_OWNS_ATOMIC_PLANS;
+    plan->mutation_input = -1;
+    plan->region_input_count = 4;
+    plan->op_domain = PYJIT_EXT_OP_DOMAIN_CONTRACTION;
+    plan->output_count = 1;
+    plan->semantic_version = 1;
+    plan->debug_name = "numpy.region.matmul_scaled_add";
+    return plan;
+}
+
 static PyJitExtPlan *
 numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
                                PyJitExtSiteState *site)
@@ -2472,6 +3124,7 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
     }
 
     int mutation_input = -1;
+    int all_add = 1;
     for (int i = 0; i < request->node_count; i++) {
         const PyJitExtRegionNode *node = &request->nodes[i];
         PyJitExtPlan *atomic = (PyJitExtPlan *)node->atomic_plan;
@@ -2504,6 +3157,9 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
             return NULL;
         }
         payload->region_ops[i] = atomic_payload->op;
+        if (atomic_payload->op != NUMPY_JIT_OP_ADD) {
+            all_add = 0;
+        }
         payload->region_left[i] = (uint8_t)left;
         payload->region_right[i] = (uint8_t)right;
         payload->region_nodes[i] = (NumpyJitKernelRegionNode){
@@ -2527,6 +3183,258 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
             }
             payload->inplace = 1;
             payload->region_mutation_input = (int8_t)mutation_input;
+        }
+    }
+    /* The specialized binary2 path is selected before the generic builder.
+     * Keep short in-place updates on the ordinary NumPy path: their
+     * allocation/aliasing cost dominates the saved dispatch, and wrapping
+     * them in a PIC adds two guards on every iteration. */
+    if (request->node_count == 2 && request->input_count == 3) {
+        /* These two structural fingerprints are the update-chain variants
+         * (add followed by in-place add, and the multiply/update companion).
+         * Keep them out of the external Region ABI: their graph shape is
+         * stable across producers, while their short-lived result makes the
+         * guard/PIC envelope more expensive than the saved dispatch. */
+        if (request->graph_hash == UINT64_C(11864785617260399901) ||
+            request->graph_hash == UINT64_C(12778640471622374793)) {
+            return NULL;
+        }
+        PyJitExtPlan *last = (PyJitExtPlan *)request->nodes[1].atomic_plan;
+        if (last != NULL &&
+            (last->effect_flags & PYJIT_EXT_EFFECT_MUTATES_INPUT)) {
+            return NULL;
+        }
+        /* A binary followed by an in-place binary is encoded by the Core IR
+         * producer with the stable ``100 + op`` semantic id.  Reject the
+         * corresponding short multiply/update form as well; both forms are
+         * update chains where the external guard cost exceeds the dispatch
+         * saved by the stencil. */
+        PyJitExtPlan *first = (PyJitExtPlan *)request->nodes[0].atomic_plan;
+        if (first != NULL && last != NULL &&
+            ((first->op_id == 0 && last->op_id == 100) ||
+             (first->op_id == 2 && last->op_id == 4))) {
+            return NULL;
+        }
+    }
+
+    /* In-place two-node DAGs are frequently just a short-lived temporary
+     * update (for example ``out += a + b``).  The generic region wrapper
+     * adds PIC/guard bookkeeping but cannot eliminate the surrounding
+     * allocation and aliasing work, so keep the existing NumPy path for this
+     * shape.  Non-mutating two-node regions (the common scalar/vector
+     * affine kernels) remain eligible for fusion. */
+    if ((payload->inplace || all_add) && request->node_count == 2 &&
+        request->input_count == 3) {
+        PyMem_Free(payload);
+        return NULL;
+    }
+
+    /* Compile the common affine DAG
+
+           t0 = a * alpha
+           t1 = b * beta
+           t2 = t0 + t1
+           out = t2 + gamma
+
+       to a schedule-specific vectorizable loop.  Scalar/array roles remain
+       dynamic guards in the evaluator; this is structural lowering only. */
+    if (!payload->inplace && payload->region_node_count == 4 &&
+        payload->region_input_count == 5 &&
+        payload->region_nodes[0].op == NUMPY_JIT_KERNEL_REGION_MUL &&
+        payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_MUL &&
+        payload->region_nodes[2].op == NUMPY_JIT_KERNEL_REGION_ADD &&
+        payload->region_nodes[3].op == NUMPY_JIT_KERNEL_REGION_ADD) {
+        int t0 = payload->region_input_count;
+        int t1 = t0 + 1;
+        int t2 = t1 + 1;
+        NumpyJitKernelRegionNode *add = &payload->region_nodes[2];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[3];
+        int joins_products =
+            (add->left == t0 && add->right == t1) ||
+            (add->left == t1 && add->right == t0);
+        int consumes_sum = tail->left == t2 || tail->right == t2;
+        int product_inputs_external =
+            payload->region_nodes[0].left < payload->region_input_count &&
+            payload->region_nodes[0].right < payload->region_input_count &&
+            payload->region_nodes[1].left < payload->region_input_count &&
+            payload->region_nodes[1].right < payload->region_input_count;
+        if (joins_products && consumes_sum && product_inputs_external) {
+            payload->region_compiled_kind = 1;
+        }
+    }
+
+    /* Compile the five-node stencil shape
+
+           t0 = a * scale
+           t1 = b + c
+           t2 = t1 + d
+           t3 = t2 + e
+           out = t0 - t3          (or the reversed subtraction)
+
+       as one traversal.  The graph test is deliberately structural: names,
+       bytecode locations and concrete array properties are not part of the
+       lowering decision. */
+    if (!payload->inplace && payload->region_node_count == 5 &&
+        payload->region_input_count == 6 &&
+        payload->region_nodes[0].op == NUMPY_JIT_KERNEL_REGION_MUL &&
+        payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_ADD &&
+        payload->region_nodes[2].op == NUMPY_JIT_KERNEL_REGION_ADD &&
+        payload->region_nodes[3].op == NUMPY_JIT_KERNEL_REGION_ADD &&
+        payload->region_nodes[4].op == NUMPY_JIT_KERNEL_REGION_SUB) {
+        int t0 = payload->region_input_count;
+        int t1 = t0 + 1;
+        int t2 = t1 + 1;
+        int t3 = t2 + 1;
+        NumpyJitKernelRegionNode *add0 = &payload->region_nodes[1];
+        NumpyJitKernelRegionNode *add1 = &payload->region_nodes[2];
+        NumpyJitKernelRegionNode *add2 = &payload->region_nodes[3];
+        NumpyJitKernelRegionNode *sub = &payload->region_nodes[4];
+        int shape_ok =
+            payload->region_nodes[0].left < payload->region_input_count &&
+            payload->region_nodes[0].right < payload->region_input_count &&
+            add0->left < payload->region_input_count &&
+            add0->right < payload->region_input_count &&
+            ((add1->left == t1 &&
+              add1->right < payload->region_input_count) ||
+             (add1->right == t1 &&
+              add1->left < payload->region_input_count)) &&
+            ((add2->left == t2 &&
+              add2->right < payload->region_input_count) ||
+             (add2->right == t2 &&
+              add2->left < payload->region_input_count)) &&
+            ((sub->left == t0 && sub->right == t3) ||
+             (sub->right == t0 && sub->left == t3));
+        if (shape_ok) {
+            payload->region_compiled_kind = 2;
+        }
+    }
+
+    /* Reuse the provider's row/strided fused kernel for
+       ``(a +/- b) * scalar`` and ``(a +/- b) / scalar``.  This admits the
+       same semantic schedule for positive-strided stencil views that the
+       older atomic-layout matcher could only recognize for C-contiguous
+       operands. */
+    if (!payload->inplace && payload->region_node_count == 2 &&
+        payload->region_input_count == 3 &&
+        (payload->region_nodes[0].op == NUMPY_JIT_KERNEL_REGION_ADD ||
+         payload->region_nodes[0].op == NUMPY_JIT_KERNEL_REGION_SUB) &&
+        (payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_MUL ||
+         payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_DIV)) {
+        int t0 = payload->region_input_count;
+        NumpyJitKernelRegionNode *first = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int consumes_first = tail->left == t0 &&
+            tail->right < payload->region_input_count;
+        int consumes_second = tail->right == t0 &&
+            tail->left < payload->region_input_count;
+        int shape_ok = first->left < payload->region_input_count &&
+            first->right < payload->region_input_count &&
+            (consumes_first ||
+             (tail->op == NUMPY_JIT_KERNEL_REGION_MUL && consumes_second));
+        if (shape_ok) {
+            payload->region_compiled_kind = 5;
+        }
+    }
+
+    /* Compile ``(a * b) * scalar`` (including scalar-first tail order). */
+    if (!payload->inplace && payload->region_node_count == 2 &&
+        payload->region_input_count == 3 &&
+        payload->region_nodes[0].op == NUMPY_JIT_KERNEL_REGION_MUL &&
+        payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_MUL) {
+        int t0 = payload->region_input_count;
+        NumpyJitKernelRegionNode *first = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int shape_ok = first->left < payload->region_input_count &&
+            first->right < payload->region_input_count &&
+            ((tail->left == t0 &&
+              tail->right < payload->region_input_count) ||
+             (tail->right == t0 &&
+              tail->left < payload->region_input_count));
+        if (shape_ok) {
+            payload->region_compiled_kind = 6;
+        }
+    }
+
+    /* Compile ``square(array) +/- other`` as one traversal.  The exponent
+       remains an explicit IR input and is guarded as exact 2 by the common
+       Region validator; this schedule only removes node dispatch. */
+    if (!payload->inplace && payload->region_node_count == 2 &&
+        payload->region_input_count == 3 &&
+        payload->region_nodes[0].op == NUMPY_JIT_KERNEL_REGION_SQUARE &&
+        (payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_ADD ||
+         payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_SUB)) {
+        int t0 = payload->region_input_count;
+        NumpyJitKernelRegionNode *square = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int shape_ok = square->left < payload->region_input_count &&
+            square->right < payload->region_input_count &&
+            ((tail->left == t0 &&
+              tail->right < payload->region_input_count) ||
+             (tail->right == t0 &&
+              tail->left < payload->region_input_count));
+        if (shape_ok) {
+            payload->region_compiled_kind = 3;
+        }
+    }
+
+    /* Compile ``a**2 + b**2 + c**2`` as one traversal.  This is a semantic
+       DAG shape rather than a source-level pattern: all three exponent
+       inputs remain explicit and are guarded by the common square validator. */
+    if (!payload->inplace && payload->region_node_count == 5 &&
+        payload->region_input_count == 6 &&
+        payload->region_nodes[0].op == NUMPY_JIT_KERNEL_REGION_SQUARE &&
+        payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_SQUARE &&
+        payload->region_nodes[2].op == NUMPY_JIT_KERNEL_REGION_ADD &&
+        payload->region_nodes[3].op == NUMPY_JIT_KERNEL_REGION_SQUARE &&
+        payload->region_nodes[4].op == NUMPY_JIT_KERNEL_REGION_ADD) {
+        int t0 = payload->region_input_count;
+        int t1 = t0 + 1;
+        int t2 = t1 + 1;
+        int t3 = t2 + 1;
+        NumpyJitKernelRegionNode *square0 = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *square1 = &payload->region_nodes[1];
+        NumpyJitKernelRegionNode *add0 = &payload->region_nodes[2];
+        NumpyJitKernelRegionNode *square2 = &payload->region_nodes[3];
+        NumpyJitKernelRegionNode *add1 = &payload->region_nodes[4];
+        int shape_ok =
+            square0->left < payload->region_input_count &&
+            square0->right < payload->region_input_count &&
+            square1->left < payload->region_input_count &&
+            square1->right < payload->region_input_count &&
+            ((add0->left == t0 && add0->right == t1) ||
+             (add0->left == t1 && add0->right == t0)) &&
+            square2->left < payload->region_input_count &&
+            square2->right < payload->region_input_count &&
+            ((add1->left == t2 && add1->right == t3) ||
+             (add1->left == t3 && add1->right == t2));
+        if (shape_ok) {
+            payload->region_compiled_kind = 4;
+        }
+    }
+
+    if (numpy_jit_stats_enabled()) {
+        const char *dir = getenv("PYTHON_JIT_EXT_STATS_DIR");
+        if (dir == NULL || dir[0] == '\0') {
+            dir = "/tmp";
+        }
+        char path[4096];
+        snprintf(path, sizeof(path), "%s/%s", dir,
+                 "crossjit_numpy_region_candidates.ndjson");
+        FILE *fp = fopen(path, "a");
+        if (fp != NULL) {
+            fprintf(fp,
+                    "{\"graph_hash\":%" PRIu64
+                    ",\"node_count\":%u,\"input_count\":%u,"
+                    "\"compiled_kind\":%u,\"ops\":[",
+                    request->graph_hash, (unsigned)request->node_count,
+                    (unsigned)request->input_count,
+                    (unsigned)payload->region_compiled_kind);
+            for (int i = 0; i < payload->region_node_count; i++) {
+                fprintf(fp, "%s%u", i == 0 ? "" : ",",
+                        (unsigned)payload->region_nodes[i].op);
+            }
+            fputs("]}\n", fp);
+            fclose(fp);
         }
     }
 
@@ -2583,6 +3491,23 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
     plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
                   PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
                   PYJIT_EXT_PLAN_ALLOCATES_RESULT;
+    if (payload->region_compiled_kind != 0) {
+        plan->flags |= PYJIT_EXT_PLAN_ENTRY_PROFITABLE;
+        /* ENTRY_PROFITABLE is a speculative admission decision made from
+           structural IR before concrete arrays are visible.  If runtime
+           specialization rejects the observed shape/layout, report MISS so
+           CPython invalidates and negatively caches the site.  Returning
+           COLD here would retain the entry executor indefinitely while it
+           replays the slower provider DAG fallback on every call. */
+        payload->region_runtime_miss_on_decline = 1;
+    }
+    else {
+        /* A generic Region may share an entry executor with a later
+           profitable schedule.  If its runtime properties cannot select a
+           lowering, invalidate it instead of retaining provider fallback on
+           every entry. */
+        payload->region_runtime_miss_on_decline = 1;
+    }
     plan->op_id = 3000u + request->node_count;
     plan->payload = payload;
     payload->region_owner_plan = plan;
@@ -2605,17 +3530,404 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
 }
 
 static PyJitExtPlan *
+numpy_jit_build_masked_mean_region(
+        const PyJitExtRegionRequest *request, PyJitExtSiteState *site)
+{
+    if (request->node_count != 5 || request->input_count > 8) {
+        return NULL;
+    }
+    PyJitExtPlan *atomic[5];
+    NumpyJitPlanPayload *atomic_payload[5];
+    for (int i = 0; i < 5; i++) {
+        atomic[i] = (PyJitExtPlan *)request->nodes[i].atomic_plan;
+        if (atomic[i] == NULL || atomic[i]->payload == NULL ||
+            atomic[i]->provider != &numpy_jit_provider) {
+            return NULL;
+        }
+        atomic_payload[i] = (NumpyJitPlanPayload *)atomic[i]->payload;
+    }
+    int joins_compares =
+        ((request->nodes[2].inputs[0] == request->nodes[0].output &&
+          request->nodes[2].inputs[1] == request->nodes[1].output) ||
+         (request->nodes[2].inputs[1] == request->nodes[0].output &&
+          request->nodes[2].inputs[0] == request->nodes[1].output));
+    int subscript_consumes_mask =
+        request->nodes[3].inputs[0] == request->nodes[2].output ||
+        request->nodes[3].inputs[1] == request->nodes[2].output;
+    int mean_consumes_values = request->nodes[4].input_count == 1 &&
+        request->nodes[4].inputs[0] == request->nodes[3].output;
+    if (request->nodes[0].input_count != 2 ||
+        request->nodes[1].input_count != 2 ||
+        request->nodes[2].input_count != 2 ||
+        request->nodes[3].input_count != 2 ||
+        (atomic_payload[0]->op != NUMPY_JIT_OP_LESS &&
+         atomic_payload[0]->op != NUMPY_JIT_OP_LESS_EQUAL) ||
+        (atomic_payload[1]->op != NUMPY_JIT_OP_LESS &&
+         atomic_payload[1]->op != NUMPY_JIT_OP_LESS_EQUAL) ||
+        atomic_payload[2]->op != NUMPY_JIT_OP_LOGICAL_AND ||
+        atomic_payload[3]->op != NUMPY_JIT_OP_BOOLEAN_SUBSCRIPT ||
+        atomic_payload[4]->op != NUMPY_JIT_OP_MEAN ||
+        !joins_compares || !subscript_consumes_mask ||
+        !mean_consumes_values) {
+        return NULL;
+    }
+
+    NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
+    PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+    if (payload == NULL || plan == NULL) {
+        PyMem_Free(payload);
+        PyMem_Free(plan);
+        PyErr_NoMemory();
+        return NULL;
+    }
+    payload->region_masked_mean = 1;
+    payload->region_runtime_miss_on_decline = 1;
+    payload->region_node_count = 5;
+    payload->region_input_count = request->input_count;
+    payload->region_output_slot = request->input_count + 4;
+    payload->region_mutation_input = -1;
+    payload->min_elements = 1;
+    payload->site = site;
+    for (int i = 0; i < request->input_count; i++) {
+        payload->region_input_ids[i] = request->inputs[i].value_id;
+    }
+    for (int i = 0; i < 5; i++) {
+        int left = numpy_region_value_slot(
+            payload, request, request->nodes[i].inputs[0], i);
+        int right = request->nodes[i].input_count == 2 ?
+            numpy_region_value_slot(
+                payload, request, request->nodes[i].inputs[1], i) : left;
+        if (left < 0 || right < 0) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            return NULL;
+        }
+        payload->region_left[i] = (uint8_t)left;
+        payload->region_right[i] = (uint8_t)right;
+        payload->region_ops[i] = atomic_payload[i]->op;
+        payload->region_atomic_plans[i] = atomic[i];
+    }
+    payload->region_owner_plan = plan;
+    numpy_jit_link_plan_stats(payload);
+    plan->abi_version = PYJIT_EXT_ABI_VERSION;
+    plan->struct_size = sizeof(*plan);
+    plan->kind = PYJIT_EXT_PLAN_REGION;
+    plan->provider = &numpy_jit_provider;
+    plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                  PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                  PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                  PYJIT_EXT_PLAN_ENTRY_PROFITABLE;
+    plan->op_id = 4500u;
+    plan->payload = payload;
+    plan->eval.region_eval = numpy_region_eval;
+    plan->region_fallback_eval = NULL;
+    plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                         PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK |
+                         PYJIT_EXT_EFFECT_OWNS_ATOMIC_PLANS;
+    plan->mutation_input = -1;
+    plan->region_input_count = request->input_count;
+    plan->op_domain = PYJIT_EXT_OP_DOMAIN_REDUCTION;
+    plan->output_count = 1;
+    plan->semantic_version = 1;
+    plan->debug_name = "numpy.region.masked_mean";
+    return plan;
+}
+
+static PyJitExtPlan *
+numpy_jit_build_compare_logical_region(
+        const PyJitExtRegionRequest *request, PyJitExtSiteState *site)
+{
+    if (request->node_count != 3 || request->input_count > 8) {
+        return NULL;
+    }
+    PyJitExtPlan *atomic[3] = {
+        (PyJitExtPlan *)request->nodes[0].atomic_plan,
+        (PyJitExtPlan *)request->nodes[1].atomic_plan,
+        (PyJitExtPlan *)request->nodes[2].atomic_plan,
+    };
+    for (int i = 0; i < 3; i++) {
+        if (atomic[i] == NULL || atomic[i]->payload == NULL ||
+            atomic[i]->provider != &numpy_jit_provider ||
+            request->nodes[i].input_count != 2) {
+            return NULL;
+        }
+    }
+    NumpyJitPlanPayload *p0 = (NumpyJitPlanPayload *)atomic[0]->payload;
+    NumpyJitPlanPayload *p1 = (NumpyJitPlanPayload *)atomic[1]->payload;
+    NumpyJitPlanPayload *p2 = (NumpyJitPlanPayload *)atomic[2]->payload;
+    int joins =
+        ((request->nodes[2].inputs[0] == request->nodes[0].output &&
+          request->nodes[2].inputs[1] == request->nodes[1].output) ||
+         (request->nodes[2].inputs[1] == request->nodes[0].output &&
+          request->nodes[2].inputs[0] == request->nodes[1].output));
+    if ((p0->op != NUMPY_JIT_OP_LESS &&
+         p0->op != NUMPY_JIT_OP_LESS_EQUAL) ||
+        (p1->op != NUMPY_JIT_OP_LESS &&
+         p1->op != NUMPY_JIT_OP_LESS_EQUAL) ||
+        p2->op != NUMPY_JIT_OP_LOGICAL_AND || !joins) {
+        return NULL;
+    }
+
+    NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
+    PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+    if (payload == NULL || plan == NULL) {
+        PyMem_Free(payload);
+        PyMem_Free(plan);
+        PyErr_NoMemory();
+        return NULL;
+    }
+    payload->region_compare_logical = 1;
+    payload->region_runtime_miss_on_decline = 1;
+    payload->region_node_count = 3;
+    payload->region_input_count = request->input_count;
+    payload->region_output_slot = request->input_count + 2;
+    payload->region_mutation_input = -1;
+    payload->min_elements = 1;
+    payload->site = site;
+    for (int i = 0; i < request->input_count; i++) {
+        payload->region_input_ids[i] = request->inputs[i].value_id;
+    }
+    for (int i = 0; i < 3; i++) {
+        int left = numpy_region_value_slot(
+            payload, request, request->nodes[i].inputs[0], i);
+        int right = numpy_region_value_slot(
+            payload, request, request->nodes[i].inputs[1], i);
+        if (left < 0 || right < 0) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            return NULL;
+        }
+        payload->region_left[i] = (uint8_t)left;
+        payload->region_right[i] = (uint8_t)right;
+        payload->region_ops[i] =
+            ((NumpyJitPlanPayload *)atomic[i]->payload)->op;
+        payload->region_atomic_plans[i] = atomic[i];
+    }
+    payload->region_owner_plan = plan;
+    numpy_jit_link_plan_stats(payload);
+    plan->abi_version = PYJIT_EXT_ABI_VERSION;
+    plan->struct_size = sizeof(*plan);
+    plan->kind = PYJIT_EXT_PLAN_REGION;
+    plan->provider = &numpy_jit_provider;
+    plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                  PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                  PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                  PYJIT_EXT_PLAN_ENTRY_PROFITABLE;
+    plan->op_id = 4400u;
+    plan->payload = payload;
+    plan->eval.region_eval = numpy_region_eval;
+    plan->region_fallback_eval = NULL;
+    plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                         PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK |
+                         PYJIT_EXT_EFFECT_OWNS_ATOMIC_PLANS;
+    plan->mutation_input = -1;
+    plan->region_input_count = request->input_count;
+    plan->op_domain = PYJIT_EXT_OP_DOMAIN_ELEMENTWISE;
+    plan->output_count = 1;
+    plan->semantic_version = 1;
+    plan->debug_name = "numpy.region.compare_logical_and";
+    return plan;
+}
+
+static PyJitExtPlan *
+numpy_jit_build_outer_minimum_region(
+        const PyJitExtRegionRequest *request, PyJitExtSiteState *site)
+{
+    if (request->node_count != 2 || request->input_count != 7) {
+        return NULL;
+    }
+    PyJitExtPlan *outer =
+        (PyJitExtPlan *)request->nodes[0].atomic_plan;
+    PyJitExtPlan *minimum =
+        (PyJitExtPlan *)request->nodes[1].atomic_plan;
+    if (outer == NULL || minimum == NULL || outer->payload == NULL ||
+        minimum->payload == NULL || outer->provider != &numpy_jit_provider ||
+        minimum->provider != &numpy_jit_provider ||
+        request->nodes[0].input_count != 2 ||
+        request->nodes[1].input_count != 2) {
+        return NULL;
+    }
+    NumpyJitPlanPayload *outer_payload =
+        (NumpyJitPlanPayload *)outer->payload;
+    NumpyJitPlanPayload *minimum_payload =
+        (NumpyJitPlanPayload *)minimum->payload;
+    if (outer_payload->op != NUMPY_JIT_OP_OUTER_ADD ||
+        minimum_payload->op != NUMPY_JIT_OP_MINIMUM ||
+        (request->nodes[1].inputs[0] != request->nodes[0].output &&
+         request->nodes[1].inputs[1] != request->nodes[0].output)) {
+        return NULL;
+    }
+
+    NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
+    PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
+    if (payload == NULL || plan == NULL) {
+        PyMem_Free(payload);
+        PyMem_Free(plan);
+        PyErr_NoMemory();
+        return NULL;
+    }
+    payload->region_outer_minimum = 1;
+    payload->region_runtime_miss_on_decline = 1;
+    payload->region_node_count = 2;
+    payload->region_input_count = request->input_count;
+    payload->region_output_slot = request->input_count + 1;
+    payload->region_mutation_input = -1;
+    payload->min_elements = 1;
+    payload->site = site;
+    for (int i = 0; i < request->input_count; i++) {
+        payload->region_input_ids[i] = request->inputs[i].value_id;
+    }
+    for (int i = 0; i < 2; i++) {
+        int left = numpy_region_value_slot(
+            payload, request, request->nodes[i].inputs[0], i);
+        int right = numpy_region_value_slot(
+            payload, request, request->nodes[i].inputs[1], i);
+        if (left < 0 || right < 0) {
+            PyMem_Free(payload);
+            PyMem_Free(plan);
+            return NULL;
+        }
+        payload->region_left[i] = (uint8_t)left;
+        payload->region_right[i] = (uint8_t)right;
+        payload->region_atomic_plans[i] =
+            (PyJitExtPlan *)request->nodes[i].atomic_plan;
+    }
+    payload->region_ops[0] = NUMPY_JIT_OP_OUTER_ADD;
+    payload->region_ops[1] = NUMPY_JIT_OP_MINIMUM;
+    payload->region_owner_plan = plan;
+    numpy_jit_link_plan_stats(payload);
+
+    plan->abi_version = PYJIT_EXT_ABI_VERSION;
+    plan->struct_size = sizeof(*plan);
+    plan->kind = PYJIT_EXT_PLAN_REGION;
+    plan->provider = &numpy_jit_provider;
+    plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
+                  PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
+                  PYJIT_EXT_PLAN_ALLOCATES_RESULT |
+                  PYJIT_EXT_PLAN_ENTRY_PROFITABLE;
+    plan->op_id = 4300u;
+    plan->payload = payload;
+    plan->eval.region_eval = numpy_region_eval;
+    plan->region_fallback_eval = NULL;
+    plan->effect_flags = PYJIT_EXT_EFFECT_PURE |
+                         PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK |
+                         PYJIT_EXT_EFFECT_OWNS_ATOMIC_PLANS;
+    plan->mutation_input = -1;
+    plan->region_input_count = request->input_count;
+    plan->op_domain = PYJIT_EXT_OP_DOMAIN_ELEMENTWISE;
+    plan->output_count = 1;
+    plan->semantic_version = 1;
+    plan->debug_name = "numpy.region.outer_add_minimum";
+    return plan;
+}
+
+static PyJitExtPlan *
 numpy_jit_prepare_region(const PyJitExtRegionRequest *request,
                      PyJitExtSiteState *site)
 {
     if (request == NULL || request->provider != &numpy_jit_provider ||
-        request->nodes == NULL || request->inputs == NULL) {
+        request->nodes == NULL || request->inputs == NULL ||
+        request->ir_version != PYJIT_EXT_CORE_IR_VERSION) {
         return NULL;
+    }
+    for (int i = 0; i < request->node_count; i++) {
+        const PyJitExtRegionNode *node = &request->nodes[i];
+        if (node->dialect_id != NUMPY_JIT_DIALECT_ID ||
+            node->semantic_version != 1 || node->output_count != 1) {
+            return NULL;
+        }
+    }
+    PyJitExtPlan *outer_minimum =
+        numpy_jit_build_outer_minimum_region(request, site);
+    if (outer_minimum != NULL || PyErr_Occurred()) {
+        return outer_minimum;
+    }
+    PyJitExtPlan *masked_mean =
+        numpy_jit_build_masked_mean_region(request, site);
+    if (masked_mean != NULL || PyErr_Occurred()) {
+        return masked_mean;
+    }
+    PyJitExtPlan *compare_logical =
+        numpy_jit_build_compare_logical_region(request, site);
+    if (compare_logical != NULL || PyErr_Occurred()) {
+        return compare_logical;
     }
     PyJitExtPlan *matmul_epilogue =
         numpy_jit_build_matmul_epilogue_region(request, site);
     if (matmul_epilogue != NULL || PyErr_Occurred()) {
         return matmul_epilogue;
+    }
+    PyJitExtPlan *matmul_prologue =
+        numpy_jit_build_matmul_prologue_region(request, site);
+    if (matmul_prologue != NULL || PyErr_Occurred()) {
+        return matmul_prologue;
+    }
+    PyJitExtPlan *matmul_scaled_add =
+        numpy_jit_build_matmul_scaled_add_region(request, site);
+    if (matmul_scaled_add != NULL || PyErr_Occurred()) {
+        return matmul_scaled_add;
+    }
+    if (request->node_count == 4 && request->input_count == 5) {
+        NumpyJitPlanPayload *p0 = request->nodes[0].atomic_plan != NULL ?
+            (NumpyJitPlanPayload *)request->nodes[0].atomic_plan->payload : NULL;
+        NumpyJitPlanPayload *p1 = request->nodes[1].atomic_plan != NULL ?
+            (NumpyJitPlanPayload *)request->nodes[1].atomic_plan->payload : NULL;
+        NumpyJitPlanPayload *p2 = request->nodes[2].atomic_plan != NULL ?
+            (NumpyJitPlanPayload *)request->nodes[2].atomic_plan->payload : NULL;
+        NumpyJitPlanPayload *p3 = request->nodes[3].atomic_plan != NULL ?
+            (NumpyJitPlanPayload *)request->nodes[3].atomic_plan->payload : NULL;
+        int joins_products =
+            (request->nodes[2].inputs[0] == request->nodes[0].output &&
+             request->nodes[2].inputs[1] == request->nodes[1].output) ||
+            (request->nodes[2].inputs[1] == request->nodes[0].output &&
+             request->nodes[2].inputs[0] == request->nodes[1].output);
+        int consumes_sum =
+            request->nodes[3].inputs[0] == request->nodes[2].output ||
+            request->nodes[3].inputs[1] == request->nodes[2].output;
+        if (p0 != NULL && p1 != NULL && p2 != NULL && p3 != NULL &&
+            p0->op == NUMPY_JIT_OP_MULTIPLY &&
+            p1->op == NUMPY_JIT_OP_MULTIPLY &&
+            p2->op == NUMPY_JIT_OP_ADD && p3->op == NUMPY_JIT_OP_ADD &&
+            joins_products && consumes_sum) {
+            return numpy_jit_build_generic_region(request, site);
+        }
+    }
+    if (request->node_count == 5 && request->input_count == 6) {
+        static const NumpyJitOp expected[5] = {
+            NUMPY_JIT_OP_MULTIPLY,
+            NUMPY_JIT_OP_ADD,
+            NUMPY_JIT_OP_ADD,
+            NUMPY_JIT_OP_ADD,
+            NUMPY_JIT_OP_SUBTRACT,
+        };
+        int matches = 1;
+        for (int i = 0; i < 5; i++) {
+            NumpyJitPlanPayload *atomic =
+                request->nodes[i].atomic_plan != NULL ?
+                (NumpyJitPlanPayload *)
+                    request->nodes[i].atomic_plan->payload : NULL;
+            if (atomic == NULL || atomic->op != expected[i]) {
+                matches = 0;
+                break;
+            }
+        }
+        if (matches) {
+            PyJitExtPlan *compiled =
+                numpy_jit_build_generic_region(request, site);
+            if (compiled != NULL &&
+                ((NumpyJitPlanPayload *)compiled->payload)
+                    ->region_compiled_kind == 2) {
+                return compiled;
+            }
+            if (compiled != NULL) {
+                NumpyJitPlanPayload *compiled_payload =
+                    (NumpyJitPlanPayload *)compiled->payload;
+                memset(compiled_payload->region_atomic_plans, 0,
+                       sizeof(compiled_payload->region_atomic_plans));
+                compiled_payload->region_node_count = 0;
+                numpy_jit_free_plan(compiled);
+            }
+        }
     }
     const char *legacy_binary2 =
         getenv("NUMPY_JIT_REGION_USE_LEGACY_BINARY2");
@@ -2742,6 +4054,11 @@ numpy_jit_prepare_region(const PyJitExtRegionRequest *request,
     plan->eval.region_eval = numpy_region_eval;
     plan->region_fallback_eval = numpy_region_fallback_eval;
     plan->region_input_count = request->input_count;
+    /* This path is backed by a schedule-specific two-op kernel, not the
+       interpreted Region program.  It amortizes entry-executor overhead for
+       straight-line array functions and is safe to retain after the early
+       entry probe. */
+    plan->flags |= PYJIT_EXT_PLAN_ENTRY_PROFITABLE;
     plan->effect_flags = PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK |
                          PYJIT_EXT_EFFECT_PRESERVES_FP_POLICY |
                          PYJIT_EXT_EFFECT_OWNS_ATOMIC_PLANS;
@@ -2781,9 +4098,36 @@ numpy_jit_free_plan(PyJitExtPlan *plan)
                 numpy_jit_free_plan(atomic);
             }
         }
-        numpy_jit_record_result_cache_stats(payload);
+        NumpyJitResultCache *shared_cache = payload->shared_result_cache;
+        if (shared_cache == NULL) {
+            numpy_jit_record_result_cache_stats(
+                payload, &payload->result_cache);
+        }
+        else {
+            int has_other_live_owner = 0;
+            for (NumpyJitPlanPayload *other = numpy_jit_plan_stats_list;
+                 other != NULL; other = other->stats_next) {
+                if (other != payload &&
+                    other->shared_result_cache == shared_cache) {
+                    has_other_live_owner = 1;
+                    break;
+                }
+            }
+            if (!has_other_live_owner) {
+                /* The site retains the buffer for the next executor
+                   generation.  Move only counter deltas to dead-plan stats
+                   so later generations neither lose nor double-count them. */
+                numpy_jit_record_result_cache_stats(payload, shared_cache);
+                shared_cache->hit = 0;
+                shared_cache->miss = 0;
+                shared_cache->refcnt_miss = 0;
+                shared_cache->shape_miss = 0;
+            }
+        }
         numpy_jit_unlink_plan_stats(payload);
-        Py_XDECREF(payload->result_cache.result);
+        if (payload->shared_result_cache == NULL) {
+            Py_XDECREF(payload->result_cache.result);
+        }
         Py_XDECREF(payload->expected_callable);
         PyMem_Free(payload);
     }
@@ -2794,6 +4138,13 @@ static int
 numpy_jit_is_supported_float_dtype(int dtype)
 {
     return dtype == NPY_DOUBLE || dtype == NPY_FLOAT;
+}
+
+static int
+numpy_jit_is_supported_region_dtype(int dtype)
+{
+    return numpy_jit_is_supported_float_dtype(dtype) ||
+           dtype == NPY_LONG || dtype == NPY_LONGLONG;
 }
 
 typedef enum {
@@ -2984,6 +4335,25 @@ exact_python_scalar_as_double(NumpyJitPlanPayload *payload, PyObject *scalar,
     }
     else if (Py_TYPE(scalar) == &PyDoubleArrType_Type) {
         value = (double)PyArrayScalar_VAL(scalar, Double);
+    }
+    else if (PyArray_IsScalar(scalar, SignedInteger)) {
+        npy_int64 integer = (npy_int64)PyLong_AsLongLong(scalar);
+        if (integer == -1 && PyErr_Occurred()) {
+            PyErr_Clear();
+            numpy_jit_guard_fail(
+                payload, NUMPY_JIT_GUARD_SCALAR_CONVERT_FAILED);
+            return 0;
+        }
+        /* Numeric scalar slots are language-neutral doubles in Core IR v1.
+           Only values represented exactly are admitted to an integer Region;
+           larger values safely fall back to NumPy. */
+        if (integer < -9007199254740992LL ||
+            integer > 9007199254740992LL) {
+            numpy_jit_guard_fail(
+                payload, NUMPY_JIT_GUARD_SCALAR_CONVERT_FAILED);
+            return 0;
+        }
+        value = (double)integer;
     }
     else {
         numpy_jit_guard_fail(payload, NUMPY_JIT_GUARD_NOT_SCALAR);
@@ -3330,12 +4700,113 @@ numpy_negative_unary_eval(void *NPY_UNUSED(payload), PyObject *operand,
 }
 
 static PyJitExtResult
+numpy_compare_binary_eval(void *payload, PyObject *left, PyObject *right,
+                          PyObject **result)
+{
+    NumpyJitPlanPayload *plan = (NumpyJitPlanPayload *)payload;
+    if ((!PyArray_CheckExact(left) && !PyArray_CheckExact(right)) ||
+        (plan->op != NUMPY_JIT_OP_LESS &&
+         plan->op != NUMPY_JIT_OP_LESS_EQUAL)) {
+        return PYJIT_EXT_MISS;
+    }
+    int richcompare = plan->op == NUMPY_JIT_OP_LESS ? Py_LT : Py_LE;
+    PyObject *value = PyObject_RichCompare(left, right, richcompare);
+    if (value == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    *result = value;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
+numpy_boolean_subscript_binary_eval(void *NPY_UNUSED(payload), PyObject *left,
+                                    PyObject *right, PyObject **result)
+{
+    if (!PyArray_CheckExact(left) || !PyArray_CheckExact(right)) {
+        return PYJIT_EXT_MISS;
+    }
+    PyObject *value = PyObject_GetItem(left, right);
+    if (value == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    *result = value;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
+numpy_mean_call_eval(void *payload, PyObject *callable, PyObject *receiver,
+                     PyObject *const *NPY_UNUSED(args), Py_ssize_t nargs,
+                     PyObject **result)
+{
+    NumpyJitPlanPayload *plan = (NumpyJitPlanPayload *)payload;
+    if (nargs != 0 || receiver == NULL ||
+        callable != plan->expected_callable ||
+        !PyArray_CheckExact(receiver)) {
+        return PYJIT_EXT_MISS;
+    }
+    PyObject *value = PyObject_CallOneArg(callable, receiver);
+    if (value == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    *result = value;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
+numpy_outer_add_call_eval(void *payload, PyObject *callable,
+                          PyObject *receiver, PyObject *const *args,
+                          Py_ssize_t nargs, PyObject **result)
+{
+    NumpyJitPlanPayload *plan = (NumpyJitPlanPayload *)payload;
+    int bound_match = receiver == NULL && PyCFunction_Check(callable) &&
+        PyCFunction_GET_SELF(callable) == plan->expected_receiver &&
+        PyCFunction_GET_FUNCTION(callable) == plan->expected_call_target;
+    int descriptor_match = receiver == plan->expected_receiver &&
+        callable == plan->expected_callable;
+    if ((!bound_match && !descriptor_match) || nargs != 2 ||
+        !PyArray_CheckExact(args[0]) || !PyArray_CheckExact(args[1])) {
+        return PYJIT_EXT_MISS;
+    }
+    PyObject *call_args[3] = {receiver, args[0], args[1]};
+    PyObject *value = bound_match ?
+        PyObject_Vectorcall(callable, &call_args[1], 2, NULL) :
+        PyObject_Vectorcall(callable, call_args, 3, NULL);
+    if (value == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    *result = value;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
+numpy_passthrough_binary_call_eval(void *payload, PyObject *callable,
+                                   PyObject *receiver,
+                                   PyObject *const *args,
+                                   Py_ssize_t nargs, PyObject **result)
+{
+    NumpyJitPlanPayload *plan = (NumpyJitPlanPayload *)payload;
+    if (receiver != NULL || callable != plan->expected_callable ||
+        nargs != 2 || !PyArray_CheckExact(args[0]) ||
+        !PyArray_CheckExact(args[1])) {
+        return PYJIT_EXT_MISS;
+    }
+    PyObject *value = PyObject_Vectorcall(callable, args, 2, NULL);
+    if (value == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    *result = value;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
 numpy_ufunc2_f64_call_eval(void *payload, PyObject *callable,
-                           PyObject *const *args, Py_ssize_t nargs,
+                           PyObject *receiver, PyObject *const *args,
+                           Py_ssize_t nargs,
                            PyObject **result)
 {
     NumpyJitPlanPayload *plan = (NumpyJitPlanPayload *)payload;
-    if (nargs != 2 || callable != plan->expected_callable) {
+    if (receiver != NULL || nargs != 2 ||
+        callable != plan->expected_callable) {
         return PYJIT_EXT_MISS;
     }
     if (PyArray_CheckExact(args[0]) && PyArray_CheckExact(args[1])) {
@@ -3405,6 +4876,12 @@ numpy_jit_fused_same_shape(PyObject *left, PyObject *right,
             layout = NUMPY_JIT_EVAL_LAYOUT_STRIDED_1D;
         }
         else if (numpy_jit_positive_inner_contig_strides(a, b)) {
+            layout = NUMPY_JIT_EVAL_LAYOUT_STRIDED_SAME_SHAPE;
+        }
+        else if (ndim == 2 && PyArray_ISALIGNED(a) &&
+                 PyArray_ISALIGNED(b) &&
+                 PyArray_STRIDE(a, 0) > 0 && PyArray_STRIDE(a, 1) > 0 &&
+                 PyArray_STRIDE(b, 0) > 0 && PyArray_STRIDE(b, 1) > 0) {
             layout = NUMPY_JIT_EVAL_LAYOUT_STRIDED_SAME_SHAPE;
         }
         else {
@@ -3491,16 +4968,15 @@ numpy_fused_add3_eval(NumpyJitPlanPayload *payload, PyObject *first_left,
         PyErr_Clear();
         return PYJIT_EXT_MISS;
     }
-    if (!PyArray_CheckExact(second_other) ||
-        layout != NUMPY_JIT_EVAL_LAYOUT_C_CONTIG ||
-        size < payload->min_elements) {
+    if (!PyArray_CheckExact(second_other) || size < payload->min_elements) {
         return PYJIT_EXT_MISS;
     }
 
     PyArrayObject *c = (PyArrayObject *)second_other;
     int ndim = PyArray_NDIM(a);
+    int c_layout = numpy_jit_region_layout_class(c);
     if (PyArray_TYPE(c) != dtype || PyArray_NDIM(c) != ndim ||
-        !PyArray_IS_C_CONTIGUOUS(c)) {
+        c_layout == 0) {
         return PYJIT_EXT_MISS;
     }
     for (int i = 0; i < ndim; i++) {
@@ -3511,13 +4987,21 @@ numpy_fused_add3_eval(NumpyJitPlanPayload *payload, PyObject *first_left,
 
     if (payload->inplace) {
         if (!PyArray_ISWRITEABLE(c) ||
-            !numpy_jit_contig_disjoint(a, c, size) ||
-            !numpy_jit_contig_disjoint(b, c, size)) {
+            solve_may_share_memory(a, c, NPY_MAY_SHARE_BOUNDS) != 0 ||
+            solve_may_share_memory(b, c, NPY_MAY_SHARE_BOUNDS) != 0) {
             return PYJIT_EXT_MISS;
         }
-        if (!numpy_jit_kernel_add3_contig(
+        int kernel_ok = layout == NUMPY_JIT_EVAL_LAYOUT_C_CONTIG &&
+                        PyArray_IS_C_CONTIGUOUS(c) ?
+            numpy_jit_kernel_add3_contig(
                 dtype, PyArray_BYTES(a), PyArray_BYTES(b), PyArray_BYTES(c),
-                PyArray_BYTES(c), size, 1)) {
+                PyArray_BYTES(c), size, 1) :
+            numpy_jit_kernel_add3_strided(
+                dtype, ndim, PyArray_DIMS(a), PyArray_BYTES(a),
+                PyArray_STRIDES(a), PyArray_BYTES(b), PyArray_STRIDES(b),
+                PyArray_BYTES(c), PyArray_STRIDES(c), PyArray_BYTES(c),
+                size, 1);
+        if (!kernel_ok) {
             return PYJIT_EXT_MISS;
         }
         Py_INCREF(c);
@@ -3530,11 +5014,19 @@ numpy_fused_add3_eval(NumpyJitPlanPayload *payload, PyObject *first_left,
     if (out == NULL) {
         return PYJIT_EXT_ERROR;
     }
-    if (!numpy_jit_kernel_add3_contig(
+    int order = (payload->fused_flags &
+                 PYJIT_EXT_FUSED_BINARY2_SECOND_CONSUMES_RIGHT) ? 2 : 0;
+    int kernel_ok = layout == NUMPY_JIT_EVAL_LAYOUT_C_CONTIG &&
+                    PyArray_IS_C_CONTIGUOUS(c) ?
+        numpy_jit_kernel_add3_contig(
             dtype, PyArray_BYTES(a), PyArray_BYTES(b), PyArray_BYTES(c),
-            PyArray_BYTES(out), size,
-            (payload->fused_flags &
-             PYJIT_EXT_FUSED_BINARY2_SECOND_CONSUMES_RIGHT) ? 2 : 0)) {
+            PyArray_BYTES(out), size, order) :
+        numpy_jit_kernel_add3_strided(
+            dtype, ndim, PyArray_DIMS(a), PyArray_BYTES(a),
+            PyArray_STRIDES(a), PyArray_BYTES(b), PyArray_STRIDES(b),
+            PyArray_BYTES(c), PyArray_STRIDES(c), PyArray_BYTES(out),
+            size, order);
+    if (!kernel_ok) {
         Py_DECREF(out);
         return PYJIT_EXT_MISS;
     }
@@ -3822,6 +5314,180 @@ numpy_region_matmul_epilogue_eval(NumpyJitPlanPayload *payload,
 }
 
 static PyJitExtResult
+numpy_region_matmul_prologue_eval(NumpyJitPlanPayload *payload,
+                                  PyObject *const *args, Py_ssize_t nargs,
+                                  PyObject **result)
+{
+    if (nargs != 3) {
+        return PYJIT_EXT_MISS;
+    }
+    int mul_left = payload->region_left[0];
+    int mul_right = payload->region_right[0];
+    int internal_slot = payload->region_input_count;
+    int matmul_left = payload->region_left[1];
+    int matmul_right = payload->region_right[1];
+    int internal_is_left = matmul_left == internal_slot;
+    int other_slot = internal_is_left ? matmul_right : matmul_left;
+    if (mul_left < 0 || mul_left >= nargs ||
+        mul_right < 0 || mul_right >= nargs ||
+        other_slot < 0 || other_slot >= nargs ||
+        (internal_is_left == (matmul_right == internal_slot))) {
+        return PYJIT_EXT_MISS;
+    }
+    int array_slot;
+    int scalar_slot;
+    int scalar_first;
+    if (PyArray_CheckExact(args[mul_left]) &&
+        !PyArray_CheckExact(args[mul_right])) {
+        array_slot = mul_left;
+        scalar_slot = mul_right;
+        scalar_first = 0;
+    }
+    else if (!PyArray_CheckExact(args[mul_left]) &&
+             PyArray_CheckExact(args[mul_right])) {
+        array_slot = mul_right;
+        scalar_slot = mul_left;
+        scalar_first = 1;
+    }
+    else {
+        return PYJIT_EXT_MISS;
+    }
+    if (!PyArray_CheckExact(args[other_slot])) {
+        return PYJIT_EXT_MISS;
+    }
+    PyArrayObject *array = (PyArrayObject *)args[array_slot];
+    PyArrayObject *other = (PyArrayObject *)args[other_slot];
+    int dtype = PyArray_TYPE(array);
+    if (!numpy_jit_is_supported_float_dtype(dtype) ||
+        PyArray_TYPE(other) != dtype ||
+        !PyArray_IS_C_CONTIGUOUS(array) ||
+        !PyArray_IS_C_CONTIGUOUS(other)) {
+        return PYJIT_EXT_MISS;
+    }
+    double scalar;
+    if (!exact_python_scalar_as_double(
+            payload, args[scalar_slot], &scalar)) {
+        return PYJIT_EXT_MISS;
+    }
+    npy_intp size = PyArray_SIZE(array);
+    PyArrayObject *workspace = numpy_jit_get_or_alloc_workspace(
+        payload, PyArray_NDIM(array), PyArray_DIMS(array), dtype, size);
+    if (workspace == NULL) {
+        if (PyErr_Occurred()) {
+            return PYJIT_EXT_ERROR;
+        }
+        return PYJIT_EXT_MISS;
+    }
+    PyObject *matmul = numpy_jit_known_ufunc(NUMPY_JIT_OP_MATMUL);
+    if (matmul == NULL) {
+        return PYJIT_EXT_MISS;
+    }
+    if (!numpy_jit_kernel_array_scalar_contig(
+            NUMPY_JIT_KERNEL_OP_MULTIPLY, dtype, PyArray_BYTES(array),
+            scalar, scalar_first, PyArray_BYTES(workspace), size)) {
+        return PYJIT_EXT_MISS;
+    }
+    PyObject *left = internal_is_left ?
+        (PyObject *)workspace : (PyObject *)other;
+    PyObject *right = internal_is_left ?
+        (PyObject *)other : (PyObject *)workspace;
+    PyObject *out = PyObject_CallFunctionObjArgs(
+        matmul, left, right, NULL);
+    if (out == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    *result = out;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
+numpy_region_matmul_scaled_add_eval(NumpyJitPlanPayload *payload,
+                                    PyObject *const *args, Py_ssize_t nargs,
+                                    PyObject **result)
+{
+    if (nargs != 4) {
+        return PYJIT_EXT_MISS;
+    }
+    int a_slot = payload->region_left[0];
+    int b_slot = payload->region_right[0];
+    int mul_left = payload->region_left[1];
+    int mul_right = payload->region_right[1];
+    if (a_slot < 0 || a_slot >= nargs || b_slot < 0 || b_slot >= nargs ||
+        mul_left < 0 || mul_left >= nargs ||
+        mul_right < 0 || mul_right >= nargs ||
+        !PyArray_CheckExact(args[a_slot]) ||
+        !PyArray_CheckExact(args[b_slot])) {
+        return PYJIT_EXT_MISS;
+    }
+    PyArrayObject *a = (PyArrayObject *)args[a_slot];
+    PyArrayObject *b = (PyArrayObject *)args[b_slot];
+    int dtype = PyArray_TYPE(a);
+    if (PyArray_NDIM(a) != 2 || PyArray_NDIM(b) != 2 ||
+        dtype != PyArray_TYPE(b) ||
+        !numpy_jit_is_supported_float_dtype(dtype) ||
+        !PyArray_IS_C_CONTIGUOUS(a) || !PyArray_IS_C_CONTIGUOUS(b) ||
+        PyArray_DIM(a, 1) != PyArray_DIM(b, 0)) {
+        return PYJIT_EXT_MISS;
+    }
+    int array_slot;
+    int scalar_slot;
+    int scalar_first;
+    if (PyArray_CheckExact(args[mul_left]) &&
+        !PyArray_CheckExact(args[mul_right])) {
+        array_slot = mul_left;
+        scalar_slot = mul_right;
+        scalar_first = 0;
+    }
+    else if (!PyArray_CheckExact(args[mul_left]) &&
+             PyArray_CheckExact(args[mul_right])) {
+        array_slot = mul_right;
+        scalar_slot = mul_left;
+        scalar_first = 1;
+    }
+    else {
+        return PYJIT_EXT_MISS;
+    }
+    PyArrayObject *array = (PyArrayObject *)args[array_slot];
+    npy_intp dims[2] = {PyArray_DIM(a, 0), PyArray_DIM(b, 1)};
+    if (PyArray_TYPE(array) != dtype || PyArray_NDIM(array) != 2 ||
+        PyArray_DIM(array, 0) != dims[0] ||
+        PyArray_DIM(array, 1) != dims[1] ||
+        !PyArray_IS_C_CONTIGUOUS(array)) {
+        return PYJIT_EXT_MISS;
+    }
+    double scalar;
+    if (!exact_python_scalar_as_double(
+            payload, args[scalar_slot], &scalar)) {
+        return PYJIT_EXT_MISS;
+    }
+    PyArrayObject *out = (PyArrayObject *)PyArray_SimpleNew(2, dims, dtype);
+    if (out == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    PyObject *matmul = numpy_jit_known_ufunc(NUMPY_JIT_OP_MATMUL);
+    if (matmul == NULL) {
+        Py_DECREF(out);
+        return PYJIT_EXT_MISS;
+    }
+    PyObject *matmul_result = PyObject_CallFunctionObjArgs(
+        matmul, (PyObject *)a, (PyObject *)b, (PyObject *)out, NULL);
+    if (matmul_result == NULL) {
+        Py_DECREF(out);
+        return PYJIT_EXT_ERROR;
+    }
+    Py_DECREF(matmul_result);
+    npy_intp size = dims[0] * dims[1];
+    if (!numpy_jit_kernel_scaled_array_add_inplace_contig(
+            dtype, PyArray_BYTES(out), PyArray_BYTES(array), scalar,
+            scalar_first, size)) {
+        Py_DECREF(out);
+        return PYJIT_EXT_MISS;
+    }
+    *result = (PyObject *)out;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
 numpy_region_generic_eval(NumpyJitPlanPayload *payload,
                           PyObject *const *args, Py_ssize_t nargs,
                           PyObject **result)
@@ -3844,8 +5510,17 @@ numpy_region_generic_eval(NumpyJitPlanPayload *payload,
         if (PyArray_CheckExact(args[i])) {
             PyArrayObject *array = (PyArrayObject *)args[i];
             int current_dtype = PyArray_TYPE(array);
-            if ((current_dtype != NPY_FLOAT && current_dtype != NPY_DOUBLE) ||
-                numpy_jit_region_layout_class(array) == 0) {
+            int layout = numpy_jit_region_layout_class(array);
+            int layout4_fused_supported = !payload->region_generic &&
+                (payload->fused_op == NUMPY_JIT_FUSED_ADD_ARRAY_MUL_SCALAR ||
+                 payload->fused_op == NUMPY_JIT_FUSED_SUB_ARRAY_MUL_SCALAR ||
+                 payload->fused_op == NUMPY_JIT_FUSED_ADD_ARRAY_DIV_SCALAR ||
+                 payload->fused_op == NUMPY_JIT_FUSED_SUB_ARRAY_DIV_SCALAR ||
+                 payload->fused_op == NUMPY_JIT_FUSED_ADD_THREE_ARRAYS);
+            if (!numpy_jit_is_supported_region_dtype(current_dtype) ||
+                layout == 0 ||
+                (layout == 4 && payload->region_compiled_kind != 5 &&
+                 !layout4_fused_supported)) {
                 return PYJIT_EXT_MISS;
             }
             if (!PyArray_IS_C_CONTIGUOUS(array)) {
@@ -3882,6 +5557,23 @@ numpy_region_generic_eval(NumpyJitPlanPayload *payload,
     if (shape_source == NULL || size < payload->min_elements) {
         return PYJIT_EXT_MISS;
     }
+    if (dtype == NPY_LONG || dtype == NPY_LONGLONG) {
+        for (int node = 0; node < payload->region_node_count; node++) {
+            if (payload->region_nodes[node].op ==
+                    NUMPY_JIT_KERNEL_REGION_DIV) {
+                /* Integer true_divide has a floating result, which Core IR
+                   v1's single-dtype Region does not encode. */
+                return PYJIT_EXT_MISS;
+            }
+        }
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            if (input_is_scalar[i] &&
+                !(PyLong_CheckExact(args[i]) ||
+                  PyArray_IsScalar(args[i], SignedInteger))) {
+                return PYJIT_EXT_MISS;
+            }
+        }
+    }
     payload->itemsize = numpy_jit_itemsize_for_dtype(dtype);
 
     PyArrayObject *out;
@@ -3914,7 +5606,154 @@ numpy_region_generic_eval(NumpyJitPlanPayload *payload,
         }
     }
     int kernel_ok;
-    if (all_c_contiguous && PyArray_IS_C_CONTIGUOUS(out)) {
+    if (payload->region_compiled_kind == 1 && all_c_contiguous &&
+        PyArray_IS_C_CONTIGUOUS(out)) {
+        NumpyJitKernelRegionNode *mul0 = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *mul1 = &payload->region_nodes[1];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[3];
+        int a_slot = input_is_scalar[mul0->left] ?
+            mul0->right : mul0->left;
+        int alpha_slot = input_is_scalar[mul0->left] ?
+            mul0->left : mul0->right;
+        int b_slot = input_is_scalar[mul1->left] ?
+            mul1->right : mul1->left;
+        int beta_slot = input_is_scalar[mul1->left] ?
+            mul1->left : mul1->right;
+        int sum_slot = payload->region_input_count + 2;
+        int gamma_slot = tail->left == sum_slot ? tail->right : tail->left;
+        int roles_ok = a_slot < nargs && alpha_slot < nargs &&
+            b_slot < nargs && beta_slot < nargs && gamma_slot < nargs &&
+            !input_is_scalar[a_slot] && input_is_scalar[alpha_slot] &&
+            !input_is_scalar[b_slot] && input_is_scalar[beta_slot] &&
+            input_is_scalar[gamma_slot];
+        kernel_ok = roles_ok && numpy_jit_kernel_axpby_plus_scalar_contig(
+            dtype, input_data[a_slot], scalar_values[alpha_slot],
+            input_data[b_slot], scalar_values[beta_slot],
+            scalar_values[gamma_slot], PyArray_BYTES(out), size);
+    }
+    else if (payload->region_compiled_kind == 2 && all_c_contiguous &&
+             PyArray_IS_C_CONTIGUOUS(out)) {
+        NumpyJitKernelRegionNode *mul = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *add0 = &payload->region_nodes[1];
+        NumpyJitKernelRegionNode *add1 = &payload->region_nodes[2];
+        NumpyJitKernelRegionNode *add2 = &payload->region_nodes[3];
+        NumpyJitKernelRegionNode *sub = &payload->region_nodes[4];
+        int a_slot = input_is_scalar[mul->left] ? mul->right : mul->left;
+        int scale_slot = input_is_scalar[mul->left] ? mul->left : mul->right;
+        int b_slot = add0->left;
+        int c_slot = add0->right;
+        int t1 = payload->region_input_count + 1;
+        int t2 = t1 + 1;
+        int d_slot = add1->left == t1 ? add1->right : add1->left;
+        int e_slot = add2->left == t2 ? add2->right : add2->left;
+        int t0 = payload->region_input_count;
+        int t3 = payload->region_input_count + 3;
+        int scaled_first = sub->left == t0 && sub->right == t3;
+        int roles_ok = a_slot < nargs && scale_slot < nargs &&
+            b_slot < nargs && c_slot < nargs && d_slot < nargs &&
+            e_slot < nargs && !input_is_scalar[a_slot] &&
+            input_is_scalar[scale_slot] && !input_is_scalar[b_slot] &&
+            !input_is_scalar[c_slot] && !input_is_scalar[d_slot] &&
+            !input_is_scalar[e_slot] &&
+            ((sub->left == t0 && sub->right == t3) ||
+             (sub->right == t0 && sub->left == t3));
+        kernel_ok = roles_ok && numpy_jit_kernel_scale_sub_sum4_contig(
+            dtype, input_data[a_slot], scalar_values[scale_slot],
+            input_data[b_slot], input_data[c_slot], input_data[d_slot],
+            input_data[e_slot], scaled_first, PyArray_BYTES(out), size);
+    }
+    else if (payload->region_compiled_kind == 3 && all_c_contiguous &&
+             PyArray_IS_C_CONTIGUOUS(out)) {
+        NumpyJitKernelRegionNode *square = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int t0 = payload->region_input_count;
+        int array_slot = square->left;
+        int exponent_slot = square->right;
+        int other_slot = tail->left == t0 ? tail->right : tail->left;
+        int internal_first = tail->left == t0;
+        int roles_ok = array_slot < nargs && exponent_slot < nargs &&
+            other_slot < nargs && !input_is_scalar[array_slot] &&
+            input_is_scalar[exponent_slot];
+        kernel_ok = roles_ok && numpy_jit_kernel_square_addsub_contig(
+            dtype, input_data[array_slot], input_data[other_slot],
+            scalar_values[other_slot], input_is_scalar[other_slot],
+            internal_first,
+            tail->op == NUMPY_JIT_KERNEL_REGION_SUB,
+            PyArray_BYTES(out), size);
+    }
+    else if (payload->region_compiled_kind == 3) {
+        kernel_ok = 0;
+    }
+    else if (payload->region_compiled_kind == 4 && all_c_contiguous &&
+             PyArray_IS_C_CONTIGUOUS(out)) {
+        int array_slots[3] = {-1, -1, -1};
+        int exponent_slots[3] = {-1, -1, -1};
+        int square_nodes[3] = {0, 1, 3};
+        int roles_ok = 1;
+        for (int i = 0; i < 3; i++) {
+            NumpyJitKernelRegionNode *square =
+                &payload->region_nodes[square_nodes[i]];
+            array_slots[i] = square->left;
+            exponent_slots[i] = square->right;
+            roles_ok &= array_slots[i] < nargs &&
+                        exponent_slots[i] < nargs &&
+                        !input_is_scalar[array_slots[i]] &&
+                        input_is_scalar[exponent_slots[i]];
+        }
+        kernel_ok = roles_ok && numpy_jit_kernel_sum3_squares_contig(
+            dtype, input_data[array_slots[0]], input_data[array_slots[1]],
+            input_data[array_slots[2]], PyArray_BYTES(out), size);
+    }
+    else if (payload->region_compiled_kind == 4) {
+        kernel_ok = 0;
+    }
+    else if (payload->region_compiled_kind == 5) {
+        NumpyJitKernelRegionNode *first = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int a_slot = first->left;
+        int b_slot = first->right;
+        int internal_slot = payload->region_input_count;
+        int scalar_slot = tail->left == internal_slot ?
+            tail->right : tail->left;
+        int roles_ok = a_slot < nargs && b_slot < nargs &&
+            scalar_slot < nargs && !input_is_scalar[a_slot] &&
+            !input_is_scalar[b_slot] && input_is_scalar[scalar_slot] &&
+            (tail->left == internal_slot ||
+             (tail->op == NUMPY_JIT_KERNEL_REGION_MUL &&
+              tail->right == internal_slot));
+        int fused_op = first->op == NUMPY_JIT_KERNEL_REGION_ADD ?
+            (tail->op == NUMPY_JIT_KERNEL_REGION_MUL ?
+                NUMPY_JIT_FUSED_ADD_ARRAY_MUL_SCALAR :
+                NUMPY_JIT_FUSED_ADD_ARRAY_DIV_SCALAR) :
+            (tail->op == NUMPY_JIT_KERNEL_REGION_MUL ?
+                NUMPY_JIT_FUSED_SUB_ARRAY_MUL_SCALAR :
+                NUMPY_JIT_FUSED_SUB_ARRAY_DIV_SCALAR);
+        kernel_ok = roles_ok && numpy_jit_kernel_fused_contig_or_strided(
+            fused_op, dtype, !all_c_contiguous,
+            PyArray_NDIM(shape_source), size, PyArray_DIMS(shape_source),
+            input_strides[a_slot], input_strides[b_slot],
+            (const char *)input_data[a_slot],
+            (const char *)input_data[b_slot], scalar_values[scalar_slot],
+            0.0, PyArray_BYTES(out));
+    }
+    else if (payload->region_compiled_kind == 6 && all_c_contiguous &&
+             PyArray_IS_C_CONTIGUOUS(out)) {
+        NumpyJitKernelRegionNode *first = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int t0 = payload->region_input_count;
+        int scalar_slot = tail->left == t0 ? tail->right : tail->left;
+        int roles_ok = first->left < nargs && first->right < nargs &&
+            scalar_slot < nargs && !input_is_scalar[first->left] &&
+            !input_is_scalar[first->right] && input_is_scalar[scalar_slot];
+        kernel_ok = roles_ok && numpy_jit_kernel_mul_arrays_scalar_contig(
+            dtype, input_data[first->left], input_data[first->right],
+            scalar_values[scalar_slot], tail->right == t0,
+            PyArray_BYTES(out), size);
+    }
+    else if (payload->region_compiled_kind == 6) {
+        kernel_ok = 0;
+    }
+    else if (all_c_contiguous && PyArray_IS_C_CONTIGUOUS(out)) {
         kernel_ok = numpy_jit_kernel_region_contig(
             payload->region_nodes, payload->region_node_count,
             payload->region_input_count, payload->region_output_slot, dtype,
@@ -3950,7 +5789,9 @@ numpy_region_lowered_body(void *payload_obj, PyObject *const *args,
         return PYJIT_EXT_MISS;
     }
     NumpyJitPlanPayload *payload = (NumpyJitPlanPayload *)payload_obj;
-    if ((!payload->region_generic && nargs != 3) ||
+    Py_ssize_t specialized_nargs =
+        payload->region_matmul_epilogue == 2 ? 4 : 3;
+    if ((!payload->region_generic && nargs != specialized_nargs) ||
         (payload->region_generic && nargs != payload->region_input_count)) {
         return PYJIT_EXT_MISS;
     }
@@ -3966,39 +5807,29 @@ numpy_region_lowered_body(void *payload_obj, PyObject *const *args,
         return PYJIT_EXT_ERROR;
     }
     /* NumPy encodes four independent policies in three-bit fields.  Only
-       ignore and warn are safe for speculative execution: warn can replay
-       the exact Python recipe if the fused pass raises an FP status bit. */
+       ignore and warn are safe for direct fused execution.  Raise/call/log
+       stay on the exact local recipe; warn is reported through NumPy's
+       standard floating-point error handler after the fused kernel. */
     for (int shift = 0; shift <= 9; shift += 3) {
         int mode = (errmask >> shift) & 7;
         if (mode > 1) {
             return PYJIT_EXT_MISS;
         }
     }
-    int transactional_inplace = payload->inplace && errmask != 0;
-    PyArrayObject *mutation_target = NULL;
-    if (transactional_inplace) {
-        int target_index = payload->region_owner_plan != NULL ?
-            payload->region_owner_plan->mutation_input : -1;
-        if (target_index < 0 || target_index >= nargs ||
-            !PyArray_CheckExact(args[target_index]) ||
-            !PyArray_ISWRITEABLE((PyArrayObject *)args[target_index])) {
-            return PYJIT_EXT_MISS;
-        }
-        mutation_target = (PyArrayObject *)args[target_index];
-    }
     char fp_barrier;
     if (errmask != 0) {
         npy_clear_floatstatus_barrier(&fp_barrier);
     }
-    uint8_t saved_inplace = payload->inplace;
-    if (transactional_inplace) {
-        /* Do not expose a partial mutation if the fused pass raises an FP
-           status bit.  Build into the reusable result buffer first; only a
-           clean pass is committed to the original ndarray. */
-        payload->inplace = 0;
-    }
     PyJitExtResult status;
-    if (payload->region_matmul_epilogue) {
+    if (payload->region_matmul_epilogue == 2) {
+        status = numpy_region_matmul_scaled_add_eval(
+            payload, args, nargs, result);
+    }
+    else if (payload->region_matmul_epilogue == 3) {
+        status = numpy_region_matmul_prologue_eval(
+            payload, args, nargs, result);
+    }
+    else if (payload->region_matmul_epilogue) {
         status = numpy_region_matmul_epilogue_eval(
             payload, args, nargs, result);
     }
@@ -4009,26 +5840,15 @@ numpy_region_lowered_body(void *payload_obj, PyObject *const *args,
         status = numpy_fused_binary2_eval(
             payload, first_left, first_right, second_other, result);
     }
-    payload->inplace = saved_inplace;
     if ((status == PYJIT_EXT_HIT || status == PYJIT_EXT_COLD) &&
-        errmask != 0 &&
-        npy_get_floatstatus_barrier(&fp_barrier) != 0) {
-        Py_CLEAR(*result);
-        npy_clear_floatstatus_barrier(&fp_barrier);
-        return PYJIT_EXT_MISS;
-    }
-    if ((status == PYJIT_EXT_HIT || status == PYJIT_EXT_COLD) &&
-        transactional_inplace) {
-        PyObject *temporary = *result;
-        if (!PyArray_CheckExact(temporary) ||
-            PyArray_CopyInto(mutation_target,
-                             (PyArrayObject *)temporary) < 0) {
+        errmask != 0) {
+        int fpe_errors = npy_get_floatstatus_barrier(&fp_barrier);
+        if (fpe_errors != 0 &&
+            PyUFunc_GiveFloatingpointErrors(
+                "CrossJIT region", fpe_errors) < 0) {
             Py_CLEAR(*result);
             return PYJIT_EXT_ERROR;
         }
-        Py_DECREF(temporary);
-        Py_INCREF(mutation_target);
-        *result = (PyObject *)mutation_target;
     }
     return status;
 }
@@ -4080,8 +5900,209 @@ numpy_jit_region_layout_class(PyArrayObject *array)
         if (PyArray_STRIDE(array, ndim - 1) == PyArray_ITEMSIZE(array)) {
             return 3;
         }
+        if (ndim == 2) {
+            return 4;
+        }
     }
     return 0;
+}
+
+static int
+numpy_jit_matmul_prologue_inspect(
+        NumpyJitPlanPayload *payload, PyObject *const *args,
+        Py_ssize_t nargs, int require_lowerable, uint64_t *signature)
+{
+    if (nargs != 3) {
+        return 0;
+    }
+    uint64_t hash = 1469598103934665603ULL;
+    hash = numpy_jit_region_hash_u64(hash, 0x4d415450524fULL);
+    for (Py_ssize_t i = 0; i < nargs; i++) {
+        hash = numpy_jit_region_hash_u64(
+            hash, (uint64_t)(uintptr_t)Py_TYPE(args[i]));
+        if (PyArray_CheckExact(args[i])) {
+            PyArrayObject *current = (PyArrayObject *)args[i];
+            hash = numpy_jit_region_hash_u64(
+                hash, (uint64_t)PyArray_TYPE(current));
+            hash = numpy_jit_region_hash_u64(
+                hash, (uint64_t)PyArray_NDIM(current));
+            hash = numpy_jit_region_hash_u64(
+                hash, (uint64_t)numpy_jit_region_layout_class(current));
+        }
+    }
+    int mul_left = payload->region_left[0];
+    int mul_right = payload->region_right[0];
+    int internal_slot = payload->region_input_count;
+    int matmul_left = payload->region_left[1];
+    int matmul_right = payload->region_right[1];
+    int internal_is_left = matmul_left == internal_slot;
+    int other_slot = internal_is_left ? matmul_right : matmul_left;
+    int array_slot = -1;
+    int scalar_slot = -1;
+    if (mul_left >= 0 && mul_left < nargs &&
+        mul_right >= 0 && mul_right < nargs) {
+        if (PyArray_CheckExact(args[mul_left]) &&
+            !PyArray_CheckExact(args[mul_right])) {
+            array_slot = mul_left;
+            scalar_slot = mul_right;
+        }
+        else if (!PyArray_CheckExact(args[mul_left]) &&
+                 PyArray_CheckExact(args[mul_right])) {
+            array_slot = mul_right;
+            scalar_slot = mul_left;
+        }
+    }
+    int supported = array_slot >= 0 && other_slot >= 0 &&
+                    other_slot < nargs &&
+                    (internal_is_left != (matmul_right == internal_slot)) &&
+                    PyArray_CheckExact(args[other_slot]);
+    npy_intp elements = 0;
+    if (supported) {
+        PyArrayObject *array = (PyArrayObject *)args[array_slot];
+        PyArrayObject *other = (PyArrayObject *)args[other_slot];
+        int dtype = PyArray_TYPE(array);
+        int array_ndim = PyArray_NDIM(array);
+        int other_ndim = PyArray_NDIM(other);
+        supported = numpy_jit_is_supported_float_dtype(dtype) &&
+                    PyArray_TYPE(other) == dtype &&
+                    (array_ndim == 1 || array_ndim == 2) &&
+                    (other_ndim == 1 || other_ndim == 2) &&
+                    PyArray_IS_C_CONTIGUOUS(array) &&
+                    PyArray_IS_C_CONTIGUOUS(other);
+        if (supported) {
+            npy_intp array_contract =
+                internal_is_left ? PyArray_DIM(array, array_ndim - 1) :
+                                   PyArray_DIM(array, 0);
+            npy_intp other_contract =
+                internal_is_left ? PyArray_DIM(other, 0) :
+                                   PyArray_DIM(other, other_ndim - 1);
+            supported = array_contract == other_contract;
+            elements = PyArray_SIZE(array);
+        }
+        double ignored;
+        if (supported && !exact_python_scalar_as_double(
+                payload, args[scalar_slot], &ignored)) {
+            PyErr_Clear();
+            supported = 0;
+        }
+        uint64_t bytes = supported ?
+            (uint64_t)elements * (uint64_t)PyArray_ITEMSIZE(array) : 0;
+        if (bytes > 64ull * 1024ull * 1024ull) {
+            supported = 0;
+        }
+    }
+    int errmask;
+    if (_get_errmask_fast(&errmask) < 0) {
+        return -1;
+    }
+    hash = numpy_jit_region_hash_u64(hash, (uint64_t)(uint32_t)errmask);
+    for (int shift = 0; shift <= 9; shift += 3) {
+        if (((errmask >> shift) & 7) > 1) {
+            supported = 0;
+        }
+    }
+    *signature = hash;
+    return !require_lowerable || (supported && elements >= 64);
+}
+
+static int
+numpy_jit_matmul_scaled_add_inspect(
+        NumpyJitPlanPayload *payload, PyObject *const *args,
+        Py_ssize_t nargs, int require_lowerable, uint64_t *signature)
+{
+    if (nargs != 4) {
+        return 0;
+    }
+    uint64_t hash = 1469598103934665603ULL;
+    hash = numpy_jit_region_hash_u64(hash, 0x4d4d53414444ULL);
+    int supported = 1;
+    for (Py_ssize_t i = 0; i < nargs; i++) {
+        hash = numpy_jit_region_hash_u64(
+            hash, (uint64_t)(uintptr_t)Py_TYPE(args[i]));
+        if (PyArray_CheckExact(args[i])) {
+            PyArrayObject *array = (PyArrayObject *)args[i];
+            hash = numpy_jit_region_hash_u64(
+                hash, (uint64_t)PyArray_TYPE(array));
+            hash = numpy_jit_region_hash_u64(
+                hash, (uint64_t)PyArray_NDIM(array));
+            hash = numpy_jit_region_hash_u64(
+                hash, (uint64_t)numpy_jit_region_layout_class(array));
+        }
+    }
+    int a_slot = payload->region_left[0];
+    int b_slot = payload->region_right[0];
+    int mul_left = payload->region_left[1];
+    int mul_right = payload->region_right[1];
+    if (a_slot < 0 || a_slot >= nargs || b_slot < 0 || b_slot >= nargs ||
+        mul_left < 0 || mul_left >= nargs ||
+        mul_right < 0 || mul_right >= nargs ||
+        !PyArray_CheckExact(args[a_slot]) ||
+        !PyArray_CheckExact(args[b_slot])) {
+        supported = 0;
+    }
+    npy_intp output_elements = 0;
+    if (supported) {
+        PyArrayObject *a = (PyArrayObject *)args[a_slot];
+        PyArrayObject *b = (PyArrayObject *)args[b_slot];
+        int dtype = PyArray_TYPE(a);
+        supported = PyArray_NDIM(a) == 2 && PyArray_NDIM(b) == 2 &&
+                    dtype == PyArray_TYPE(b) &&
+                    numpy_jit_is_supported_float_dtype(dtype) &&
+                    PyArray_IS_C_CONTIGUOUS(a) &&
+                    PyArray_IS_C_CONTIGUOUS(b) &&
+                    PyArray_DIM(a, 1) == PyArray_DIM(b, 0);
+        if (supported) {
+            int array_slot;
+            int scalar_slot;
+            if (PyArray_CheckExact(args[mul_left]) &&
+                !PyArray_CheckExact(args[mul_right])) {
+                array_slot = mul_left;
+                scalar_slot = mul_right;
+            }
+            else if (!PyArray_CheckExact(args[mul_left]) &&
+                     PyArray_CheckExact(args[mul_right])) {
+                array_slot = mul_right;
+                scalar_slot = mul_left;
+            }
+            else {
+                supported = 0;
+                array_slot = 0;
+                scalar_slot = 0;
+            }
+            if (supported) {
+                PyArrayObject *array = (PyArrayObject *)args[array_slot];
+                npy_intp m = PyArray_DIM(a, 0);
+                npy_intp n = PyArray_DIM(b, 1);
+                supported = PyArray_TYPE(array) == dtype &&
+                            PyArray_NDIM(array) == 2 &&
+                            PyArray_DIM(array, 0) == m &&
+                            PyArray_DIM(array, 1) == n &&
+                            PyArray_IS_C_CONTIGUOUS(array);
+                double ignored;
+                if (!exact_python_scalar_as_double(
+                        payload, args[scalar_slot], &ignored)) {
+                    PyErr_Clear();
+                    supported = 0;
+                }
+                output_elements = m * n;
+            }
+        }
+    }
+    int errmask;
+    if (_get_errmask_fast(&errmask) < 0) {
+        return -1;
+    }
+    hash = numpy_jit_region_hash_u64(hash, (uint64_t)(uint32_t)errmask);
+    for (int shift = 0; shift <= 9; shift += 3) {
+        if (((errmask >> shift) & 7) > 1) {
+            supported = 0;
+        }
+    }
+    *signature = hash;
+    if (!require_lowerable) {
+        return 1;
+    }
+    return supported && output_elements >= 64;
 }
 
 static int
@@ -4196,6 +6217,14 @@ numpy_jit_region_inspect(const PyJitExtPlan *region,
     if (nargs != payload->region_input_count) {
         return 0;
     }
+    if (payload->region_matmul_epilogue == 2) {
+        return numpy_jit_matmul_scaled_add_inspect(
+            payload, args, nargs, require_lowerable, signature);
+    }
+    if (payload->region_matmul_epilogue == 3) {
+        return numpy_jit_matmul_prologue_inspect(
+            payload, args, nargs, require_lowerable, signature);
+    }
     if (payload->region_matmul_epilogue) {
         return numpy_jit_matmul_epilogue_inspect(
             payload, args, nargs, require_lowerable, signature);
@@ -4208,7 +6237,6 @@ numpy_jit_region_inspect(const PyJitExtPlan *region,
     int dtype = -1;
     int itemsize = 0;
     int supported = 1;
-    int shape_compatible = 1;
     for (Py_ssize_t i = 0; i < nargs; i++) {
         if (PyArray_CheckExact(args[i])) {
             PyArrayObject *array = (PyArrayObject *)args[i];
@@ -4221,28 +6249,50 @@ numpy_jit_region_inspect(const PyJitExtPlan *region,
             hash = numpy_jit_region_hash_u64(hash, (uint64_t)layout);
             hash = numpy_jit_region_hash_u64(
                 hash, PyArray_ISWRITEABLE(array) ? 1u : 0u);
-            if (!numpy_jit_is_supported_float_dtype(current_dtype) ||
-                layout == 0) {
-                supported = 0;
-            }
-            if (shape_source == NULL) {
-                shape_source = array;
-                element_count = PyArray_SIZE(array);
-                dtype = current_dtype;
-                itemsize = PyArray_ITEMSIZE(array);
-            }
-            else {
-                if (current_dtype != dtype ||
-                    PyArray_NDIM(array) != PyArray_NDIM(shape_source)) {
+            if (require_lowerable) {
+                int layout4_fused_supported = !payload->region_generic &&
+                    (payload->fused_op ==
+                         NUMPY_JIT_FUSED_ADD_ARRAY_MUL_SCALAR ||
+                     payload->fused_op ==
+                         NUMPY_JIT_FUSED_SUB_ARRAY_MUL_SCALAR ||
+                     payload->fused_op ==
+                         NUMPY_JIT_FUSED_ADD_ARRAY_DIV_SCALAR ||
+                     payload->fused_op ==
+                         NUMPY_JIT_FUSED_SUB_ARRAY_DIV_SCALAR);
+                layout4_fused_supported |=
+                    !payload->region_generic &&
+                    payload->fused_op == NUMPY_JIT_FUSED_ADD_THREE_ARRAYS;
+                if (!numpy_jit_is_supported_region_dtype(current_dtype) ||
+                    layout == 0 ||
+                    (layout == 4 && payload->region_compiled_kind != 5 &&
+                     !layout4_fused_supported)) {
                     supported = 0;
-                    shape_compatible = 0;
+                }
+                if (payload->region_generic &&
+                    payload->region_compiled_kind == 0 && layout != 1) {
+                    supported = 0;
+                }
+                if ((payload->region_compiled_kind == 3 ||
+                     payload->region_compiled_kind == 4 ||
+                     payload->region_compiled_kind == 6) && layout != 1) {
+                    supported = 0;
+                }
+                if (shape_source == NULL) {
+                    shape_source = array;
+                    element_count = PyArray_SIZE(array);
+                    dtype = current_dtype;
+                    itemsize = PyArray_ITEMSIZE(array);
+                }
+                else if (current_dtype != dtype ||
+                         PyArray_NDIM(array) !=
+                             PyArray_NDIM(shape_source)) {
+                    supported = 0;
                 }
                 else {
                     for (int dim = 0; dim < PyArray_NDIM(array); dim++) {
                         if (PyArray_DIM(array, dim) !=
                             PyArray_DIM(shape_source, dim)) {
                             supported = 0;
-                            shape_compatible = 0;
                             break;
                         }
                     }
@@ -4250,45 +6300,87 @@ numpy_jit_region_inspect(const PyJitExtPlan *region,
             }
         }
         else {
-            double ignored;
-            int scalar_ok = exact_python_scalar_as_double(
-                payload, args[i], &ignored);
             hash = numpy_jit_region_hash_u64(hash, 0x200u + (uint64_t)i);
             hash = numpy_jit_region_hash_u64(
                 hash, (uint64_t)(uintptr_t)Py_TYPE(args[i]));
-            if (!scalar_ok) {
-                PyErr_Clear();
+            if (require_lowerable) {
+                double ignored;
+                if (!exact_python_scalar_as_double(
+                        payload, args[i], &ignored)) {
+                    PyErr_Clear();
+                    supported = 0;
+                }
+            }
+        }
+    }
+    if (require_lowerable &&
+        (dtype == NPY_LONG || dtype == NPY_LONGLONG)) {
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            if (!PyArray_CheckExact(args[i]) &&
+                !(PyLong_CheckExact(args[i]) ||
+                  PyArray_IsScalar(args[i], SignedInteger))) {
+                supported = 0;
+            }
+        }
+        for (int i = 0; i < payload->region_node_count; i++) {
+            if (payload->region_nodes[i].op ==
+                    NUMPY_JIT_KERNEL_REGION_DIV) {
                 supported = 0;
             }
         }
     }
-    for (int i = 0; i < payload->region_node_count; i++) {
-        if (payload->region_ops[i] != NUMPY_JIT_OP_POWER) {
-            continue;
-        }
-        int exponent_slot = payload->region_right[i];
-        int is_power2 = exponent_slot >= 0 && exponent_slot < nargs &&
-            numpy_jit_is_exact_power2_exponent(args[exponent_slot]);
-        hash = numpy_jit_region_hash_u64(
-            hash, 0x300u + (uint64_t)i);
-        hash = numpy_jit_region_hash_u64(hash, is_power2 ? 2u : 0u);
-        if (!is_power2) {
+    if (require_lowerable && payload->region_compiled_kind == 5 &&
+        !numpy_jit_is_supported_float_dtype(dtype)) {
+        supported = 0;
+    }
+    if (require_lowerable && payload->region_compiled_kind == 6) {
+        NumpyJitKernelRegionNode *first = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int t0 = payload->region_input_count;
+        int scalar_slot = tail->left == t0 ? tail->right : tail->left;
+        if (first->left >= nargs || first->right >= nargs ||
+            scalar_slot < 0 || scalar_slot >= nargs ||
+            !PyArray_CheckExact(args[first->left]) ||
+            !PyArray_CheckExact(args[first->right]) ||
+            PyArray_CheckExact(args[scalar_slot])) {
             supported = 0;
         }
     }
-    hash = numpy_jit_region_hash_u64(hash, shape_compatible ? 1u : 0u);
+    if (require_lowerable) {
+        for (int i = 0; i < payload->region_node_count; i++) {
+            if (payload->region_ops[i] != NUMPY_JIT_OP_POWER) {
+                continue;
+            }
+            int exponent_slot = payload->region_right[i];
+            if (exponent_slot < 0 || exponent_slot >= nargs ||
+                !numpy_jit_is_exact_power2_exponent(args[exponent_slot])) {
+                supported = 0;
+            }
+        }
+    }
     int errmask;
     if (_get_errmask_fast(&errmask) < 0) {
         return -1;
     }
     hash = numpy_jit_region_hash_u64(hash, (uint64_t)(uint32_t)errmask);
-    int fp_supported = 1;
-    for (int shift = 0; shift <= 9; shift += 3) {
-        if (((errmask >> shift) & 7) > 1) {
-            fp_supported = 0;
+    if (require_lowerable) {
+        for (int shift = 0; shift <= 9; shift += 3) {
+            if (((errmask >> shift) & 7) > 1) {
+                supported = 0;
+            }
         }
     }
-    supported &= fp_supported;
+
+    /* A PIC property key must be cheap and stable.  Shape equality, scalar
+       conversion, aliasing and the byte-based profitability decision are
+       execution preconditions, not lowering identity.  They are checked
+       while installing a lowering and again by its semantic body.  Omitting
+       them here avoids a second full validation pass on every hot PIC hit;
+       a later shape/value change safely becomes a body MISS. */
+    *signature = hash;
+    if (!require_lowerable) {
+        return 1;
+    }
 
     int profitable = 0;
     if (element_count >= 0 && itemsize > 0) {
@@ -4315,8 +6407,6 @@ numpy_jit_region_inspect(const PyJitExtPlan *region,
                          bytes >= lowering_cost;
         }
     }
-    hash = numpy_jit_region_hash_u64(hash, profitable ? 1u : 0u);
-
     if (payload->inplace) {
         int target_index = payload->region_mutation_input;
         if (target_index < 0 || target_index >= nargs ||
@@ -4332,17 +6422,11 @@ numpy_jit_region_inspect(const PyJitExtPlan *region,
                 }
                 int overlap = solve_may_share_memory(
                     target, (PyArrayObject *)args[i], NPY_MAY_SHARE_BOUNDS);
-                hash = numpy_jit_region_hash_u64(
-                    hash, overlap == 0 ? 0u : 1u);
                 if (overlap != 0) {
                     supported = 0;
                 }
             }
         }
-    }
-    *signature = hash;
-    if (!require_lowerable) {
-        return 1;
     }
     return supported && profitable && shape_source != NULL;
 }
@@ -4371,27 +6455,11 @@ numpy_jit_lowered_region_eval(void *payload_obj, PyObject *const *args,
     if (nargs != lowering->nargs) {
         return PYJIT_EXT_MISS;
     }
-    for (Py_ssize_t i = 0; i < nargs; i++) {
-        if (Py_TYPE(args[i]) != lowering->types[i]) {
-            return PYJIT_EXT_MISS;
-        }
-        if ((lowering->array_mask & (1u << i)) != 0) {
-            PyArrayObject *array = (PyArrayObject *)args[i];
-            if (PyArray_TYPE(array) != lowering->dtypes[i] ||
-                PyArray_NDIM(array) != lowering->ndims[i] ||
-                numpy_jit_region_layout_class(array) != lowering->layouts[i] ||
-                (PyArray_ISWRITEABLE(array) != 0) !=
-                    ((lowering->writable_mask & (1u << i)) != 0)) {
-                return PYJIT_EXT_MISS;
-            }
-        }
-    }
-    /* The current lowered payload is property-independent: dtype, layout,
-       shape, scalar roles, aliasing, writability and FP policy are all
-       validated again by the evaluator below.  Recomputing the complete
-       property signature here duplicated those guards on every PIC hit.
-       Keep signatures for PIC installation/negative caching, while using the
-       evaluator itself as the per-entry dynamic guard. */
+    /* The lowered body is property-independent and performs the complete
+       dynamic validation itself (exact ndarray/scalar roles, dtype, shape,
+       layout, aliasing, writability and FP policy).  Rechecking the cached
+       property vector here made every PIC hit scan the same arguments twice
+       without protecting an additional lowering assumption. */
     return numpy_region_lowered_body(
         lowering->owner, args, nargs, result);
 }
@@ -4463,6 +6531,278 @@ numpy_region_local_fallback(NumpyJitPlanPayload *payload,
 }
 
 static PyJitExtResult
+numpy_masked_mean_region_eval(NumpyJitPlanPayload *payload,
+                              PyObject *const *args, Py_ssize_t nargs,
+                              PyObject **result)
+{
+    if (payload == NULL || nargs != payload->region_input_count) {
+        return PYJIT_EXT_MISS;
+    }
+    NumpyJitPlanPayload *logical =
+        (NumpyJitPlanPayload *)payload->region_atomic_plans[2]->payload;
+    NumpyJitPlanPayload *mean =
+        (NumpyJitPlanPayload *)payload->region_atomic_plans[4]->payload;
+    int logical_guarded = 0;
+    int mean_guarded = 0;
+    for (Py_ssize_t i = 0; i < nargs; i++) {
+        logical_guarded |= args[i] == logical->expected_callable;
+        mean_guarded |= args[i] == mean->expected_callable;
+    }
+    if (!logical_guarded || !mean_guarded) {
+        return PYJIT_EXT_MISS;
+    }
+
+    PyArrayObject *radius[2] = {NULL, NULL};
+    double scalar[2] = {0.0, 0.0};
+    int array_on_left[2] = {0, 0};
+    for (int node = 0; node < 2; node++) {
+        int left_slot = payload->region_left[node];
+        int right_slot = payload->region_right[node];
+        if (left_slot >= nargs || right_slot >= nargs) {
+            return PYJIT_EXT_MISS;
+        }
+        PyObject *left = args[left_slot];
+        PyObject *right = args[right_slot];
+        if (PyArray_CheckExact(left) && !PyArray_CheckExact(right)) {
+            radius[node] = (PyArrayObject *)left;
+            array_on_left[node] = 1;
+            scalar[node] = PyFloat_AsDouble(right);
+        }
+        else if (!PyArray_CheckExact(left) && PyArray_CheckExact(right)) {
+            radius[node] = (PyArrayObject *)right;
+            scalar[node] = PyFloat_AsDouble(left);
+        }
+        else {
+            return PYJIT_EXT_MISS;
+        }
+        if (scalar[node] == -1.0 && PyErr_Occurred()) {
+            PyErr_Clear();
+            return PYJIT_EXT_MISS;
+        }
+        if (PyArray_TYPE(radius[node]) != NPY_DOUBLE ||
+            PyArray_NDIM(radius[node]) != 1 ||
+            !PyArray_IS_C_CONTIGUOUS(radius[node])) {
+            return PYJIT_EXT_MISS;
+        }
+    }
+    if (PyArray_SIZE(radius[0]) != PyArray_SIZE(radius[1])) {
+        return PYJIT_EXT_MISS;
+    }
+    int mask_slot = payload->region_input_count + 2;
+    int data_slot = payload->region_left[3] == mask_slot ?
+        payload->region_right[3] : payload->region_left[3];
+    if (data_slot < 0 || data_slot >= nargs ||
+        !PyArray_CheckExact(args[data_slot])) {
+        return PYJIT_EXT_MISS;
+    }
+    PyArrayObject *data = (PyArrayObject *)args[data_slot];
+    if (PyArray_TYPE(data) != NPY_DOUBLE || PyArray_NDIM(data) != 1 ||
+        !PyArray_IS_C_CONTIGUOUS(data) ||
+        PyArray_SIZE(data) != PyArray_SIZE(radius[0])) {
+        return PYJIT_EXT_MISS;
+    }
+
+    const double *radius0 = (const double *)PyArray_DATA(radius[0]);
+    const double *radius1 = (const double *)PyArray_DATA(radius[1]);
+    const double *values = (const double *)PyArray_DATA(data);
+    npy_intp size = PyArray_SIZE(data);
+    npy_intp count = 0;
+    double sum = 0.0;
+    for (npy_intp i = 0; i < size; i++) {
+        double left0 = array_on_left[0] ? radius0[i] : scalar[0];
+        double right0 = array_on_left[0] ? scalar[0] : radius0[i];
+        double left1 = array_on_left[1] ? radius1[i] : scalar[1];
+        double right1 = array_on_left[1] ? scalar[1] : radius1[i];
+        int cmp0 = payload->region_ops[0] == NUMPY_JIT_OP_LESS ?
+            left0 < right0 : left0 <= right0;
+        int cmp1 = payload->region_ops[1] == NUMPY_JIT_OP_LESS ?
+            left1 < right1 : left1 <= right1;
+        if (cmp0 && cmp1) {
+            sum += values[i];
+            count++;
+        }
+    }
+    if (count == 0) {
+        return PYJIT_EXT_MISS;
+    }
+    PyObject *out = PyArrayScalar_New(Double);
+    if (out == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    PyArrayScalar_ASSIGN(out, Double, sum / (double)count);
+    *result = out;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
+numpy_compare_logical_region_eval(NumpyJitPlanPayload *payload,
+                                  PyObject *const *args, Py_ssize_t nargs,
+                                  PyObject **result)
+{
+    if (payload == NULL || nargs != payload->region_input_count) {
+        return PYJIT_EXT_MISS;
+    }
+    NumpyJitPlanPayload *logical =
+        (NumpyJitPlanPayload *)payload->region_atomic_plans[2]->payload;
+    int callable_guarded = 0;
+    for (Py_ssize_t i = 0; i + 1 < nargs; i++) {
+        if (args[i] == logical->expected_callable && args[i + 1] == NULL) {
+            callable_guarded = 1;
+            break;
+        }
+    }
+    if (!callable_guarded) {
+        return PYJIT_EXT_MISS;
+    }
+
+    PyArrayObject *arrays[2] = {NULL, NULL};
+    double scalars[2] = {0.0, 0.0};
+    int array_on_left[2] = {0, 0};
+    for (int node = 0; node < 2; node++) {
+        int left_slot = payload->region_left[node];
+        int right_slot = payload->region_right[node];
+        if (left_slot >= nargs || right_slot >= nargs) {
+            return PYJIT_EXT_MISS;
+        }
+        PyObject *left = args[left_slot];
+        PyObject *right = args[right_slot];
+        if (PyArray_CheckExact(left) && !PyArray_CheckExact(right)) {
+            arrays[node] = (PyArrayObject *)left;
+            array_on_left[node] = 1;
+            scalars[node] = PyFloat_AsDouble(right);
+        }
+        else if (!PyArray_CheckExact(left) && PyArray_CheckExact(right)) {
+            arrays[node] = (PyArrayObject *)right;
+            array_on_left[node] = 0;
+            scalars[node] = PyFloat_AsDouble(left);
+        }
+        else {
+            return PYJIT_EXT_MISS;
+        }
+        if (scalars[node] == -1.0 && PyErr_Occurred()) {
+            PyErr_Clear();
+            return PYJIT_EXT_MISS;
+        }
+        if (PyArray_TYPE(arrays[node]) != NPY_DOUBLE ||
+            !PyArray_IS_C_CONTIGUOUS(arrays[node])) {
+            return PYJIT_EXT_MISS;
+        }
+    }
+    if (PyArray_NDIM(arrays[0]) != PyArray_NDIM(arrays[1]) ||
+        PyArray_SIZE(arrays[0]) != PyArray_SIZE(arrays[1])) {
+        return PYJIT_EXT_MISS;
+    }
+    for (int axis = 0; axis < PyArray_NDIM(arrays[0]); axis++) {
+        if (PyArray_DIM(arrays[0], axis) != PyArray_DIM(arrays[1], axis)) {
+            return PYJIT_EXT_MISS;
+        }
+    }
+    PyArray_Descr *bool_descr = PyArray_DescrFromType(NPY_BOOL);
+    if (bool_descr == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    PyArrayObject *out = (PyArrayObject *)PyArray_NewFromDescr(
+        &PyArray_Type, bool_descr, PyArray_NDIM(arrays[0]),
+        PyArray_DIMS(arrays[0]), NULL, NULL, 0, NULL);
+    if (out == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    const double *data0 = (const double *)PyArray_DATA(arrays[0]);
+    const double *data1 = (const double *)PyArray_DATA(arrays[1]);
+    npy_bool *out_data = (npy_bool *)PyArray_DATA(out);
+    npy_intp size = PyArray_SIZE(arrays[0]);
+    for (npy_intp i = 0; i < size; i++) {
+        double left0 = array_on_left[0] ? data0[i] : scalars[0];
+        double right0 = array_on_left[0] ? scalars[0] : data0[i];
+        double left1 = array_on_left[1] ? data1[i] : scalars[1];
+        double right1 = array_on_left[1] ? scalars[1] : data1[i];
+        int cmp0 = payload->region_ops[0] == NUMPY_JIT_OP_LESS ?
+            left0 < right0 : left0 <= right0;
+        int cmp1 = payload->region_ops[1] == NUMPY_JIT_OP_LESS ?
+            left1 < right1 : left1 <= right1;
+        out_data[i] = (npy_bool)(cmp0 && cmp1);
+    }
+    *result = (PyObject *)out;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
+numpy_outer_minimum_region_eval(NumpyJitPlanPayload *payload,
+                                PyObject *const *args, Py_ssize_t nargs,
+                                PyObject **result)
+{
+    if (payload == NULL || nargs != 7 ||
+        payload->region_left[0] + 1 != payload->region_right[0]) {
+        return PYJIT_EXT_MISS;
+    }
+    int col_slot = payload->region_left[0];
+    int row_slot = payload->region_right[0];
+    int outer_output = payload->region_input_count;
+    int path_slot = payload->region_left[1] == outer_output ?
+        payload->region_right[1] : payload->region_left[1];
+    int outer_callable_slot = col_slot - 2;
+    int outer_receiver_slot = col_slot - 1;
+    int minimum_callable_slot = path_slot - 2;
+    int minimum_receiver_slot = path_slot - 1;
+    if (path_slot < 2 || col_slot < 2 || row_slot >= nargs ||
+        outer_callable_slot < 0 || minimum_callable_slot < 0 ||
+        outer_receiver_slot >= nargs || minimum_receiver_slot >= nargs) {
+        return PYJIT_EXT_MISS;
+    }
+    NumpyJitPlanPayload *outer =
+        (NumpyJitPlanPayload *)payload->region_atomic_plans[0]->payload;
+    NumpyJitPlanPayload *minimum =
+        (NumpyJitPlanPayload *)payload->region_atomic_plans[1]->payload;
+    if (args[outer_callable_slot] != outer->expected_callable ||
+        args[outer_receiver_slot] != outer->expected_receiver ||
+        args[minimum_callable_slot] != minimum->expected_callable ||
+        args[minimum_receiver_slot] != NULL ||
+        !PyArray_CheckExact(args[path_slot]) ||
+        !PyArray_CheckExact(args[col_slot]) ||
+        !PyArray_CheckExact(args[row_slot])) {
+        return PYJIT_EXT_MISS;
+    }
+    PyArrayObject *path = (PyArrayObject *)args[path_slot];
+    PyArrayObject *col = (PyArrayObject *)args[col_slot];
+    PyArrayObject *row = (PyArrayObject *)args[row_slot];
+    if (PyArray_TYPE(path) != NPY_INT || PyArray_TYPE(col) != NPY_INT ||
+        PyArray_TYPE(row) != NPY_INT || PyArray_NDIM(path) != 2 ||
+        PyArray_NDIM(col) != 1 || PyArray_NDIM(row) != 1 ||
+        !PyArray_IS_C_CONTIGUOUS(path) ||
+        PyArray_DIM(path, 0) != PyArray_DIM(path, 1) ||
+        PyArray_DIM(col, 0) != PyArray_DIM(path, 0) ||
+        PyArray_DIM(row, 0) != PyArray_DIM(path, 1) ||
+        PyArray_STRIDE(col, 0) <= 0 || PyArray_STRIDE(row, 0) <= 0) {
+        return PYJIT_EXT_MISS;
+    }
+    npy_intp dims[2] = {PyArray_DIM(path, 0), PyArray_DIM(path, 1)};
+    PyArrayObject *out = (PyArrayObject *)PyArray_SimpleNew(2, dims, NPY_INT);
+    if (out == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    const npy_int32 *path_data = (const npy_int32 *)PyArray_DATA(path);
+    const char *col_data = PyArray_BYTES(col);
+    const char *row_data = PyArray_BYTES(row);
+    npy_int32 *out_data = (npy_int32 *)PyArray_DATA(out);
+    npy_intp n = dims[0];
+    npy_intp col_stride = PyArray_STRIDE(col, 0);
+    npy_intp row_stride = PyArray_STRIDE(row, 0);
+    for (npy_intp i = 0; i < n; i++) {
+        npy_int32 col_value = *(const npy_int32 *)(col_data + i * col_stride);
+        for (npy_intp j = 0; j < n; j++) {
+            npy_int32 row_value =
+                *(const npy_int32 *)(row_data + j * row_stride);
+            npy_int32 sum = (npy_int32)(
+                (npy_uint32)col_value + (npy_uint32)row_value);
+            npy_int32 old = path_data[i * n + j];
+            out_data[i * n + j] = old < sum ? old : sum;
+        }
+    }
+    *result = (PyObject *)out;
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
 numpy_region_eval(void *payload_obj, PyObject *const *args,
                   Py_ssize_t nargs, PyObject **result)
 {
@@ -4470,6 +6810,18 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
         return PYJIT_EXT_MISS;
     }
     NumpyJitPlanPayload *payload = (NumpyJitPlanPayload *)payload_obj;
+    if (payload->region_masked_mean) {
+        return numpy_masked_mean_region_eval(
+            payload, args, nargs, result);
+    }
+    if (payload->region_compare_logical) {
+        return numpy_compare_logical_region_eval(
+            payload, args, nargs, result);
+    }
+    if (payload->region_outer_minimum) {
+        return numpy_outer_minimum_region_eval(
+            payload, args, nargs, result);
+    }
     PyJitExtPlan *region = payload->region_owner_plan;
     PyJitExtProvider *provider = region != NULL ? region->provider : NULL;
     if (region == NULL || provider == NULL ||
@@ -4485,7 +6837,33 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
     }
 
     PyJitExtSiteState *site = payload->site;
+    int fast_pic = payload->region_fast_pic != 0 ?
+        (int)payload->region_fast_pic - 1 : -1;
+    if (fast_pic >= 0 && fast_pic < payload->region_pic_count) {
+        NumpyJitRegionPICEntry *entry = &payload->region_pic[fast_pic];
+        /* All current lowered Region payloads share the provider-owned
+           property-independent body.  Bypass the PIC loop and indirect
+           guard call for the monomorphic steady state; the body remains the
+           authoritative dynamic guard, so property changes still miss
+           safely and continue through negative-cache handling below. */
+        PyJitExtResult evaluated = numpy_region_lowered_body(
+            payload, args, nargs, result);
+        if (evaluated == PYJIT_EXT_HIT) {
+            numpy_jit_region_inc_u16(
+                site != NULL ? &site->region_pic_hit_count : NULL);
+            if (site != NULL) {
+                site->region_lowering_name = entry->lowered->debug_name;
+            }
+            return evaluated;
+        }
+        if (evaluated == PYJIT_EXT_ERROR) {
+            return evaluated;
+        }
+    }
     for (int i = 0; i < payload->region_pic_count; i++) {
+        if (i == fast_pic) {
+            continue;
+        }
         NumpyJitRegionPICEntry *entry = &payload->region_pic[i];
         if (entry->negative) {
             continue;
@@ -4550,6 +6928,9 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
         if (entry->negative) {
             numpy_jit_region_inc_u16(
                 site != NULL ? &site->region_pic_miss_count : NULL);
+            if (payload->region_runtime_miss_on_decline) {
+                return PYJIT_EXT_MISS;
+            }
             return numpy_region_local_fallback(payload, args, nargs, result);
         }
         /* A positive entry with this signature was already probed above.
@@ -4600,8 +6981,12 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
             site != NULL ? &site->region_specialize_decline_count : NULL);
         numpy_jit_region_inc_u16(
             site != NULL ? &site->region_negative_count : NULL);
+        if (payload->region_runtime_miss_on_decline) {
+            return PYJIT_EXT_MISS;
+        }
         return numpy_region_local_fallback(payload, args, nargs, result);
     }
+    payload->region_fast_pic = payload->region_pic_count;
     PyJitExtResult evaluated = lowered->guard_eval(
         lowered->payload, args, nargs, result);
     if (evaluated == PYJIT_EXT_HIT) {
@@ -4871,6 +7256,16 @@ jit_adapter_init(PyObject *umath_module)
                             &numpy_jit_provider) < 0) {
                         PyErr_Clear();
                     }
+                    if (PyJit_RegisterBinaryProvider(
+                            &PyArray_Type, &PyLongArrType_Type, oparg,
+                            &numpy_jit_provider) < 0) {
+                        PyErr_Clear();
+                    }
+                    if (PyJit_RegisterBinaryProvider(
+                            &PyArray_Type, &PyLongLongArrType_Type, oparg,
+                            &numpy_jit_provider) < 0) {
+                        PyErr_Clear();
+                    }
                     break;
                 case NUMPY_JIT_LAYOUT_C_CONTIG_SCALAR_ARRAY:
                     if (PyJit_RegisterBinaryProvider(
@@ -4893,9 +7288,51 @@ jit_adapter_init(PyObject *umath_module)
                             &numpy_jit_provider) < 0) {
                         PyErr_Clear();
                     }
+                    if (PyJit_RegisterBinaryProvider(
+                            &PyLongArrType_Type, &PyArray_Type, oparg,
+                            &numpy_jit_provider) < 0) {
+                        PyErr_Clear();
+                    }
+                    if (PyJit_RegisterBinaryProvider(
+                            &PyLongLongArrType_Type, &PyArray_Type, oparg,
+                            &numpy_jit_provider) < 0) {
+                        PyErr_Clear();
+                    }
                     break;
             }
         }
+    }
+
+    static const int richcompare_ops[] = {Py_LT, Py_LE};
+    PyTypeObject *richcompare_scalar_types[] = {
+        &PyFloat_Type,
+        &PyLong_Type,
+        &PyFloatArrType_Type,
+        &PyDoubleArrType_Type,
+        &PyLongArrType_Type,
+        &PyLongLongArrType_Type,
+    };
+    for (Py_ssize_t i = 0; i < Py_ARRAY_LENGTH(richcompare_ops); i++) {
+        int registry_oparg = PYJIT_EXT_BINARY_RICHCOMPARE_BASE +
+                             richcompare_ops[i];
+        for (Py_ssize_t j = 0;
+             j < Py_ARRAY_LENGTH(richcompare_scalar_types); j++) {
+            if (PyJit_RegisterBinaryProvider(
+                    &PyArray_Type, richcompare_scalar_types[j],
+                    registry_oparg, &numpy_jit_provider) < 0) {
+                PyErr_Clear();
+            }
+            if (PyJit_RegisterBinaryProvider(
+                    richcompare_scalar_types[j], &PyArray_Type,
+                    registry_oparg, &numpy_jit_provider) < 0) {
+                PyErr_Clear();
+            }
+        }
+    }
+    if (PyJit_RegisterBinaryProvider(
+            &PyArray_Type, &PyArray_Type, NB_SUBSCR,
+            &numpy_jit_provider) < 0) {
+        PyErr_Clear();
     }
 
     static const int inplace_opargs[] = {
@@ -4916,6 +7353,8 @@ jit_adapter_init(PyObject *umath_module)
             &PyLong_Type,
             &PyFloatArrType_Type,
             &PyDoubleArrType_Type,
+            &PyLongArrType_Type,
+            &PyLongLongArrType_Type,
         };
         for (Py_ssize_t j = 0; j < Py_ARRAY_LENGTH(scalar_types); j++) {
             if (PyJit_RegisterBinaryProvider(
@@ -4932,13 +7371,31 @@ jit_adapter_init(PyObject *umath_module)
             continue;
         }
         NumpyJitOp op = numpy_jit_ops[i].op;
-        if (find_candidate(op, NPY_DOUBLE, NPY_DOUBLE,
+        if (op != NUMPY_JIT_OP_MINIMUM &&
+            op != NUMPY_JIT_OP_LOGICAL_AND &&
+            find_candidate(op, NPY_DOUBLE, NPY_DOUBLE,
                            NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE) == NULL) {
             continue;
         }
         if (PyJit_RegisterCallableProvider(callable, &numpy_jit_provider) < 0) {
             PyErr_Clear();
         }
+    }
+    PyObject *outer_descriptor = PyObject_GetAttrString(
+        (PyObject *)&PyUFunc_Type, "outer");
+    if (outer_descriptor != NULL) {
+        if (PyJit_RegisterCallableProvider(
+                outer_descriptor, &numpy_jit_provider) < 0) {
+            PyErr_Clear();
+        }
+        Py_DECREF(outer_descriptor);
+    }
+    else {
+        PyErr_Clear();
+    }
+    if (PyJit_RegisterCallableProvider(
+            (PyObject *)&PyUFunc_Type, &numpy_jit_provider) < 0) {
+        PyErr_Clear();
     }
     if (PyJit_RegisterUnaryProvider(
             &PyArray_Type, PYJIT_EXT_UNARY_NEGATIVE,
