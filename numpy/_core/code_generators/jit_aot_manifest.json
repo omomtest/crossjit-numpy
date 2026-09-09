@@ -1,0 +1,16 @@
+{
+  "dialect_version": 1,
+  "entries": [
+    {
+      "name": "square_sub_f64_scalar_exponent",
+      "graph_hash": 11331462692101918030,
+      "dtype": "float64",
+      "scalar_mask": 4,
+      "accepted_bucket_mask": 3,
+      "nodes": [
+        {"op": 4, "left": 1, "right": 2, "out": 3},
+        {"op": 1, "left": 0, "right": 3, "out": 4}
+      ]
+    }
+  ]
+}

@@ -1295,13 +1295,48 @@ src_umath = umath_gen_headers + [
 # CrossJIT compute kernels are kept in their own optimized build artifact,
 # mirroring CPython's copy-and-patch split between build-time optimized
 # stencils and runtime plan dispatch.
-numpy_jit_kernel_lib = static_library('np_jit_kernels',
-  [
+numpy_jit_kernel_sources = [
     config_h,
     _numpyconfig_h,
     'src/umath/jit_kernel.c',
-  ],
+]
+numpy_jit_aot_enabled = get_option('crossjit-aot-stencils').enabled()
+if numpy_jit_aot_enabled
+  numpy_jit_aot_manifest_h = custom_target(
+    'numpy_jit_aot_manifest_generated',
+    output: 'jit_aot_manifest_generated.h',
+    command: [
+      py,
+      files('code_generators/generate_jit_aot_manifest.py'),
+      files('code_generators/jit_aot_manifest.json'),
+      '@OUTPUT@',
+    ],
+  )
+  numpy_jit_kernel_sources += [
+    numpy_jit_aot_manifest_h,
+    'src/umath/jit_aot_backend.c',
+  ]
+else
+  numpy_jit_kernel_sources += 'src/umath/jit_aot_backend_stub.c'
+endif
+numpy_jit_llvm_dep = dependency(
+  'llvm',
+  version: '>=18',
+  modules: ['core', 'native', 'orcjit', 'passes'],
+  required: get_option('crossjit-llvm'),
+  method: 'config-tool',
+)
+numpy_jit_llvm_enabled = numpy_jit_llvm_dep.found()
+if numpy_jit_llvm_enabled
+  numpy_jit_kernel_sources += 'src/umath/jit_llvm_backend.cpp'
+else
+  numpy_jit_kernel_sources += 'src/umath/jit_llvm_backend_stub.c'
+endif
+
+numpy_jit_kernel_lib = static_library('np_jit_kernels',
+  numpy_jit_kernel_sources,
   c_args: c_args_common + max_opt,
+  cpp_args: cpp_args_common,
   include_directories: [
     'include',
     'src/common',
@@ -1312,7 +1347,7 @@ numpy_jit_kernel_lib = static_library('np_jit_kernels',
   dependencies: [
     py_dep,
     np_core_dep,
-  ],
+  ] + (numpy_jit_llvm_enabled ? [numpy_jit_llvm_dep] : []),
   pic: true,
 )
 
@@ -1389,7 +1424,7 @@ py.extension_module('_multiarray_umath',
     'src/umath',
     'src/highway'
   ],
-  dependencies: [blas_dep, omp],
+  dependencies: [blas_dep, omp] + (numpy_jit_llvm_enabled ? [numpy_jit_llvm_dep] : []),
   link_with: [
     npymath_lib,
     unique_hash_so,

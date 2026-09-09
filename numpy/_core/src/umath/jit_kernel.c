@@ -33,6 +33,12 @@ numpy_jit_region_scalar_uint64(double value)
     return (npy_uint64)(npy_int64)value;
 }
 
+static inline npy_uint32
+numpy_jit_region_scalar_uint32(double value)
+{
+    return (npy_uint32)(npy_int32)value;
+}
+
 #define DEFINE_REGION_CHUNK(TYPE, NAME)                                      \
 NUMPY_JIT_REGION_OPTIMIZED                                                    \
 static inline NUMPY_JIT_ALWAYS_INLINE int                                    \
@@ -110,6 +116,7 @@ numpy_jit_region_chunk_##NAME(                                               \
 
 DEFINE_REGION_CHUNK(double, double)
 DEFINE_REGION_CHUNK(float, float)
+DEFINE_REGION_CHUNK(npy_uint32, uint32)
 DEFINE_REGION_CHUNK(npy_uint64, uint64)
 
 NUMPY_JIT_REGION_OPTIMIZED
@@ -137,6 +144,11 @@ numpy_jit_kernel_region_contig(
             numpy_jit_region_chunk_float(
                 nodes, node_count, input_count, output_slot, input_data,
                 scalar_values, input_is_scalar, (float *)out, base, lanes) :
+            dtype == NPY_INT ?
+            numpy_jit_region_chunk_uint32(
+                nodes, node_count, input_count, output_slot, input_data,
+                scalar_values, input_is_scalar, (npy_uint32 *)out,
+                base, lanes) :
             (dtype == NPY_LONG || dtype == NPY_LONGLONG) ?
             numpy_jit_region_chunk_uint64(
                 nodes, node_count, input_count, output_slot, input_data,
@@ -378,25 +390,20 @@ numpy_jit_region_strided_##NAME(                                             \
     const double *scalar_values, const uint8_t *input_is_scalar,             \
     void *out, const npy_intp *out_strides, npy_intp size)                  \
 {                                                                            \
+    /* Maintain byte offsets incrementally.  Reconstructing coordinates with \
+       division/modulo for every element dominates generic strided Regions. */\
+    npy_intp coordinates[NPY_MAXDIMS] = {0};                                 \
+    npy_intp offsets[NUMPY_JIT_KERNEL_REGION_MAX_INPUTS] = {0};              \
+    npy_intp out_offset = 0;                                                  \
     for (npy_intp linear = 0; linear < size; linear++) {                     \
-        npy_intp coordinates[NPY_MAXDIMS];                                   \
-        npy_intp remaining = linear;                                         \
-        for (int dim = ndim - 1; dim >= 0; dim--) {                         \
-            coordinates[dim] = remaining % dims[dim];                       \
-            remaining /= dims[dim];                                         \
-        }                                                                    \
         TYPE slots[NUMPY_JIT_KERNEL_REGION_MAX_SLOTS];                       \
         for (int input = 0; input < input_count; input++) {                  \
             if (input_is_scalar[input]) {                                    \
                 slots[input] = (TYPE)scalar_values[input];                   \
                 continue;                                                    \
             }                                                                \
-            npy_intp offset = 0;                                             \
-            for (int dim = 0; dim < ndim; dim++) {                          \
-                offset += coordinates[dim] * input_strides[input][dim];      \
-            }                                                                \
             slots[input] = *(const TYPE *)                                   \
-                ((const char *)input_data[input] + offset);                  \
+                ((const char *)input_data[input] + offsets[input]);           \
         }                                                                    \
         for (int n = 0; n < node_count; n++) {                              \
             const NumpyJitKernelRegionNode *node = &nodes[n];                \
@@ -425,11 +432,26 @@ numpy_jit_region_strided_##NAME(                                             \
                     return 0;                                                \
             }                                                                \
         }                                                                    \
-        npy_intp out_offset = 0;                                             \
-        for (int dim = 0; dim < ndim; dim++) {                              \
-            out_offset += coordinates[dim] * out_strides[dim];              \
-        }                                                                    \
         *(TYPE *)((char *)out + out_offset) = slots[output_slot];            \
+        for (int dim = ndim - 1; dim >= 0; dim--) {                          \
+            coordinates[dim]++;                                             \
+            for (int input = 0; input < input_count; input++) {              \
+                if (!input_is_scalar[input]) {                              \
+                    offsets[input] += input_strides[input][dim];             \
+                }                                                            \
+            }                                                                \
+            out_offset += out_strides[dim];                                  \
+            if (coordinates[dim] < dims[dim]) {                              \
+                break;                                                       \
+            }                                                                \
+            coordinates[dim] = 0;                                            \
+            for (int input = 0; input < input_count; input++) {              \
+                if (!input_is_scalar[input]) {                              \
+                    offsets[input] -= input_strides[input][dim] * dims[dim]; \
+                }                                                            \
+            }                                                                \
+            out_offset -= out_strides[dim] * dims[dim];                      \
+        }                                                                    \
     }                                                                        \
     return 1;                                                                \
 }
@@ -582,6 +604,52 @@ numpy_jit_kernel_add3_strided(
         ADD3_STRIDED_LOOP(float);
     }
 #undef ADD3_STRIDED_LOOP
+    return 0;
+}
+
+int
+numpy_jit_kernel_mul_addsub3(
+    int dtype, int subtract, int ndim, const npy_intp *dims,
+    const char *a, const npy_intp *astrides,
+    const char *b, const npy_intp *bstrides,
+    const char *c, const npy_intp *cstrides,
+    void *out_data, const npy_intp *outstrides, npy_intp size, int contiguous)
+{
+    if (size <= 0) return 0;
+#define MUL_ADDSUB_LOOP(TYPE) do {                                           \
+        TYPE *out = (TYPE *)out_data;                                       \
+        if (contiguous) {                                                    \
+            const TYPE *aa = (const TYPE *)a;                               \
+            const TYPE *bb = (const TYPE *)b;                               \
+            const TYPE *cc = (const TYPE *)c;                               \
+            for (npy_intp i = 0; i < size; i++)                             \
+                out[i] = aa[i] * bb[i] + (subtract ? -cc[i] : cc[i]);       \
+        } else {                                                             \
+            npy_intp coords[NPY_MAXDIMS] = {0};                             \
+            npy_intp ao = 0, bo = 0, co = 0, oo = 0;                        \
+            for (npy_intp i = 0; i < size; i++) {                           \
+                TYPE av = *(const TYPE *)(a + ao);                         \
+                TYPE bv = *(const TYPE *)(b + bo);                         \
+                TYPE cv = *(const TYPE *)(c + co);                         \
+                *(TYPE *)(out_data + oo) = av * bv +                        \
+                    (subtract ? -cv : cv);                                  \
+                for (int dim = ndim - 1; dim >= 0; dim--) {                 \
+                    coords[dim]++; ao += astrides[dim];                    \
+                    bo += bstrides[dim]; co += cstrides[dim];               \
+                    oo += outstrides[dim];                                 \
+                    if (coords[dim] < dims[dim]) break;                    \
+                    coords[dim] = 0;                                       \
+                    ao -= astrides[dim] * dims[dim];                        \
+                    bo -= bstrides[dim] * dims[dim];                        \
+                    co -= cstrides[dim] * dims[dim];                        \
+                    oo -= outstrides[dim] * dims[dim];                      \
+                }                                                            \
+            }                                                                \
+        }                                                                    \
+    } while (0)
+    if (dtype == NPY_DOUBLE) { MUL_ADDSUB_LOOP(double); return 1; }
+    if (dtype == NPY_FLOAT) { MUL_ADDSUB_LOOP(float); return 1; }
+#undef MUL_ADDSUB_LOOP
     return 0;
 }
 

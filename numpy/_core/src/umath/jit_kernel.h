@@ -100,6 +100,13 @@ int numpy_jit_kernel_add3_strided(
     const char *c, const npy_intp *cstrides,
     void *out, npy_intp size, int order);
 
+int numpy_jit_kernel_mul_addsub3(
+    int dtype, int subtract, int ndim, const npy_intp *dims,
+    const char *a, const npy_intp *astrides,
+    const char *b, const npy_intp *bstrides,
+    const char *c, const npy_intp *cstrides,
+    void *out, const npy_intp *outstrides, npy_intp size, int contiguous);
+
 int numpy_jit_kernel_axpby_plus_scalar_contig(
     int dtype, const void *a, double alpha, const void *b, double beta,
     double gamma, void *out, npy_intp size);

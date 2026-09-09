@@ -22,6 +22,10 @@ option('disable-threading', type: 'boolean', value: false,
         description: 'Disable threading support (see `NPY_ALLOW_THREADS` docs)')
 option('enable-openmp', type: 'boolean', value: false,
        description: 'Enable compilation with OpenMP support')
+option('crossjit-llvm', type: 'feature', value: 'disabled',
+       description: 'Enable the experimental LLVM ORC backend for CrossJIT Regions')
+option('crossjit-aot-stencils', type: 'feature', value: 'disabled',
+       description: 'Enable experimental build-time AOT Region DAG stencils')
 
 # CPU optimization / SIMD
 option('disable-optimization', type: 'boolean', value: false,

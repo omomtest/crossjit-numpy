@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "numpy/arrayobject.h"
 #include "numpy/arrayscalars.h"
@@ -18,6 +19,8 @@
 #include "extobj.h"
 #include "mem_overlap.h"
 #include "jit_kernel.h"
+#include "jit_aot_backend.h"
+#include "jit_llvm_backend.h"
 
 #ifndef PYJIT_EXT_ABI_VERSION
 #define PYJIT_EXT_ABI_VERSION 7u
@@ -360,6 +363,16 @@ PyAPI_FUNC(int) PyJit_RegisterCallableProvider(
     PyJitExtProvider *provider);
 #endif
 
+#define NUMPY_JIT_MUL_ADDSUB_REGION_MIN_ELEMENTS 256
+#define NUMPY_JIT_VARIANT_PROBATION_SAMPLES 4
+#define NUMPY_JIT_VARIANT_DEFAULT_MIN_GAIN_PERCENT 3
+
+typedef enum {
+    NUMPY_JIT_VARIANT_PROBATION = 1,
+    NUMPY_JIT_VARIANT_COMMITTED_ATOMIC,
+    NUMPY_JIT_VARIANT_COMMITTED_CANDIDATE,
+} NumpyJitVariantDecision;
+
 /* Stable public dialect identity for the NumPy Region operation schema.
    It is deliberately independent of module addresses and Python objects so
    producers written in another implementation language can emit compatible
@@ -442,14 +455,116 @@ typedef struct {
     const char *disable_reason;
 } NumpyJitResultCache;
 
+typedef struct NumpyJitPlanPayload NumpyJitPlanPayload;
+typedef struct NumpyJitDispatchEntry NumpyJitDispatchEntry;
+
 typedef struct {
+    NumpyJitPlanPayload *next;
+} NumpyJitTelemetryState;
+
+typedef struct {
+    uint8_t atomic_samples;
+    uint8_t candidate_samples;
+    uint64_t atomic_elapsed_ns;
+    uint64_t candidate_elapsed_ns;
+} NumpyJitProfileState;
+
+typedef PyJitExtResult (*NumpyJitRegionDispatchExecuteFn)(
+    NumpyJitPlanPayload *payload, NumpyJitDispatchEntry *entry,
+    PyObject *const *args, Py_ssize_t nargs, PyObject **result);
+
+struct NumpyJitDispatchEntry {
     uint64_t signature;
     PyJitExtLoweredRegion *lowered;
     uint8_t negative;
     uint8_t unsupported_layout_mask;
-} NumpyJitRegionPICEntry;
+    uint8_t size_bucket;
+    uint8_t decision;
+    /* The one authoritative target for this PropertyKey. */
+    uint8_t selected_variant;
+    NumpyJitKernelFunc selected_function;
+    NumpyJitProfileState profile;
+    /* Installed only after probation.  The hot path must not repeat
+       candidate selection, environment parsing, or sampling. */
+    NumpyJitRegionDispatchExecuteFn selected_execute;
+};
 
-typedef struct NumpyJitPlanPayload {
+typedef struct {
+    uint32_t execution_count;
+    uint8_t count;
+    uint8_t saturated;
+    uint8_t fast_entry;
+    NumpyJitDispatchEntry entries[PYJIT_EXT_REGION_PIC_SIZE];
+    const NumpyJitAOTEntry *precompiled_entry;
+    uint64_t precompiled_lookup_ns;
+    uint32_t precompiled_lookup_hit;
+    uint32_t precompiled_lookup_miss;
+    uint32_t precompiled_uses[3];
+    uint8_t precompiled_lookup_done;
+    NumpyJitLLVMEntry *llvm_entry;
+    uint64_t llvm_visited_elements;
+    uint64_t llvm_old_samples[3][8];
+    uint64_t llvm_native_samples[3][8];
+    uint32_t llvm_eligible_hits;
+    uint32_t llvm_guard_misses;
+    uint32_t llvm_native_uses[3];
+    int16_t llvm_dtype;
+    uint8_t llvm_scalar_mask;
+    uint8_t llvm_property_valid;
+    uint8_t llvm_decision;
+    uint8_t llvm_bucket_decision[3];
+    uint8_t llvm_old_count[3];
+    uint8_t llvm_native_count[3];
+    uint8_t llvm_cache_hit;
+    uint8_t llvm_probation_old_active;
+} NumpyJitDispatchTable;
+
+typedef enum {
+    NUMPY_JIT_VARIANT_ATOMIC = 1,
+    NUMPY_JIT_VARIANT_DEDICATED,
+    NUMPY_JIT_VARIANT_GENERIC,
+    NUMPY_JIT_VARIANT_PRECOMPILED,
+    NUMPY_JIT_VARIANT_LLVM,
+} NumpyJitVariantKind;
+
+/* Candidate producers fill this small value object.  Only the selector is
+ * allowed to choose one as a dispatch target. */
+typedef struct {
+    NumpyJitVariantKind kind;
+    NumpyJitKernelFunc function;
+    uint8_t measure_probation;
+} NumpyJitVariant;
+
+#define NUMPY_JIT_REGION_PROGRAM_FIELDS \
+    NumpyJitOp region_first_op; \
+    NumpyJitOp region_second_op; \
+    int region_second_consumes_right; \
+    int region_runtime_other_first; \
+    uint8_t region_generic; \
+    uint8_t region_matmul_epilogue; \
+    uint8_t region_outer_minimum; \
+    uint8_t region_compare_logical; \
+    uint8_t region_masked_mean; \
+    uint8_t region_compiled_kind; \
+    uint8_t region_runtime_miss_on_decline; \
+    uint8_t region_node_count; \
+    uint8_t region_input_count; \
+    uint8_t region_output_slot; \
+    int8_t region_mutation_input; \
+    PyJitExtValueId region_input_ids[PYJIT_EXT_REGION_MAX_INPUTS]; \
+    NumpyJitOp region_ops[PYJIT_EXT_REGION_MAX_NODES]; \
+    uint8_t region_left[PYJIT_EXT_REGION_MAX_NODES]; \
+    uint8_t region_right[PYJIT_EXT_REGION_MAX_NODES]; \
+    PyJitExtPlan *region_atomic_plans[PYJIT_EXT_REGION_MAX_NODES]; \
+    NumpyJitKernelRegionNode region_nodes[PYJIT_EXT_REGION_MAX_NODES]; \
+    PyJitExtPlan *region_owner_plan; \
+    uint64_t region_graph_hash
+
+typedef struct {
+    NUMPY_JIT_REGION_PROGRAM_FIELDS;
+} NumpyJitRegionProgram;
+
+struct NumpyJitPlanPayload {
     NumpyJitOp op;
     NumpyJitLayoutKind layout;
     int left_dtype;
@@ -466,38 +581,49 @@ typedef struct NumpyJitPlanPayload {
     int inplace;
     uint32_t fused_flags;
     const char *fused_pattern;
-    NumpyJitOp region_first_op;
-    NumpyJitOp region_second_op;
-    int region_second_consumes_right;
-    int region_runtime_other_first;
-    uint8_t region_generic;
-    uint8_t region_matmul_epilogue;
-    uint8_t region_outer_minimum;
-    uint8_t region_compare_logical;
-    uint8_t region_masked_mean;
-    uint8_t region_compiled_kind;
-    uint8_t region_runtime_miss_on_decline;
-    uint8_t region_node_count;
-    uint8_t region_input_count;
-    uint8_t region_output_slot;
-    int8_t region_mutation_input;
-    PyJitExtValueId region_input_ids[PYJIT_EXT_REGION_MAX_INPUTS];
-    NumpyJitOp region_ops[PYJIT_EXT_REGION_MAX_NODES];
-    uint8_t region_left[PYJIT_EXT_REGION_MAX_NODES];
-    uint8_t region_right[PYJIT_EXT_REGION_MAX_NODES];
-    PyJitExtPlan *region_atomic_plans[PYJIT_EXT_REGION_MAX_NODES];
-    NumpyJitKernelRegionNode region_nodes[PYJIT_EXT_REGION_MAX_NODES];
-    PyJitExtPlan *region_owner_plan;
-    uint32_t region_execution_count;
-    uint8_t region_pic_count;
-    uint8_t region_pic_saturated;
-    /* One-based index of the property-independent positive lowering. */
-    uint8_t region_fast_pic;
-    NumpyJitRegionPICEntry region_pic[PYJIT_EXT_REGION_PIC_SIZE];
+    union {
+        NumpyJitRegionProgram program;
+        struct {
+            NUMPY_JIT_REGION_PROGRAM_FIELDS;
+        };
+    };
+    NumpyJitDispatchTable dispatch;
     NumpyJitResultCache result_cache;
     NumpyJitResultCache *shared_result_cache;
-    struct NumpyJitPlanPayload *stats_next;
-} NumpyJitPlanPayload;
+    NumpyJitTelemetryState telemetry;
+};
+
+/* Transitional member aliases keep the evaluator readable while making the
+   ownership boundary explicit: all PropertyKey decisions live in the one
+   DispatchTable, not in the immutable Region description. */
+#define region_execution_count dispatch.execution_count
+#define region_pic_count dispatch.count
+#define region_pic_saturated dispatch.saturated
+#define region_fast_pic dispatch.fast_entry
+#define region_pic dispatch.entries
+#define region_aot_entry dispatch.precompiled_entry
+#define region_aot_lookup_ns dispatch.precompiled_lookup_ns
+#define region_aot_lookup_hit dispatch.precompiled_lookup_hit
+#define region_aot_lookup_miss dispatch.precompiled_lookup_miss
+#define region_aot_native_uses dispatch.precompiled_uses
+#define region_aot_lookup_done dispatch.precompiled_lookup_done
+#define region_llvm_entry dispatch.llvm_entry
+#define region_llvm_visited_elements dispatch.llvm_visited_elements
+#define region_llvm_old_samples dispatch.llvm_old_samples
+#define region_llvm_native_samples dispatch.llvm_native_samples
+#define region_llvm_eligible_hits dispatch.llvm_eligible_hits
+#define region_llvm_guard_misses dispatch.llvm_guard_misses
+#define region_llvm_native_uses dispatch.llvm_native_uses
+#define region_llvm_dtype dispatch.llvm_dtype
+#define region_llvm_scalar_mask dispatch.llvm_scalar_mask
+#define region_llvm_property_valid dispatch.llvm_property_valid
+#define region_llvm_decision dispatch.llvm_decision
+#define region_llvm_bucket_decision dispatch.llvm_bucket_decision
+#define region_llvm_old_count dispatch.llvm_old_count
+#define region_llvm_native_count dispatch.llvm_native_count
+#define region_llvm_cache_hit dispatch.llvm_cache_hit
+#define region_llvm_probation_old_active dispatch.llvm_probation_old_active
+#define stats_next telemetry.next
 
 typedef struct {
     const double *left_data;
@@ -519,6 +645,7 @@ static PyJitExtLoweredRegion *numpy_jit_specialize_region(
     Py_ssize_t nargs, uint64_t signature);
 static void numpy_jit_free_lowered_region(PyJitExtLoweredRegion *lowered);
 static void numpy_jit_free_plan(PyJitExtPlan *plan);
+static int numpy_jit_region_layout_class(PyArrayObject *array);
 static int numpy_jit_describe_plan(
     const PyJitExtPlan *plan, PyJitExtPlanInfo *info);
 static const PyJitExtStencil *numpy_jit_get_stencil(
@@ -774,6 +901,11 @@ static int numpy_jit_env_enable_strided_1d_scalar = -1;
 static int numpy_jit_env_enable_strided_inner_scalar = -1;
 static int numpy_jit_env_enable_result_cache = -1;
 static uint64_t numpy_jit_env_result_cache_max_bytes = UINT64_MAX;
+static int numpy_jit_env_aot_mode = -1;
+static int numpy_jit_env_llvm_mode = -1;
+static uint64_t numpy_jit_env_llvm_min_hits = UINT64_MAX;
+static uint64_t numpy_jit_env_llvm_min_visited_elements = UINT64_MAX;
+static uint64_t numpy_jit_env_variant_min_gain_percent = UINT64_MAX;
 static int numpy_jit_stats_enabled_cache = -1;
 static int numpy_jit_atexit_registered = 0;
 
@@ -849,8 +981,15 @@ static NumpyJitLayoutMissDetail *numpy_jit_layout_miss_details = NULL;
 static NumpyJitDtypeMissDetail *numpy_jit_dtype_miss_details = NULL;
 static NumpyJitResultCacheStats *numpy_jit_result_cache_stats = NULL;
 static NumpyJitPlanPayload *numpy_jit_plan_stats_list = NULL;
+typedef struct NumpyJitLLVMRetiredStats {
+    NumpyJitPlanPayload payload;
+    uint32_t site_id;
+    struct NumpyJitLLVMRetiredStats *next;
+} NumpyJitLLVMRetiredStats;
+static NumpyJitLLVMRetiredStats *numpy_jit_llvm_retired_stats = NULL;
 
 static int numpy_jit_stats_enabled(void);
+static uint64_t numpy_jit_median8(uint64_t values[8]);
 
 static const char *
 numpy_jit_op_name(NumpyJitOp op)
@@ -1445,6 +1584,104 @@ numpy_jit_result_cache_max_bytes(void)
     return max_bytes;
 }
 
+enum {
+    NUMPY_JIT_LLVM_MODE_OFF = 0,
+    NUMPY_JIT_LLVM_MODE_AUTO = 1,
+    NUMPY_JIT_LLVM_MODE_FORCE = 2,
+};
+
+static int
+numpy_jit_aot_mode(void)
+{
+    if (numpy_jit_env_aot_mode >= 0) {
+        return numpy_jit_env_aot_mode;
+    }
+    const char *value = Py_GETENV("NUMPY_JIT_AOT");
+    int mode = NUMPY_JIT_LLVM_MODE_AUTO;
+    if (value != NULL && value[0] != '\0') {
+        if (strcmp(value, "0") == 0 || strcmp(value, "off") == 0) {
+            mode = NUMPY_JIT_LLVM_MODE_OFF;
+        }
+        else if (strcmp(value, "force") == 0) {
+            mode = NUMPY_JIT_LLVM_MODE_FORCE;
+        }
+    }
+    if (!numpy_jit_aot_backend_available()) {
+        mode = NUMPY_JIT_LLVM_MODE_OFF;
+    }
+    numpy_jit_env_aot_mode = mode;
+    return mode;
+}
+
+static int
+numpy_jit_llvm_mode(void)
+{
+    if (numpy_jit_env_llvm_mode >= 0) {
+        return numpy_jit_env_llvm_mode;
+    }
+    const char *value = Py_GETENV("NUMPY_JIT_LLVM");
+    int mode = NUMPY_JIT_LLVM_MODE_AUTO;
+    if (value != NULL && value[0] != '\0') {
+        if (strcmp(value, "0") == 0 || strcmp(value, "off") == 0) {
+            mode = NUMPY_JIT_LLVM_MODE_OFF;
+        }
+        else if (strcmp(value, "force") == 0) {
+            mode = NUMPY_JIT_LLVM_MODE_FORCE;
+        }
+    }
+    if (!numpy_jit_llvm_backend_available()) {
+        mode = NUMPY_JIT_LLVM_MODE_OFF;
+    }
+    numpy_jit_env_llvm_mode = mode;
+    return mode;
+}
+
+static uint64_t
+numpy_jit_env_u64(const char *name, uint64_t *cache, uint64_t fallback)
+{
+    if (*cache != UINT64_MAX) {
+        return *cache;
+    }
+    uint64_t result = fallback;
+    const char *value = Py_GETENV(name);
+    if (value != NULL && value[0] != '\0') {
+        char *end = NULL;
+        unsigned long long parsed = strtoull(value, &end, 10);
+        if (end != value) {
+            result = (uint64_t)parsed;
+        }
+    }
+    *cache = result;
+    return result;
+}
+
+static uint64_t
+numpy_jit_llvm_min_hits(void)
+{
+    return numpy_jit_env_u64(
+        "NUMPY_JIT_LLVM_MIN_HITS", &numpy_jit_env_llvm_min_hits, 32);
+}
+
+static uint64_t
+numpy_jit_llvm_min_visited_elements(void)
+{
+    return numpy_jit_env_u64(
+        "NUMPY_JIT_LLVM_MIN_VISITED_ELEMENTS",
+        &numpy_jit_env_llvm_min_visited_elements, 65536);
+}
+
+static uint64_t
+numpy_jit_variant_min_gain_percent(void)
+{
+    uint64_t gain = numpy_jit_env_u64(
+        "NUMPY_JIT_VARIANT_MIN_GAIN_PERCENT",
+        &numpy_jit_env_variant_min_gain_percent,
+        NUMPY_JIT_VARIANT_DEFAULT_MIN_GAIN_PERCENT);
+    /* A value outside this range makes the multiplication-based comparison
+     * either meaningless or vulnerable to overflow for long-running sites. */
+    return gain > 99 ? 99 : gain;
+}
+
 static void
 numpy_jit_link_plan_stats(NumpyJitPlanPayload *payload)
 {
@@ -1767,6 +2004,115 @@ numpy_jit_dump_result_cache_row(FILE *fp, uint32_t site_id, NumpyJitOp op,
 }
 
 static void
+numpy_jit_retire_llvm_stats(NumpyJitPlanPayload *payload)
+{
+    if (!numpy_jit_stats_enabled() || payload == NULL ||
+        !payload->region_generic ||
+        (payload->region_llvm_eligible_hits == 0 &&
+         payload->region_llvm_entry == NULL &&
+         !payload->region_aot_lookup_done)) {
+        return;
+    }
+    NumpyJitLLVMRetiredStats *retired = malloc(sizeof(*retired));
+    if (retired == NULL) {
+        return;
+    }
+    memcpy(&retired->payload, payload, sizeof(retired->payload));
+    retired->site_id = payload->site != NULL ?
+        payload->site->site_id : UINT32_MAX;
+    retired->next = numpy_jit_llvm_retired_stats;
+    numpy_jit_llvm_retired_stats = retired;
+}
+
+static void
+numpy_jit_dump_aot_row(FILE *fp, NumpyJitPlanPayload *payload,
+                       uint32_t site_id)
+{
+    if (!payload->region_aot_lookup_done) {
+        return;
+    }
+    NumpyJitAOTEntryInfo info = {0};
+    numpy_jit_aot_entry_info(payload->region_aot_entry, &info);
+    fprintf(fp,
+        "{\"site_id\":%" PRIu32
+        ",\"graph_hash\":%" PRIu64
+        ",\"backend\":\"aot-stencil\",\"lookup_hit\":%" PRIu32
+        ",\"lookup_miss\":%" PRIu32
+        ",\"lookup_ns\":%" PRIu64
+        ",\"name\":\"%s\",\"accepted_bucket_mask\":%u"
+        ",\"vector_bits\":%u,\"code_size\":%u"
+        ",\"native_uses\":[%" PRIu32 ",%" PRIu32 ",%" PRIu32 "]}\n",
+        site_id, payload->region_graph_hash,
+        payload->region_aot_lookup_hit, payload->region_aot_lookup_miss,
+        payload->region_aot_lookup_ns, info.name,
+        (unsigned)info.accepted_bucket_mask, (unsigned)info.vector_bits,
+        (unsigned)info.code_size, payload->region_aot_native_uses[0],
+        payload->region_aot_native_uses[1], payload->region_aot_native_uses[2]);
+}
+
+static void
+numpy_jit_dump_llvm_row(FILE *fp, NumpyJitPlanPayload *payload,
+                        uint32_t site_id)
+{
+    NumpyJitLLVMEntryInfo info = {0};
+    numpy_jit_llvm_entry_info(payload->region_llvm_entry, &info);
+    for (unsigned bucket = 0; bucket < 3; bucket++) {
+        if (bucket != 0 && payload->region_llvm_old_count[bucket] == 0 &&
+            payload->region_llvm_native_count[bucket] == 0 &&
+            payload->region_llvm_native_uses[bucket] == 0) {
+            continue;
+        }
+        uint64_t old_median = payload->region_llvm_old_count[bucket] == 8 ?
+            numpy_jit_median8(payload->region_llvm_old_samples[bucket]) : 0;
+        uint64_t native_median =
+            payload->region_llvm_native_count[bucket] == 8 ?
+            numpy_jit_median8(payload->region_llvm_native_samples[bucket]) : 0;
+        uint8_t bucket_decision =
+            payload->region_llvm_bucket_decision[bucket];
+        const char *decision = payload->region_llvm_decision == 3 ?
+            "rejected-hard" : bucket_decision == 2 ?
+            "accepted" : bucket_decision == 3 ?
+            "rejected" : bucket_decision == 1 ?
+            "probation" : "warming";
+        fprintf(fp,
+            "{\"site_id\":%" PRIu32
+            ",\"graph_hash\":%" PRIu64
+            ",\"backend\":\"%s\",\"dtype\":%d,"
+            "\"scalar_mask\":%u,\"size_bucket\":%u,"
+            "\"eligible_hits\":%" PRIu32
+            ",\"guard_misses\":%" PRIu32
+            ",\"visited_elements\":%" PRIu64
+            ",\"entry_state\":%d,\"cache_hit\":%u"
+            ",\"queue_ns\":%" PRIu64
+            ",\"compile_ns\":%" PRIu64
+            ",\"optimization_ns\":%" PRIu64
+            ",\"codegen_ns\":%" PRIu64
+            ",\"object_bytes\":%" PRIu64
+            ",\"cache_uses\":%" PRIu64
+            ",\"vector_bits\":%u,\"decision\":\"%s\","
+            "\"old_samples\":%u,\"native_samples\":%u,"
+            "\"old_median_ns_per_element_x1024\":%" PRIu64
+            ",\"native_median_ns_per_element_x1024\":%" PRIu64
+            ",\"native_uses\":%" PRIu32 "}\n",
+            site_id, payload->region_graph_hash,
+            numpy_jit_llvm_backend_name(),
+            (int)payload->region_llvm_dtype,
+            (unsigned)payload->region_llvm_scalar_mask,
+            bucket, payload->region_llvm_eligible_hits,
+            payload->region_llvm_guard_misses,
+            payload->region_llvm_visited_elements,
+            info.state, (unsigned)payload->region_llvm_cache_hit,
+            info.queue_ns, info.compile_ns, info.optimization_ns,
+            info.codegen_ns, info.object_bytes, info.cache_uses,
+            info.vector_bits, decision,
+            (unsigned)payload->region_llvm_old_count[bucket],
+            (unsigned)payload->region_llvm_native_count[bucket],
+            old_median, native_median,
+            payload->region_llvm_native_uses[bucket]);
+    }
+}
+
+static void
 numpy_jit_dump_stats(void)
 {
     if (!numpy_jit_stats_enabled()) {
@@ -1911,6 +2257,49 @@ numpy_jit_dump_stats(void)
                 payload->site != NULL ? payload->site->site_id : UINT32_MAX,
                 payload->op, payload->layout, payload->result_dtype,
                 cache, cache->bytes);
+        }
+        fclose(fp);
+    }
+
+    snprintf(path, sizeof(path), "%s/%s", dir,
+             "crossjit_numpy_llvm.ndjson");
+    fp = fopen(path, "w");
+    if (fp != NULL) {
+        for (NumpyJitPlanPayload *payload = numpy_jit_plan_stats_list;
+             payload != NULL; payload = payload->stats_next) {
+            if (!payload->region_generic ||
+                (payload->region_llvm_eligible_hits == 0 &&
+                 payload->region_llvm_entry == NULL)) {
+                continue;
+            }
+            numpy_jit_dump_llvm_row(
+                fp, payload,
+                payload->site != NULL ?
+                    payload->site->site_id : UINT32_MAX);
+        }
+        for (NumpyJitLLVMRetiredStats *retired =
+                 numpy_jit_llvm_retired_stats;
+             retired != NULL; retired = retired->next) {
+            numpy_jit_dump_llvm_row(
+                fp, &retired->payload, retired->site_id);
+        }
+        fclose(fp);
+    }
+
+    snprintf(path, sizeof(path), "%s/%s", dir,
+             "crossjit_numpy_aot.ndjson");
+    fp = fopen(path, "w");
+    if (fp != NULL) {
+        for (NumpyJitPlanPayload *payload = numpy_jit_plan_stats_list;
+             payload != NULL; payload = payload->stats_next) {
+            numpy_jit_dump_aot_row(
+                fp, payload, payload->site != NULL ?
+                payload->site->site_id : UINT32_MAX);
+        }
+        for (NumpyJitLLVMRetiredStats *retired =
+                 numpy_jit_llvm_retired_stats;
+             retired != NULL; retired = retired->next) {
+            numpy_jit_dump_aot_row(fp, &retired->payload, retired->site_id);
         }
         fclose(fp);
     }
@@ -2546,188 +2935,6 @@ numpy_jit_try_call_plan(const PyJitExtTraceRequest *request,
 }
 
 static PyJitExtPlan *
-numpy_jit_try_fused_binary2_plan(const PyJitExtTraceRequest *request,
-                                 PyJitExtSiteState *site)
-{
-    PyJitExtPlan *first = request->u.fused_binary2.first_plan;
-    PyJitExtPlan *second = request->u.fused_binary2.second_plan;
-    if (first == NULL || second == NULL ||
-        first->provider != &numpy_jit_provider ||
-        second->provider != &numpy_jit_provider ||
-        first->kind != PYJIT_EXT_PLAN_BINARY ||
-        second->kind != PYJIT_EXT_PLAN_BINARY) {
-        return NULL;
-    }
-    NumpyJitPlanPayload *first_payload =
-        (NumpyJitPlanPayload *)first->payload;
-    NumpyJitPlanPayload *second_payload =
-        (NumpyJitPlanPayload *)second->payload;
-    if (first_payload == NULL || second_payload == NULL) {
-        return NULL;
-    }
-    if (first_payload->inplace) {
-        return NULL;
-    }
-
-    int fused_op = -1;
-    const char *fused_pattern = NULL;
-    int second_consumes_right =
-        (request->u.fused_binary2.flags &
-         PYJIT_EXT_FUSED_BINARY2_SECOND_CONSUMES_RIGHT) != 0;
-    int supported_scaled_inplace_second =
-        second_payload->inplace && second_consumes_right &&
-        first_payload->op == NUMPY_JIT_OP_MULTIPLY &&
-        (first_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_ARRAY_SCALAR ||
-         first_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SCALAR_ARRAY) &&
-        second_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE &&
-        (second_payload->op == NUMPY_JIT_OP_ADD ||
-         second_payload->op == NUMPY_JIT_OP_SUBTRACT);
-    int supported_add3_inplace_second =
-        second_payload->inplace && second_consumes_right &&
-        first_payload->op == NUMPY_JIT_OP_ADD &&
-        first_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE &&
-        second_payload->op == NUMPY_JIT_OP_ADD &&
-        second_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE;
-    int supported_inplace_second = supported_scaled_inplace_second ||
-                                   supported_add3_inplace_second;
-    if (second_payload->inplace && !supported_inplace_second) {
-        return NULL;
-    }
-
-    /* (array + array) + array, including out += array + array. */
-    if (first_payload->op == NUMPY_JIT_OP_ADD &&
-        first_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE &&
-        second_payload->op == NUMPY_JIT_OP_ADD &&
-        second_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE) {
-        fused_op = NUMPY_JIT_FUSED_ADD_THREE_ARRAYS;
-        fused_pattern = second_payload->inplace ?
-            "out+=a+b" : "(a+b)+c";
-    }
-
-    /* (array * scalar) +/- array, in either second-operand direction. */
-    if (fused_op < 0 &&
-        first_payload->op == NUMPY_JIT_OP_MULTIPLY &&
-        (first_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_ARRAY_SCALAR ||
-         first_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SCALAR_ARRAY) &&
-        second_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE) {
-        if (second_payload->op == NUMPY_JIT_OP_ADD) {
-            fused_op = NUMPY_JIT_FUSED_MUL_SCALAR_ADD_ARRAY;
-            fused_pattern = second_consumes_right ?
-                "a+b*scalar" : "a*scalar+b";
-        }
-        else if (second_payload->op == NUMPY_JIT_OP_SUBTRACT) {
-            fused_op = second_consumes_right ?
-                NUMPY_JIT_FUSED_ARRAY_SUB_MUL_SCALAR :
-                NUMPY_JIT_FUSED_MUL_SCALAR_SUB_ARRAY;
-            fused_pattern = second_consumes_right ?
-                "a-b*scalar" : "a*scalar-b";
-        }
-    }
-
-    /* (array +/- array) * scalar and (array +/- array) / scalar. */
-    if (fused_op < 0 &&
-        (first_payload->op == NUMPY_JIT_OP_ADD ||
-         first_payload->op == NUMPY_JIT_OP_SUBTRACT) &&
-        first_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SAME_SHAPE) {
-        NumpyJitLayoutKind expected_second_layout = second_consumes_right ?
-            NUMPY_JIT_LAYOUT_C_CONTIG_SCALAR_ARRAY :
-            NUMPY_JIT_LAYOUT_C_CONTIG_ARRAY_SCALAR;
-        if (second_payload->layout == expected_second_layout &&
-            second_payload->op == NUMPY_JIT_OP_MULTIPLY) {
-            fused_op = first_payload->op == NUMPY_JIT_OP_ADD ?
-                NUMPY_JIT_FUSED_ADD_ARRAY_MUL_SCALAR :
-                NUMPY_JIT_FUSED_SUB_ARRAY_MUL_SCALAR;
-            if (first_payload->op == NUMPY_JIT_OP_ADD) {
-                fused_pattern = second_consumes_right ?
-                    "scalar*(a+b)" : "(a+b)*scalar";
-            }
-            else {
-                fused_pattern = second_consumes_right ?
-                    "scalar*(a-b)" : "(a-b)*scalar";
-            }
-        }
-        else if (!second_consumes_right &&
-                 second_payload->layout == expected_second_layout &&
-                 second_payload->op == NUMPY_JIT_OP_TRUE_DIVIDE) {
-            fused_op = first_payload->op == NUMPY_JIT_OP_ADD ?
-                NUMPY_JIT_FUSED_ADD_ARRAY_DIV_SCALAR :
-                NUMPY_JIT_FUSED_SUB_ARRAY_DIV_SCALAR;
-            fused_pattern = first_payload->op == NUMPY_JIT_OP_ADD ?
-                "(a+b)/scalar" : "(a-b)/scalar";
-        }
-    }
-
-    /* (array * scalar) * scalar, in either second-operand direction. */
-    if (fused_op < 0 &&
-        first_payload->op == NUMPY_JIT_OP_MULTIPLY &&
-        (first_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_ARRAY_SCALAR ||
-         first_payload->layout == NUMPY_JIT_LAYOUT_C_CONTIG_SCALAR_ARRAY) &&
-        second_payload->op == NUMPY_JIT_OP_MULTIPLY) {
-        NumpyJitLayoutKind expected_second_layout = second_consumes_right ?
-            NUMPY_JIT_LAYOUT_C_CONTIG_SCALAR_ARRAY :
-            NUMPY_JIT_LAYOUT_C_CONTIG_ARRAY_SCALAR;
-        if (second_payload->layout == expected_second_layout) {
-            fused_op = NUMPY_JIT_FUSED_MUL_TWO_SCALARS;
-            fused_pattern = second_consumes_right ?
-                "scalar2*(array*scalar1)" :
-                "(array*scalar1)*scalar2";
-        }
-    }
-    if (fused_op < 0) {
-        return NULL;
-    }
-
-    NumpyJitPlanPayload *payload = PyMem_Calloc(1, sizeof(*payload));
-    if (payload == NULL) {
-        PyErr_NoMemory();
-        return NULL;
-    }
-    payload->op = second_payload->op;
-    payload->layout = first_payload->layout;
-    payload->left_dtype = NPY_DOUBLE;
-    payload->right_dtype = NPY_DOUBLE;
-    payload->result_dtype = NPY_DOUBLE;
-    payload->itemsize = (int)sizeof(double);
-    payload->min_elements = numpy_jit_get_min_elements();
-    payload->candidate = first_payload->candidate;
-    payload->site = site;
-    payload->fused_op = fused_op;
-    payload->inplace = second_payload->inplace;
-    payload->fused_flags = request->u.fused_binary2.flags;
-    payload->fused_pattern = fused_pattern;
-    numpy_jit_link_plan_stats(payload);
-
-    PyJitExtPlan *plan = PyMem_Calloc(1, sizeof(*plan));
-    if (plan == NULL) {
-        numpy_jit_unlink_plan_stats(payload);
-        PyMem_Free(payload);
-        PyErr_NoMemory();
-        return NULL;
-    }
-    plan->abi_version = PYJIT_EXT_ABI_VERSION;
-    plan->struct_size = sizeof(*plan);
-    plan->kind = PYJIT_EXT_PLAN_FUSED_BINARY2;
-    plan->provider = &numpy_jit_provider;
-    plan->flags = PYJIT_EXT_PLAN_REQUIRES_GIL |
-                  PYJIT_EXT_PLAN_NO_PYTHON_CALLBACK |
-                  PYJIT_EXT_PLAN_ALLOCATES_RESULT;
-    if (payload->inplace) {
-        plan->flags &= ~PYJIT_EXT_PLAN_ALLOCATES_RESULT;
-    }
-    plan->op_id = 1000u + (uint32_t)payload->fused_op;
-    plan->payload = payload;
-    plan->eval.fused_binary2_eval = numpy_fused_binary2_eval;
-    plan->debug_name = "numpy.fused.binary2.arithmetic_chain";
-    if (site != NULL) {
-        if (site->fused_site_count != UINT16_MAX) {
-            site->fused_site_count++;
-        }
-        site->fused_pattern = payload->fused_pattern;
-    }
-    return plan;
-}
-
-static PyJitExtPlan *
 numpy_jit_try_plan(const PyJitExtTraceRequest *request, PyJitExtSiteState *site)
 {
     if (site != NULL) {
@@ -2740,8 +2947,6 @@ numpy_jit_try_plan(const PyJitExtTraceRequest *request, PyJitExtSiteState *site)
             return numpy_jit_try_call_plan(request, site);
         case PYJIT_EXT_TRACE_UNARY:
             return numpy_jit_try_unary_plan(request, site);
-        case PYJIT_EXT_TRACE_FUSED_BINARY2:
-            return numpy_jit_try_fused_binary2_plan(request, site);
         default:
             return NULL;
     }
@@ -2894,6 +3099,16 @@ static PyJitExtPlan *
 numpy_jit_build_matmul_prologue_region(
         const PyJitExtRegionRequest *request, PyJitExtSiteState *site)
 {
+    /* Scaling one matmul operand into a provider workspace is semantically
+     * safe, but it is not consistently profitable: Gemver S regresses while
+     * M gains materially.  Keep the experimental lowering available for
+     * targeted study, but require an explicit opt-in until Core IR can carry
+     * a pre-admission size property rather than installing a Region that
+     * later has to fall back. */
+    const char *enabled = getenv("NUMPY_JIT_ENABLE_MATMUL_PROLOGUE_REGION");
+    if (enabled == NULL || enabled[0] != '1') {
+        return NULL;
+    }
     if (request->node_count != 2 || request->input_count != 3) {
         return NULL;
     }
@@ -3112,6 +3327,7 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
         return NULL;
     }
     payload->region_generic = 1;
+    payload->region_graph_hash = request->graph_hash;
     payload->region_node_count = request->node_count;
     payload->region_input_count = request->input_count;
     payload->region_output_slot = request->input_count + request->node_count - 1;
@@ -3185,20 +3401,10 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
             payload->region_mutation_input = (int8_t)mutation_input;
         }
     }
-    /* The specialized binary2 path is selected before the generic builder.
-     * Keep short in-place updates on the ordinary NumPy path: their
+    /* Keep short in-place updates on the ordinary NumPy path: their
      * allocation/aliasing cost dominates the saved dispatch, and wrapping
      * them in a PIC adds two guards on every iteration. */
     if (request->node_count == 2 && request->input_count == 3) {
-        /* These two structural fingerprints are the update-chain variants
-         * (add followed by in-place add, and the multiply/update companion).
-         * Keep them out of the external Region ABI: their graph shape is
-         * stable across producers, while their short-lived result makes the
-         * guard/PIC envelope more expensive than the saved dispatch. */
-        if (request->graph_hash == UINT64_C(11864785617260399901) ||
-            request->graph_hash == UINT64_C(12778640471622374793)) {
-            return NULL;
-        }
         PyJitExtPlan *last = (PyJitExtPlan *)request->nodes[1].atomic_plan;
         if (last != NULL &&
             (last->effect_flags & PYJIT_EXT_EFFECT_MUTATES_INPUT)) {
@@ -3223,10 +3429,34 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
      * allocation and aliasing work, so keep the existing NumPy path for this
      * shape.  Non-mutating two-node regions (the common scalar/vector
      * affine kernels) remain eligible for fusion. */
-    if ((payload->inplace || all_add) && request->node_count == 2 &&
+    if (payload->inplace && request->node_count == 2 &&
         request->input_count == 3) {
         PyMem_Free(payload);
         return NULL;
+    }
+
+    /* The all-array add chain is one of the most common Region DAGs.  Use
+       the existing add3 traversal as a normal schedule (rather than
+       treating it as a separate fused architecture path). */
+    if (!payload->inplace && all_add && payload->region_node_count == 2 &&
+        payload->region_input_count == 3) {
+        int t0 = payload->region_input_count;
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int consumes_internal = tail->left == t0 || tail->right == t0;
+        if (consumes_internal) {
+            payload->region_compiled_kind = 7;
+        }
+    }
+
+    /* High-frequency elementwise multiply followed by add/subtract. */
+    if (!payload->inplace && payload->region_node_count == 2 &&
+        payload->region_input_count == 3 &&
+        payload->region_nodes[0].op == NUMPY_JIT_KERNEL_REGION_MUL &&
+        (payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_ADD ||
+         payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_SUB) &&
+        payload->region_nodes[1].left == payload->region_input_count) {
+        payload->region_compiled_kind =
+            payload->region_nodes[1].op == NUMPY_JIT_KERNEL_REGION_ADD ? 8 : 9;
     }
 
     /* Compile the common affine DAG
@@ -3331,6 +3561,17 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
             first->right < payload->region_input_count &&
             (consumes_first ||
              (tail->op == NUMPY_JIT_KERNEL_REGION_MUL && consumes_second));
+        /* ``a * (b - c)`` has the same opcode-only fingerprint as the
+         * scalar affine form, but puts the temporary on the right.  It is a
+         * three-array expression, not an affine scalar tail; installing a
+         * generic Region would replace two already-hot atomic sites with a
+         * Region entry that can never use the schedule-5 kernel.  Reject it
+         * while building the plan so CPython keeps the independent atomic
+         * specialization path. */
+        if (consumes_second) {
+            PyMem_Free(payload);
+            return NULL;
+        }
         if (shape_ok) {
             payload->region_compiled_kind = 5;
         }
@@ -3425,13 +3666,19 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
             fprintf(fp,
                     "{\"graph_hash\":%" PRIu64
                     ",\"node_count\":%u,\"input_count\":%u,"
-                    "\"compiled_kind\":%u,\"ops\":[",
+                    "\"schedule_id\":%u,\"compiled_kind\":%u,\"nodes\":[",
                     request->graph_hash, (unsigned)request->node_count,
                     (unsigned)request->input_count,
+                    (unsigned)payload->region_compiled_kind,
                     (unsigned)payload->region_compiled_kind);
             for (int i = 0; i < payload->region_node_count; i++) {
-                fprintf(fp, "%s%u", i == 0 ? "" : ",",
-                        (unsigned)payload->region_nodes[i].op);
+                NumpyJitKernelRegionNode *node = &payload->region_nodes[i];
+                fprintf(fp,
+                        "%s{\"op\":%u,\"left\":%u,\"right\":%u,"
+                        "\"out\":%u}",
+                        i == 0 ? "" : ",", (unsigned)node->op,
+                        (unsigned)node->left, (unsigned)node->right,
+                        (unsigned)node->out);
             }
             fputs("]}\n", fp);
             fclose(fp);
@@ -3466,7 +3713,7 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
              op1 == NUMPY_JIT_KERNEL_REGION_MUL &&
              op2 == NUMPY_JIT_KERNEL_REGION_SUB);
     }
-    if (defer_to_atomic_prefix) {
+    if (defer_to_atomic_prefix && payload->region_compiled_kind == 0) {
         /* These short, usually strided programs are cheaper as the existing
            vectorized atomic/dedicated prefix sequence than in the generic
            per-element interpreter.  Returning NULL lets the structural
@@ -3507,6 +3754,20 @@ numpy_jit_build_generic_region(const PyJitExtRegionRequest *request,
            lowering, invalidate it instead of retaining provider fallback on
            every entry. */
         payload->region_runtime_miss_on_decline = 1;
+        for (int i = 0; i < payload->region_node_count; i++) {
+            if (payload->region_ops[i] == NUMPY_JIT_OP_POWER) {
+                /* A non-square exponent is a property miss, not structural.
+                 * Preserve the site for a later exponent=2 PIC entry. */
+                payload->region_runtime_miss_on_decline = 0;
+                break;
+            }
+        }
+    }
+    for (int i = 0; i < payload->region_node_count; i++) {
+        if (payload->region_ops[i] == NUMPY_JIT_OP_POWER) {
+            payload->region_runtime_miss_on_decline = 0;
+            break;
+        }
     }
     plan->op_id = 3000u + request->node_count;
     plan->payload = payload;
@@ -3929,151 +4190,12 @@ numpy_jit_prepare_region(const PyJitExtRegionRequest *request,
             }
         }
     }
-    const char *legacy_binary2 =
-        getenv("NUMPY_JIT_REGION_USE_LEGACY_BINARY2");
-    if (request->node_count > 2 &&
-        !(legacy_binary2 != NULL && legacy_binary2[0] == '0')) {
-        for (int pair = 0; pair + 1 < request->node_count; pair++) {
-            const PyJitExtRegionNode *first_node = &request->nodes[pair];
-            const PyJitExtRegionNode *second_node =
-                &request->nodes[pair + 1];
-            PyJitExtPlan *first = (PyJitExtPlan *)first_node->atomic_plan;
-            PyJitExtPlan *second = (PyJitExtPlan *)second_node->atomic_plan;
-            int consumes_right =
-                second_node->inputs[1] == first_node->output;
-            if ((!consumes_right &&
-                 second_node->inputs[0] != first_node->output) ||
-                first == NULL || second == NULL ||
-                first_node->input_count != 2 ||
-                second_node->input_count != 2 ||
-                first->provider != &numpy_jit_provider ||
-                second->provider != &numpy_jit_provider) {
-                continue;
-            }
-            PyJitExtTraceRequest prefix_request = {
-                .kind = PYJIT_EXT_TRACE_FUSED_BINARY2,
-                .u.fused_binary2 = {
-                    .first_plan = first,
-                    .second_plan = second,
-                    .flags = consumes_right ?
-                        PYJIT_EXT_FUSED_BINARY2_SECOND_CONSUMES_RIGHT :
-                        PYJIT_EXT_FUSED_BINARY2_SECOND_CONSUMES_LEFT,
-                },
-            };
-            PyJitExtPlan *prefix = numpy_jit_try_fused_binary2_plan(
-                &prefix_request, NULL);
-            if (prefix != NULL) {
-                /* The dedicated prefix is materially faster than the
-                   interpreted expression program for short vectors.  Ask
-                   the structural builder to retry a shorter prefix; DAGs
-                   without a dedicated prefix still use the 2-4 node generic
-                   lowering below. */
-                numpy_jit_free_plan(prefix);
-                return NULL;
-            }
-            if (PyErr_Occurred()) {
-                PyErr_Clear();
-            }
-        }
-    }
-    if ((legacy_binary2 != NULL && legacy_binary2[0] == '0') ||
-        request->node_count != 2 ||
-        request->input_count != 3) {
-        return numpy_jit_build_generic_region(request, site);
-    }
-    const PyJitExtRegionNode *first_node = &request->nodes[0];
-    const PyJitExtRegionNode *second_node = &request->nodes[1];
-    PyJitExtPlan *first = (PyJitExtPlan *)first_node->atomic_plan;
-    PyJitExtPlan *second = (PyJitExtPlan *)second_node->atomic_plan;
-    if (first == NULL || second == NULL || first_node->input_count != 2 ||
-        second_node->input_count != 2 ||
-        first->provider != &numpy_jit_provider ||
-        second->provider != &numpy_jit_provider ||
-        (first->effect_flags & (PYJIT_EXT_EFFECT_PURE |
-                                PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK)) !=
-            (PYJIT_EXT_EFFECT_PURE |
-             PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK) ||
-        !(second->effect_flags & PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK) ||
-        (((second->effect_flags & PYJIT_EXT_EFFECT_MUTATES_INPUT) != 0) !=
-         (((NumpyJitPlanPayload *)second->payload)->inplace != 0))) {
-        return NULL;
-    }
-    int consumes_right = second_node->inputs[1] == first_node->output;
-    if (!consumes_right && second_node->inputs[0] != first_node->output) {
-        return NULL;
-    }
+    /* Every structural candidate, including two-node affine expressions,
+       is represented by the same immutable Region program.  Dedicated
+       kernels are variants produced from that program, never a separate
+       fused-binary2 plan. */
+    return numpy_jit_build_generic_region(request, site);
 
-    PyJitExtTraceRequest legacy = {
-        .kind = PYJIT_EXT_TRACE_FUSED_BINARY2,
-        .u.fused_binary2 = {
-            .first_plan = first,
-            .second_plan = second,
-            .flags = consumes_right ?
-                PYJIT_EXT_FUSED_BINARY2_SECOND_CONSUMES_RIGHT :
-                PYJIT_EXT_FUSED_BINARY2_SECOND_CONSUMES_LEFT,
-        },
-    };
-    PyJitExtPlan *plan = numpy_jit_try_fused_binary2_plan(&legacy, site);
-    if (plan == NULL) {
-        return numpy_jit_build_generic_region(request, site);
-    }
-    NumpyJitPlanPayload *payload = (NumpyJitPlanPayload *)plan->payload;
-    NumpyJitPlanPayload *first_payload =
-        (NumpyJitPlanPayload *)first->payload;
-    NumpyJitPlanPayload *second_payload =
-        (NumpyJitPlanPayload *)second->payload;
-    payload->region_first_op = first_payload->op;
-    payload->region_second_op = second_payload->op;
-    payload->region_second_consumes_right = consumes_right;
-    payload->region_runtime_other_first =
-        request->inputs[0].value_id != first_node->inputs[0];
-    payload->region_node_count = request->node_count;
-    payload->region_input_count = request->input_count;
-    payload->region_output_slot = request->input_count + request->node_count - 1;
-    for (int i = 0; i < request->input_count; i++) {
-        payload->region_input_ids[i] = request->inputs[i].value_id;
-    }
-    for (int i = 0; i < request->node_count; i++) {
-        int left = numpy_region_value_slot(
-            payload, request, request->nodes[i].inputs[0], i);
-        int right = numpy_region_value_slot(
-            payload, request, request->nodes[i].inputs[1], i);
-        if (left < 0 || right < 0) {
-            memset(payload->region_atomic_plans, 0,
-                   sizeof(payload->region_atomic_plans));
-            payload->region_node_count = 0;
-            numpy_jit_free_plan(plan);
-            return NULL;
-        }
-        payload->region_left[i] = (uint8_t)left;
-        payload->region_right[i] = (uint8_t)right;
-        payload->region_atomic_plans[i] =
-            (PyJitExtPlan *)request->nodes[i].atomic_plan;
-    }
-    plan->kind = PYJIT_EXT_PLAN_REGION;
-    plan->eval.region_eval = numpy_region_eval;
-    plan->region_fallback_eval = numpy_region_fallback_eval;
-    plan->region_input_count = request->input_count;
-    /* This path is backed by a schedule-specific two-op kernel, not the
-       interpreted Region program.  It amortizes entry-executor overhead for
-       straight-line array functions and is safe to retain after the early
-       entry probe. */
-    plan->flags |= PYJIT_EXT_PLAN_ENTRY_PROFITABLE;
-    plan->effect_flags = PYJIT_EXT_EFFECT_NO_PYTHON_CALLBACK |
-                         PYJIT_EXT_EFFECT_PRESERVES_FP_POLICY |
-                         PYJIT_EXT_EFFECT_OWNS_ATOMIC_PLANS;
-    if (payload->inplace) {
-        plan->effect_flags |= PYJIT_EXT_EFFECT_MUTATES_INPUT;
-        plan->mutation_input = consumes_right ? 0 : 2;
-    }
-    else {
-        plan->effect_flags |= PYJIT_EXT_EFFECT_PURE;
-        plan->mutation_input = -1;
-    }
-    plan->op_id = 2000u + (uint32_t)payload->fused_op;
-    plan->debug_name = "numpy.region.elementwise.v1";
-    payload->region_owner_plan = plan;
-    return plan;
 }
 
 static void
@@ -4125,6 +4247,7 @@ numpy_jit_free_plan(PyJitExtPlan *plan)
             }
         }
         numpy_jit_unlink_plan_stats(payload);
+        numpy_jit_retire_llvm_stats(payload);
         if (payload->shared_result_cache == NULL) {
             Py_XDECREF(payload->result_cache.result);
         }
@@ -4144,7 +4267,7 @@ static int
 numpy_jit_is_supported_region_dtype(int dtype)
 {
     return numpy_jit_is_supported_float_dtype(dtype) ||
-           dtype == NPY_LONG || dtype == NPY_LONGLONG;
+           dtype == NPY_INT || dtype == NPY_LONG || dtype == NPY_LONGLONG;
 }
 
 typedef enum {
@@ -4935,24 +5058,6 @@ numpy_jit_fused_eval(NumpyJitPlanPayload *payload, PyObject *a_obj,
     return (PyObject *)out;
 }
 
-static int
-numpy_jit_contig_disjoint(PyArrayObject *left, PyArrayObject *right,
-                          npy_intp size)
-{
-    if (size < 0 || (uint64_t)size > UINTPTR_MAX /
-            (uint64_t)PyArray_ITEMSIZE(left)) {
-        return 0;
-    }
-    uintptr_t left_start = (uintptr_t)PyArray_BYTES(left);
-    uintptr_t right_start = (uintptr_t)PyArray_BYTES(right);
-    uintptr_t bytes = (uintptr_t)size * (uintptr_t)PyArray_ITEMSIZE(left);
-    if (left_start > UINTPTR_MAX - bytes || right_start > UINTPTR_MAX - bytes) {
-        return 0;
-    }
-    return left_start + bytes <= right_start ||
-           right_start + bytes <= left_start;
-}
-
 static PyJitExtResult
 numpy_fused_add3_eval(NumpyJitPlanPayload *payload, PyObject *first_left,
                       PyObject *first_right, PyObject *second_other,
@@ -5487,6 +5592,552 @@ numpy_region_matmul_scaled_add_eval(NumpyJitPlanPayload *payload,
     return PYJIT_EXT_HIT;
 }
 
+static int
+numpy_jit_llvm_supported_op(uint8_t op, int dtype)
+{
+    switch (op) {
+        case NUMPY_JIT_KERNEL_REGION_ADD:
+        case NUMPY_JIT_KERNEL_REGION_SUB:
+        case NUMPY_JIT_KERNEL_REGION_MUL:
+        case NUMPY_JIT_KERNEL_REGION_SQUARE:
+        case NUMPY_JIT_KERNEL_REGION_NEGATIVE:
+            return 1;
+        case NUMPY_JIT_KERNEL_REGION_DIV:
+            return dtype == NPY_FLOAT || dtype == NPY_DOUBLE;
+        default:
+            return 0;
+    }
+}
+
+static uint64_t
+numpy_jit_llvm_scalar_bits(int dtype, double value)
+{
+    uint64_t bits = 0;
+    if (dtype == NPY_DOUBLE) {
+        memcpy(&bits, &value, sizeof(value));
+    }
+    else if (dtype == NPY_FLOAT) {
+        float narrowed = (float)value;
+        uint32_t narrow_bits;
+        memcpy(&narrow_bits, &narrowed, sizeof(narrowed));
+        bits = narrow_bits;
+    }
+    else if (dtype == NPY_INT) {
+        bits = (uint32_t)(npy_int32)value;
+    }
+    else {
+        bits = (npy_uint64)(npy_int64)value;
+    }
+    return bits;
+}
+
+static int
+numpy_jit_llvm_region_eligible(NumpyJitPlanPayload *payload, int dtype,
+                               uint8_t scalar_mask, int all_c_contiguous)
+{
+    if (payload == NULL || !payload->region_generic || payload->inplace ||
+        !all_c_contiguous || payload->region_node_count < 2 ||
+        payload->region_node_count > NUMPY_JIT_LLVM_MAX_NODES ||
+        payload->region_input_count == 0 ||
+        payload->region_input_count > NUMPY_JIT_LLVM_MAX_INPUTS ||
+        (scalar_mask & ((1u << payload->region_input_count) - 1u)) ==
+            ((1u << payload->region_input_count) - 1u) ||
+        !(dtype == NPY_FLOAT || dtype == NPY_DOUBLE || dtype == NPY_INT ||
+          dtype == NPY_LONG || dtype == NPY_LONGLONG)) {
+        return 0;
+    }
+    for (int i = 0; i < payload->region_node_count; i++) {
+        if (!numpy_jit_llvm_supported_op(payload->region_nodes[i].op, dtype)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static void
+numpy_jit_build_compiled_kernel_spec(const NumpyJitPlanPayload *payload,
+                                     int dtype, uint8_t scalar_mask,
+                                     NumpyJitLLVMKernelSpec *spec)
+{
+    memset(spec, 0, sizeof(*spec));
+    spec->graph_hash = payload->region_graph_hash;
+    spec->dialect_id = NUMPY_JIT_DIALECT_ID;
+    spec->dialect_version = 1;
+    spec->node_count = payload->region_node_count;
+    spec->input_count = payload->region_input_count;
+    spec->output_slot = payload->region_output_slot;
+    spec->scalar_mask = scalar_mask;
+    spec->dtype = (int16_t)dtype;
+    memcpy(spec->nodes, payload->region_nodes,
+           payload->region_node_count * sizeof(spec->nodes[0]));
+}
+
+static void
+numpy_jit_llvm_maybe_request(NumpyJitPlanPayload *payload, int dtype,
+                             uint8_t scalar_mask, npy_intp size)
+{
+    if (payload->region_llvm_entry != NULL &&
+        numpy_jit_llvm_entry_state(payload->region_llvm_entry) ==
+            NUMPY_JIT_LLVM_ORPHANED) {
+        payload->region_llvm_entry = NULL;
+        payload->region_llvm_decision = 0;
+        payload->region_llvm_cache_hit = 0;
+    }
+    if (!payload->region_llvm_property_valid) {
+        payload->region_llvm_property_valid = 1;
+        payload->region_llvm_dtype = (int16_t)dtype;
+        payload->region_llvm_scalar_mask = scalar_mask;
+    }
+    else if (payload->region_llvm_dtype != dtype ||
+             payload->region_llvm_scalar_mask != scalar_mask) {
+        /* Keep the direct native entry monomorphic.  Other properties remain
+         * fully supported by the existing four-entry Region PIC. */
+        return;
+    }
+    if (payload->region_llvm_eligible_hits != UINT32_MAX) {
+        payload->region_llvm_eligible_hits++;
+    }
+    if (size > 0 && payload->region_llvm_visited_elements <=
+                        UINT64_MAX - (uint64_t)size) {
+        payload->region_llvm_visited_elements += (uint64_t)size;
+    }
+    if (payload->region_llvm_entry != NULL) {
+        return;
+    }
+    int force = numpy_jit_llvm_mode() == NUMPY_JIT_LLVM_MODE_FORCE;
+    if (!force &&
+        ((uint64_t)payload->region_llvm_eligible_hits <
+             numpy_jit_llvm_min_hits() ||
+         payload->region_llvm_visited_elements <
+             numpy_jit_llvm_min_visited_elements() ||
+         payload->region_llvm_guard_misses > 4u +
+             payload->region_llvm_eligible_hits / 8u)) {
+        return;
+    }
+    NumpyJitLLVMKernelSpec spec;
+    numpy_jit_build_compiled_kernel_spec(payload, dtype, scalar_mask, &spec);
+    int cache_hit = 0;
+    payload->region_llvm_entry = numpy_jit_llvm_request(&spec, &cache_hit);
+    payload->region_llvm_cache_hit = cache_hit != 0;
+    if (payload->region_llvm_entry == NULL) {
+        payload->region_llvm_decision = 3;
+    }
+}
+
+static uint64_t
+numpy_jit_elapsed_ns(const struct timespec *begin,
+                     const struct timespec *end)
+{
+    return (uint64_t)(end->tv_sec - begin->tv_sec) * UINT64_C(1000000000) +
+           (uint64_t)(end->tv_nsec - begin->tv_nsec);
+}
+
+static uint64_t
+numpy_jit_median8(uint64_t values[8])
+{
+    uint64_t sorted[8];
+    memcpy(sorted, values, sizeof(sorted));
+    for (int i = 1; i < 8; i++) {
+        uint64_t value = sorted[i];
+        int j = i - 1;
+        while (j >= 0 && sorted[j] > value) {
+            sorted[j + 1] = sorted[j];
+            j--;
+        }
+        sorted[j + 1] = value;
+    }
+    return sorted[3] / 2u + sorted[4] / 2u +
+           ((sorted[3] & 1u) && (sorted[4] & 1u));
+}
+
+static unsigned
+numpy_jit_llvm_size_bucket(npy_intp size)
+{
+    if (size < 256) {
+        return 0;
+    }
+    if (size < 4096) {
+        return 1;
+    }
+    return 2;
+}
+
+/* Property keys must distinguish the sizes at which a Region crosses over
+ * from its atomic sequence.  This deliberately has one more large bucket
+ * than the LLVM controller: Region admission is independent of LLVM. */
+static unsigned
+numpy_jit_region_size_bucket(npy_intp size)
+{
+    if (size < 256) {
+        return 0;
+    }
+    if (size < 4096) {
+        return 1;
+    }
+    if (size < 65536) {
+        return 2;
+    }
+    return 3;
+}
+
+static NumpyJitKernelFunc
+numpy_jit_precompiled_variant_produce(NumpyJitPlanPayload *payload, int dtype,
+                                      uint8_t scalar_mask, npy_intp size)
+{
+    if (numpy_jit_aot_mode() == NUMPY_JIT_LLVM_MODE_OFF) {
+        return NULL;
+    }
+    if (!payload->region_aot_lookup_done) {
+        NumpyJitLLVMKernelSpec spec;
+        struct timespec begin, end;
+        int timed = clock_gettime(CLOCK_MONOTONIC, &begin) == 0;
+        numpy_jit_build_compiled_kernel_spec(payload, dtype, scalar_mask, &spec);
+        payload->region_aot_entry = numpy_jit_aot_lookup(&spec);
+        if (timed && clock_gettime(CLOCK_MONOTONIC, &end) == 0) {
+            payload->region_aot_lookup_ns = numpy_jit_elapsed_ns(&begin, &end);
+        }
+        payload->region_aot_lookup_done = 1;
+        if (payload->region_aot_entry != NULL) {
+            payload->region_aot_lookup_hit++;
+        }
+        else {
+            payload->region_aot_lookup_miss++;
+        }
+    }
+    if (payload->region_aot_entry == NULL) {
+        return NULL;
+    }
+    NumpyJitAOTEntryInfo info;
+    numpy_jit_aot_entry_info(payload->region_aot_entry, &info);
+    if ((info.accepted_bucket_mask & (1u << numpy_jit_llvm_size_bucket(size))) == 0) {
+        return NULL;
+    }
+    return numpy_jit_aot_entry_function(payload->region_aot_entry);
+}
+
+static int
+numpy_jit_llvm_select_native(NumpyJitPlanPayload *payload,
+                             NumpyJitKernelFunc *function,
+                             int *measure_probation, npy_intp size)
+{
+    *function = NULL;
+    *measure_probation = 0;
+    if (payload->region_llvm_entry == NULL ||
+        payload->region_llvm_decision == 3) {
+        return 0;
+    }
+    int state = numpy_jit_llvm_entry_state(payload->region_llvm_entry);
+    if (state == NUMPY_JIT_LLVM_FAILED ||
+        state == NUMPY_JIT_LLVM_CAPACITY) {
+        payload->region_llvm_decision = 3;
+        return 0;
+    }
+    if (state == NUMPY_JIT_LLVM_ORPHANED) {
+        return 0;
+    }
+    if (state != NUMPY_JIT_LLVM_READY) {
+        return 0;
+    }
+    *function = numpy_jit_llvm_entry_function(payload->region_llvm_entry);
+    if (*function == NULL) {
+        return 0;
+    }
+    unsigned bucket = numpy_jit_llvm_size_bucket(size);
+    if (numpy_jit_llvm_mode() == NUMPY_JIT_LLVM_MODE_FORCE) {
+        payload->region_llvm_bucket_decision[bucket] = 2;
+    }
+    if (payload->region_llvm_bucket_decision[bucket] == 2) {
+        return 1;
+    }
+    if (payload->region_llvm_bucket_decision[bucket] == 3) {
+        return 0;
+    }
+    payload->region_llvm_bucket_decision[bucket] = 1;
+    *measure_probation = 1;
+    /* Alternate real executions.  Start with native, then use the old path,
+     * so neither candidate receives a systematically colder cache state. */
+    return payload->region_llvm_native_count[bucket] <=
+           payload->region_llvm_old_count[bucket];
+}
+
+/* AOT and LLVM are sibling candidate producers.  Keeping this decision in
+ * one place prevents the old "AOT layer, else LLVM layer" execution model
+ * from leaking into the Region evaluator. */
+static int
+numpy_jit_variant_selector(NumpyJitPlanPayload *payload, int dtype,
+                           uint8_t scalar_mask, npy_intp size,
+                           NumpyJitVariant *selected)
+{
+    memset(selected, 0, sizeof(*selected));
+    NumpyJitKernelFunc function = numpy_jit_precompiled_variant_produce(
+        payload, dtype, scalar_mask, size);
+    if (function != NULL) {
+        selected->kind = NUMPY_JIT_VARIANT_PRECOMPILED;
+        selected->function = function;
+        return 1;
+    }
+    int measure_probation = 0;
+    if (!numpy_jit_llvm_select_native(
+            payload, &function, &measure_probation, size)) {
+        return 0;
+    }
+    selected->kind = NUMPY_JIT_VARIANT_LLVM;
+    selected->function = function;
+    selected->measure_probation = (uint8_t)measure_probation;
+    return 1;
+}
+
+static void
+numpy_jit_llvm_record_probation(NumpyJitPlanPayload *payload,
+                                int used_native, uint64_t elapsed_ns,
+                                npy_intp size)
+{
+    if (payload->region_llvm_decision == 3 || size <= 0) {
+        return;
+    }
+    unsigned bucket = numpy_jit_llvm_size_bucket(size);
+    if (payload->region_llvm_bucket_decision[bucket] != 1) {
+        return;
+    }
+    uint64_t normalized = elapsed_ns <= UINT64_MAX / 1024u ?
+        elapsed_ns * 1024u / (uint64_t)size : elapsed_ns / (uint64_t)size;
+    if (used_native && payload->region_llvm_native_count[bucket] < 8) {
+        payload->region_llvm_native_samples[bucket]
+            [payload->region_llvm_native_count[bucket]++] = normalized;
+    }
+    else if (!used_native && payload->region_llvm_old_count[bucket] < 8) {
+        payload->region_llvm_old_samples[bucket]
+            [payload->region_llvm_old_count[bucket]++] = normalized;
+    }
+    if (payload->region_llvm_native_count[bucket] == 8 &&
+        payload->region_llvm_old_count[bucket] == 8) {
+        uint64_t native_median = numpy_jit_median8(
+            payload->region_llvm_native_samples[bucket]);
+        uint64_t old_median = numpy_jit_median8(
+            payload->region_llvm_old_samples[bucket]);
+        payload->region_llvm_bucket_decision[bucket] =
+            native_median <= old_median * 97u / 100u ? 2 : 3;
+    }
+}
+
+typedef struct {
+    NumpyJitKernelArgs kernel_args;
+    PyArrayObject *shape_source;
+    int dtype;
+    int errmask;
+    uint8_t scalar_mask;
+} NumpyJitLLVMDirectCall;
+
+static void
+numpy_jit_llvm_record_guard_miss(NumpyJitPlanPayload *payload)
+{
+    if (payload->region_llvm_guard_misses != UINT32_MAX) {
+        payload->region_llvm_guard_misses++;
+    }
+    if (!payload->region_llvm_property_valid &&
+        payload->region_llvm_entry == NULL &&
+        payload->region_llvm_guard_misses >= 8) {
+        /* Stable sites outside the first-phase C-contiguous subset must not
+         * pay a permanent argument scan merely because LLVM is enabled. */
+        payload->region_llvm_decision = 3;
+    }
+}
+
+/* Build the complete, address-independent native guard.  This helper is
+ * deliberately shared by generic Regions and structural schedules: the
+ * selected backend is an implementation detail of one Region DAG. */
+static int
+numpy_jit_llvm_prepare_direct(NumpyJitPlanPayload *payload,
+                              PyObject *const *args, Py_ssize_t nargs,
+                              NumpyJitLLVMDirectCall *call,
+                              int allow_producer_update)
+{
+    memset(call, 0, sizeof(*call));
+    if ((numpy_jit_llvm_mode() == NUMPY_JIT_LLVM_MODE_OFF &&
+         numpy_jit_aot_mode() == NUMPY_JIT_LLVM_MODE_OFF) ||
+        payload == NULL || !payload->region_generic || payload->inplace ||
+        nargs != payload->region_input_count) {
+        return 0;
+    }
+    npy_intp size = -1;
+    for (Py_ssize_t i = 0; i < nargs; i++) {
+        if (PyArray_CheckExact(args[i])) {
+            PyArrayObject *array = (PyArrayObject *)args[i];
+            int dtype = PyArray_TYPE(array);
+            if (!PyArray_IS_C_CONTIGUOUS(array) ||
+                !numpy_jit_is_supported_region_dtype(dtype)) {
+                numpy_jit_llvm_record_guard_miss(payload);
+                return 0;
+            }
+            if (call->shape_source == NULL) {
+                call->shape_source = array;
+                call->dtype = dtype;
+                size = PyArray_SIZE(array);
+            }
+            else if (dtype != call->dtype ||
+                     PyArray_NDIM(array) !=
+                         PyArray_NDIM(call->shape_source)) {
+                numpy_jit_llvm_record_guard_miss(payload);
+                return 0;
+            }
+            else {
+                for (int dim = 0; dim < PyArray_NDIM(array); dim++) {
+                    if (PyArray_DIM(array, dim) !=
+                        PyArray_DIM(call->shape_source, dim)) {
+                        numpy_jit_llvm_record_guard_miss(payload);
+                        return 0;
+                    }
+                }
+            }
+            call->kernel_args.data[i] = PyArray_BYTES(array);
+        }
+        else {
+            double scalar;
+            if (!exact_python_scalar_as_double(payload, args[i], &scalar)) {
+                numpy_jit_llvm_record_guard_miss(payload);
+                return 0;
+            }
+            call->scalar_mask |= (uint8_t)(1u << i);
+        }
+    }
+    if (call->shape_source == NULL || size < payload->min_elements ||
+        !numpy_jit_llvm_region_eligible(
+            payload, call->dtype, call->scalar_mask, 1)) {
+        numpy_jit_llvm_record_guard_miss(payload);
+        return 0;
+    }
+    /* Scalar slots may precede the first array, so encode them only after
+     * the array dtype has established the specialization. */
+    for (Py_ssize_t i = 0; i < nargs; i++) {
+        if ((call->scalar_mask & (1u << i)) != 0) {
+            if (call->dtype == NPY_INT || call->dtype == NPY_LONG ||
+                call->dtype == NPY_LONGLONG) {
+                if (!(PyLong_CheckExact(args[i]) ||
+                      PyArray_IsScalar(args[i], SignedInteger))) {
+                    numpy_jit_llvm_record_guard_miss(payload);
+                    return 0;
+                }
+                npy_int64 integer = (npy_int64)PyLong_AsLongLong(args[i]);
+                if (integer == -1 && PyErr_Occurred()) {
+                    PyErr_Clear();
+                    numpy_jit_llvm_record_guard_miss(payload);
+                    return 0;
+                }
+                if (call->dtype == NPY_INT &&
+                    (integer < NPY_MIN_INT32 || integer > NPY_MAX_INT32)) {
+                    numpy_jit_llvm_record_guard_miss(payload);
+                    return 0;
+                }
+                call->kernel_args.scalars[i] = (npy_uint64)integer;
+                continue;
+            }
+            double scalar;
+            if (!exact_python_scalar_as_double(payload, args[i], &scalar)) {
+                numpy_jit_llvm_record_guard_miss(payload);
+                return 0;
+            }
+            call->kernel_args.scalars[i] = numpy_jit_llvm_scalar_bits(
+                call->dtype, scalar);
+        }
+    }
+    if (payload->region_llvm_property_valid &&
+        (payload->region_llvm_dtype != call->dtype ||
+         payload->region_llvm_scalar_mask != call->scalar_mask)) {
+        numpy_jit_llvm_record_guard_miss(payload);
+        return 0;
+    }
+    if (_get_errmask_fast(&call->errmask) < 0) {
+        return -1;
+    }
+    for (int shift = 0; shift <= 9; shift += 3) {
+        if (((call->errmask >> shift) & 7) > 1) {
+            numpy_jit_llvm_record_guard_miss(payload);
+            return 0;
+        }
+    }
+    call->kernel_args.size = size;
+    /* Static stencils are resolved on the first guarded invocation.  Only an
+     * AOT miss (or a size bucket deliberately outside its manifest) enters
+     * the asynchronous LLVM tier. */
+    if (allow_producer_update &&
+        numpy_jit_precompiled_variant_produce(
+            payload, call->dtype, call->scalar_mask, size) == NULL &&
+        /* An AOT manifest match with this bucket excluded is an explicit
+         * admission decision, not a reason to route the same graph into the
+         * experimental LLVM tier.  In particular this avoids comparing LLVM
+         * against an old path inflated by direct-call preparation. */
+        payload->region_aot_entry == NULL) {
+        numpy_jit_llvm_maybe_request(
+            payload, call->dtype, call->scalar_mask, size);
+    }
+    return 1;
+}
+
+static PyJitExtResult
+numpy_jit_compiled_execute_direct(NumpyJitPlanPayload *payload,
+                              NumpyJitLLVMDirectCall *call,
+                              NumpyJitKernelFunc function,
+                              PyObject **result, int is_aot)
+{
+    PyArrayObject *out = numpy_jit_get_or_alloc_result(
+        payload, PyArray_NDIM(call->shape_source),
+        PyArray_DIMS(call->shape_source), call->dtype,
+        call->kernel_args.size);
+    if (out == NULL) {
+        return PYJIT_EXT_ERROR;
+    }
+    char fp_barrier;
+    if (call->errmask != 0) {
+        npy_clear_floatstatus_barrier(&fp_barrier);
+    }
+    call->kernel_args.output = PyArray_BYTES(out);
+    function(&call->kernel_args);
+    *result = (PyObject *)out;
+    if (call->errmask != 0) {
+        int fpe_errors = npy_get_floatstatus_barrier(&fp_barrier);
+        if (fpe_errors != 0 &&
+            PyUFunc_GiveFloatingpointErrors(
+                "CrossJIT LLVM region", fpe_errors) < 0) {
+            Py_CLEAR(*result);
+            return PYJIT_EXT_ERROR;
+        }
+    }
+    unsigned bucket = numpy_jit_llvm_size_bucket(call->kernel_args.size);
+    uint32_t *uses = is_aot ? &payload->region_aot_native_uses[bucket] :
+                              &payload->region_llvm_native_uses[bucket];
+    if (*uses != UINT32_MAX) {
+        (*uses)++;
+    }
+    return PYJIT_EXT_HIT;
+}
+
+/* Stable native execution is owned by the same PropertyKey entry as atomic
+ * and Region candidates.  The producer/cache lookup is deliberately disabled
+ * here: a committed hit performs only the specialized direct-call guard and
+ * invokes the function already selected for this entry. */
+static PyJitExtResult
+numpy_jit_region_execute_native(NumpyJitPlanPayload *payload,
+                                NumpyJitDispatchEntry *entry,
+                                PyObject *const *args, Py_ssize_t nargs,
+                                PyObject **result)
+{
+    if (entry == NULL || entry->selected_function == NULL) {
+        return PYJIT_EXT_MISS;
+    }
+    NumpyJitLLVMDirectCall call;
+    int prepared = numpy_jit_llvm_prepare_direct(
+        payload, args, nargs, &call, 0);
+    if (prepared < 0) {
+        return PYJIT_EXT_ERROR;
+    }
+    if (!prepared) {
+        return PYJIT_EXT_MISS;
+    }
+    return numpy_jit_compiled_execute_direct(
+        payload, &call, entry->selected_function, result,
+        entry->selected_variant == NUMPY_JIT_VARIANT_PRECOMPILED);
+}
+
 static PyJitExtResult
 numpy_region_generic_eval(NumpyJitPlanPayload *payload,
                           PyObject *const *args, Py_ssize_t nargs,
@@ -5557,7 +6208,7 @@ numpy_region_generic_eval(NumpyJitPlanPayload *payload,
     if (shape_source == NULL || size < payload->min_elements) {
         return PYJIT_EXT_MISS;
     }
-    if (dtype == NPY_LONG || dtype == NPY_LONGLONG) {
+    if (dtype == NPY_INT || dtype == NPY_LONG || dtype == NPY_LONGLONG) {
         for (int node = 0; node < payload->region_node_count; node++) {
             if (payload->region_nodes[node].op ==
                     NUMPY_JIT_KERNEL_REGION_DIV) {
@@ -5606,6 +6257,10 @@ numpy_region_generic_eval(NumpyJitPlanPayload *payload,
         }
     }
     int kernel_ok;
+    struct timespec region_t0, region_t1;
+    int measure_region = numpy_jit_stats_enabled() &&
+        !payload->region_llvm_probation_old_active &&
+        clock_gettime(CLOCK_MONOTONIC, &region_t0) == 0;
     if (payload->region_compiled_kind == 1 && all_c_contiguous &&
         PyArray_IS_C_CONTIGUOUS(out)) {
         NumpyJitKernelRegionNode *mul0 = &payload->region_nodes[0];
@@ -5707,6 +6362,77 @@ numpy_region_generic_eval(NumpyJitPlanPayload *payload,
     else if (payload->region_compiled_kind == 4) {
         kernel_ok = 0;
     }
+    else if (payload->region_compiled_kind == 7) {
+        NumpyJitKernelRegionNode *first = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int t0 = payload->region_input_count;
+        int third = tail->left == t0 ? tail->right : tail->left;
+        int roles_ok = first->left < nargs && first->right < nargs &&
+            third < nargs && !input_is_scalar[first->left] &&
+            !input_is_scalar[first->right] && !input_is_scalar[third];
+        int order = tail->left == t0 ? 0 : 2;
+        kernel_ok = roles_ok &&
+            ((all_c_contiguous && PyArray_IS_C_CONTIGUOUS(out)) ?
+             numpy_jit_kernel_add3_contig(
+                 dtype, input_data[first->left], input_data[first->right],
+                 input_data[third], PyArray_BYTES(out), size, order) :
+             numpy_jit_kernel_add3_strided(
+                 dtype, PyArray_NDIM(shape_source), PyArray_DIMS(shape_source),
+                 (const char *)input_data[first->left],
+                 input_strides[first->left],
+                 (const char *)input_data[first->right],
+                 input_strides[first->right], (const char *)input_data[third],
+                 input_strides[third], PyArray_BYTES(out), size, order));
+        if (!roles_ok) {
+            /* The structural schedule is selected before scalar/array roles
+             * are known.  Preserve the generic Region fallback for scalar
+             * variants instead of turning a schedule mismatch into a miss. */
+            kernel_ok = all_c_contiguous && PyArray_IS_C_CONTIGUOUS(out) ?
+                numpy_jit_kernel_region_contig(
+                    payload->region_nodes, payload->region_node_count,
+                    payload->region_input_count, payload->region_output_slot,
+                    dtype, input_data, scalar_values, input_is_scalar,
+                    PyArray_BYTES(out), size) :
+                numpy_jit_kernel_region_strided(
+                    payload->region_nodes, payload->region_node_count,
+                    payload->region_input_count, payload->region_output_slot,
+                    dtype, PyArray_NDIM(shape_source), PyArray_DIMS(shape_source),
+                    input_data, input_strides, scalar_values, input_is_scalar,
+                    PyArray_BYTES(out), PyArray_STRIDES(out), size);
+        }
+    }
+    else if ((payload->region_compiled_kind == 8 ||
+              payload->region_compiled_kind == 9) &&
+             size >= NUMPY_JIT_MUL_ADDSUB_REGION_MIN_ELEMENTS) {
+        NumpyJitKernelRegionNode *first = &payload->region_nodes[0];
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int cslot = tail->right;
+        int roles_ok = first->left < nargs && first->right < nargs &&
+            cslot < nargs && !input_is_scalar[first->left] &&
+            !input_is_scalar[first->right] && !input_is_scalar[cslot];
+        kernel_ok = roles_ok && numpy_jit_kernel_mul_addsub3(
+            dtype, payload->region_compiled_kind == 9,
+            PyArray_NDIM(shape_source), PyArray_DIMS(shape_source),
+            (const char *)input_data[first->left], input_strides[first->left],
+            (const char *)input_data[first->right], input_strides[first->right],
+            (const char *)input_data[cslot], input_strides[cslot],
+            PyArray_BYTES(out), PyArray_STRIDES(out), size,
+            all_c_contiguous && PyArray_IS_C_CONTIGUOUS(out));
+        if (!roles_ok) {
+            kernel_ok = all_c_contiguous && PyArray_IS_C_CONTIGUOUS(out) ?
+                numpy_jit_kernel_region_contig(
+                payload->region_nodes, payload->region_node_count,
+                payload->region_input_count, payload->region_output_slot, dtype,
+                input_data, scalar_values, input_is_scalar,
+                PyArray_BYTES(out), size) :
+                numpy_jit_kernel_region_strided(
+                payload->region_nodes, payload->region_node_count,
+                payload->region_input_count, payload->region_output_slot, dtype,
+                PyArray_NDIM(shape_source), PyArray_DIMS(shape_source),
+                input_data, input_strides, scalar_values, input_is_scalar,
+                PyArray_BYTES(out), PyArray_STRIDES(out), size);
+        }
+    }
     else if (payload->region_compiled_kind == 5) {
         NumpyJitKernelRegionNode *first = &payload->region_nodes[0];
         NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
@@ -5767,6 +6493,21 @@ numpy_region_generic_eval(NumpyJitPlanPayload *payload,
             PyArray_NDIM(shape_source), PyArray_DIMS(shape_source),
             input_data, input_strides, scalar_values, input_is_scalar,
             PyArray_BYTES(out), PyArray_STRIDES(out), size);
+    }
+    if (measure_region && clock_gettime(CLOCK_MONOTONIC, &region_t1) == 0) {
+        uint64_t elapsed = (uint64_t)(region_t1.tv_sec - region_t0.tv_sec) *
+            UINT64_C(1000000000) + (uint64_t)(region_t1.tv_nsec - region_t0.tv_nsec);
+        const char *dir = getenv("PYTHON_JIT_EXT_STATS_DIR");
+        if (dir == NULL || dir[0] == '\0') dir = "/tmp";
+        char path[4096];
+        snprintf(path, sizeof(path), "%s/crossjit_numpy_schedule_timing.ndjson", dir);
+        FILE *fp = fopen(path, "a");
+        if (fp != NULL) {
+            fprintf(fp, "{\"schedule_id\":%u,\"nodes\":%u,\"elements\":%" PRIdPTR ",\"elapsed_ns\":%" PRIu64 ",\"kernel_ok\":%d}\n",
+                    (unsigned)payload->region_compiled_kind,
+                    (unsigned)payload->region_node_count, size, elapsed, kernel_ok);
+            fclose(fp);
+        }
     }
     if (!kernel_ok) {
         if (!payload->inplace) {
@@ -6234,12 +6975,16 @@ numpy_jit_region_inspect(const PyJitExtPlan *region,
     hash = numpy_jit_region_hash_u64(hash, payload->region_node_count);
     PyArrayObject *shape_source = NULL;
     npy_intp element_count = -1;
+    npy_intp schedule_element_count = -1;
     int dtype = -1;
     int itemsize = 0;
     int supported = 1;
     for (Py_ssize_t i = 0; i < nargs; i++) {
         if (PyArray_CheckExact(args[i])) {
             PyArrayObject *array = (PyArrayObject *)args[i];
+            if (schedule_element_count < 0) {
+                schedule_element_count = PyArray_SIZE(array);
+            }
             int current_dtype = PyArray_TYPE(array);
             int layout = numpy_jit_region_layout_class(array);
             hash = numpy_jit_region_hash_u64(hash, 0x100u + (uint64_t)i);
@@ -6313,8 +7058,13 @@ numpy_jit_region_inspect(const PyJitExtPlan *region,
             }
         }
     }
+    /* The property identity includes size because candidate profitability is
+     * not monotonic across problem sizes.  Do this in the cheap signature
+     * pass too, so each bucket receives an independent PIC/decision entry. */
+    hash = numpy_jit_region_hash_u64(
+        hash, (uint64_t)numpy_jit_region_size_bucket(schedule_element_count));
     if (require_lowerable &&
-        (dtype == NPY_LONG || dtype == NPY_LONGLONG)) {
+        (dtype == NPY_INT || dtype == NPY_LONG || dtype == NPY_LONGLONG)) {
         for (Py_ssize_t i = 0; i < nargs; i++) {
             if (!PyArray_CheckExact(args[i]) &&
                 !(PyLong_CheckExact(args[i]) ||
@@ -6328,6 +7078,28 @@ numpy_jit_region_inspect(const PyJitExtPlan *region,
                 supported = 0;
             }
         }
+    }
+    if (payload->region_compiled_kind == 8 ||
+        payload->region_compiled_kind == 9) {
+        /* The schedule choice is part of the PIC property key.  This must be
+         * included in both the cheap property-signature pass and the full
+         * specialization inspection; otherwise their signatures can never
+         * match and no positive lowering is installed. */
+        hash = numpy_jit_region_hash_u64(
+            hash, schedule_element_count >=
+                      NUMPY_JIT_MUL_ADDSUB_REGION_MIN_ELEMENTS ? 1u : 0u);
+    }
+    for (int i = 0; i < payload->region_node_count; i++) {
+        if (payload->region_ops[i] != NUMPY_JIT_OP_POWER) {
+            continue;
+        }
+        int exponent_slot = payload->region_right[i];
+        int is_square = exponent_slot >= 0 && exponent_slot < nargs &&
+            numpy_jit_is_exact_power2_exponent(args[exponent_slot]);
+        /* POWER value eligibility is a true property specialization: cube
+         * and square at one bytecode site must not share a negative PIC key. */
+        hash = numpy_jit_region_hash_u64(
+            hash, UINT64_C(0x504f574552320000) | (uint64_t)is_square);
     }
     if (require_lowerable && payload->region_compiled_kind == 5 &&
         !numpy_jit_is_supported_float_dtype(dtype)) {
@@ -6443,6 +7215,70 @@ numpy_jit_region_property_signature(const PyJitExtPlan *region,
 }
 
 static PyJitExtResult
+numpy_region_atomic_prefix_eval(NumpyJitPlanPayload *payload,
+                                PyObject *const *args, Py_ssize_t nargs,
+                                PyObject **result)
+{
+    if (payload == NULL || nargs != 3 || payload->region_input_count != 3 ||
+        payload->region_node_count != 2) {
+        return PYJIT_EXT_MISS;
+    }
+    PyJitExtPlan *first = payload->region_atomic_plans[0];
+    PyJitExtPlan *tail = payload->region_atomic_plans[1];
+    int first_left = payload->region_left[0];
+    int first_right = payload->region_right[0];
+    int tail_consumes_left =
+        payload->region_left[1] == payload->region_input_count;
+    int tail_consumes_right =
+        payload->region_right[1] == payload->region_input_count;
+    int tail_other = tail_consumes_left ? payload->region_right[1] :
+        payload->region_left[1];
+    if (first == NULL || tail == NULL ||
+        first->kind != PYJIT_EXT_PLAN_BINARY ||
+        tail->kind != PYJIT_EXT_PLAN_BINARY ||
+        first_left < 0 || first_left >= nargs ||
+        first_right < 0 || first_right >= nargs ||
+        (!tail_consumes_left && !tail_consumes_right) ||
+        tail_other < 0 || tail_other >= nargs) {
+        return PYJIT_EXT_MISS;
+    }
+
+    PyObject *temporary = NULL;
+    PyJitExtResult status = first->eval.binary_eval(
+        first->payload, args[first_left], args[first_right], &temporary);
+    if ((status != PYJIT_EXT_HIT && status != PYJIT_EXT_COLD) ||
+        temporary == NULL) {
+        if (status == PYJIT_EXT_ERROR) {
+            return PYJIT_EXT_ERROR;
+        }
+        Py_XDECREF(temporary);
+        return numpy_region_fallback_eval(payload, args, nargs, result);
+    }
+    PyObject *out = NULL;
+    status = tail->eval.binary_eval(
+        tail->payload,
+        tail_consumes_left ? temporary : args[tail_other],
+        tail_consumes_left ? args[tail_other] : temporary, &out);
+    Py_DECREF(temporary);
+    if ((status != PYJIT_EXT_HIT && status != PYJIT_EXT_COLD) || out == NULL) {
+        if (status == PYJIT_EXT_ERROR) {
+            return PYJIT_EXT_ERROR;
+        }
+        Py_XDECREF(out);
+        /* A runtime property outside the atomic plan's fast domain is still
+         * semantically valid.  Replay the exact NumPy recipe for this
+         * execution without poisoning the positive Region PIC. */
+        return numpy_region_fallback_eval(payload, args, nargs, result);
+    }
+    *result = out;
+    /* Each atomic plan is executed through its original evaluator and keeps
+     * its own PRESERVES_FP_POLICY contract.  Re-wrapping the whole prefix in
+     * a second get/clear/check sequence both changes that execution model and
+     * is measurable for ADI's 98-element inner loops. */
+    return PYJIT_EXT_HIT;
+}
+
+static PyJitExtResult
 numpy_jit_lowered_region_eval(void *payload_obj, PyObject *const *args,
                               Py_ssize_t nargs, PyObject **result)
 {
@@ -6455,11 +7291,27 @@ numpy_jit_lowered_region_eval(void *payload_obj, PyObject *const *args,
     if (nargs != lowering->nargs) {
         return PYJIT_EXT_MISS;
     }
-    /* The lowered body is property-independent and performs the complete
-       dynamic validation itself (exact ndarray/scalar roles, dtype, shape,
-       layout, aliasing, writability and FP policy).  Rechecking the cached
-       property vector here made every PIC hit scan the same arguments twice
-       without protecting an additional lowering assumption. */
+    /* This is the committed DispatchEntry guard.  Validate every property
+       captured by this lowering before entering the selected target; only
+       value-dependent shape/alias and current FP policy remain in the body. */
+    for (Py_ssize_t i = 0; i < nargs; i++) {
+        if (Py_TYPE(args[i]) != lowering->types[i]) {
+            return PYJIT_EXT_MISS;
+        }
+        if ((lowering->array_mask & (1u << i)) != 0) {
+            if (!PyArray_CheckExact(args[i])) {
+                return PYJIT_EXT_MISS;
+            }
+            PyArrayObject *array = (PyArrayObject *)args[i];
+            if (PyArray_TYPE(array) != lowering->dtypes[i] ||
+                PyArray_NDIM(array) != lowering->ndims[i] ||
+                numpy_jit_region_layout_class(array) != lowering->layouts[i] ||
+                (PyArray_ISWRITEABLE(array) !=
+                 ((lowering->writable_mask & (1u << i)) != 0))) {
+                return PYJIT_EXT_MISS;
+            }
+        }
+    }
     return numpy_region_lowered_body(
         lowering->owner, args, nargs, result);
 }
@@ -6528,6 +7380,139 @@ numpy_region_local_fallback(NumpyJitPlanPayload *payload,
     PyJitExtResult fallback = numpy_region_fallback_eval(
         payload, args, nargs, result);
     return fallback == PYJIT_EXT_HIT ? PYJIT_EXT_COLD : fallback;
+}
+
+/* A schedule/lowering is merely a candidate.  Measure it against the exact
+ * atomic replay used on Region misses before allowing it onto the hot path.
+ * The PIC signature already includes the Region size bucket, so decisions
+ * here are per graph + runtime property + size class. */
+static PyJitExtResult
+numpy_jit_region_execute_atomic(NumpyJitPlanPayload *payload,
+                                NumpyJitDispatchEntry *entry,
+                                PyObject *const *args, Py_ssize_t nargs,
+                                PyObject **result)
+{
+    (void)entry;
+    return numpy_region_local_fallback(payload, args, nargs, result);
+}
+
+static PyJitExtResult
+numpy_jit_region_execute_candidate(NumpyJitPlanPayload *payload,
+                                   NumpyJitDispatchEntry *entry,
+                                   PyObject *const *args, Py_ssize_t nargs,
+                                   PyObject **result)
+{
+    (void)payload;
+    return entry->lowered->guard_eval(
+        entry->lowered->payload, args, nargs, result);
+}
+
+/* The only path that is allowed to sample or make a selection.  Once it
+ * commits, `selected_execute` is a stable direct target for that property. */
+static PyJitExtResult
+numpy_jit_region_execute_probation(NumpyJitPlanPayload *payload,
+                                   NumpyJitDispatchEntry *entry,
+                                   PyObject *const *args, Py_ssize_t nargs,
+                                   PyObject **result)
+{
+    const char *force = Py_GETENV("NUMPY_JIT_VARIANT_FORCE");
+    int force_atomic = force != NULL && strcmp(force, "atomic") == 0;
+    int force_candidate = force != NULL && strcmp(force, "candidate") == 0;
+    int use_atomic = force_atomic || (!force_candidate &&
+        (entry->decision == NUMPY_JIT_VARIANT_COMMITTED_ATOMIC ||
+        (entry->decision == NUMPY_JIT_VARIANT_PROBATION &&
+         entry->profile.atomic_samples < NUMPY_JIT_VARIANT_PROBATION_SAMPLES)));
+    struct timespec begin, end;
+    int timed = clock_gettime(CLOCK_MONOTONIC, &begin) == 0;
+    PyJitExtResult status = use_atomic ?
+        numpy_jit_region_execute_atomic(payload, entry, args, nargs, result) :
+        numpy_jit_region_execute_candidate(payload, entry, args, nargs, result);
+    if ((status == PYJIT_EXT_HIT || status == PYJIT_EXT_COLD) && timed &&
+        clock_gettime(CLOCK_MONOTONIC, &end) == 0) {
+        uint64_t elapsed = numpy_jit_elapsed_ns(&begin, &end);
+        if (use_atomic) {
+            entry->profile.atomic_samples++;
+            entry->profile.atomic_elapsed_ns += elapsed;
+        }
+        else if (entry->decision == NUMPY_JIT_VARIANT_PROBATION) {
+            entry->profile.candidate_samples++;
+            entry->profile.candidate_elapsed_ns += elapsed;
+        }
+    }
+    if (status != PYJIT_EXT_HIT && status != PYJIT_EXT_COLD) {
+        return status;
+    }
+    if (entry->decision == NUMPY_JIT_VARIANT_PROBATION &&
+        entry->profile.atomic_samples >= NUMPY_JIT_VARIANT_PROBATION_SAMPLES &&
+        entry->profile.candidate_samples >= NUMPY_JIT_VARIANT_PROBATION_SAMPLES) {
+        /* Candidate needs a centralized margin, rather than schedule-local
+         * notions of profitability. */
+        uint64_t atomic = entry->profile.atomic_elapsed_ns;
+        uint64_t candidate = entry->profile.candidate_elapsed_ns;
+        uint64_t min_gain = numpy_jit_variant_min_gain_percent();
+        entry->decision = candidate * 100u <=
+            atomic * (100u - min_gain) ?
+            NUMPY_JIT_VARIANT_COMMITTED_CANDIDATE :
+            NUMPY_JIT_VARIANT_COMMITTED_ATOMIC;
+        entry->selected_variant =
+            entry->decision == NUMPY_JIT_VARIANT_COMMITTED_CANDIDATE ?
+                (payload->region_compiled_kind != 0 ?
+                    NUMPY_JIT_VARIANT_DEDICATED :
+                    NUMPY_JIT_VARIANT_GENERIC) :
+                NUMPY_JIT_VARIANT_ATOMIC;
+        entry->selected_execute =
+            entry->decision == NUMPY_JIT_VARIANT_COMMITTED_CANDIDATE ?
+                numpy_jit_region_execute_candidate :
+                numpy_jit_region_execute_atomic;
+        if (payload->site != NULL) {
+            payload->site->region_lowering_name =
+                entry->decision == NUMPY_JIT_VARIANT_COMMITTED_CANDIDATE ?
+                entry->lowered->debug_name : "numpy.region.atomic.committed";
+        }
+        if (numpy_jit_stats_enabled()) {
+            const char *dir = getenv("PYTHON_JIT_EXT_STATS_DIR");
+            if (dir == NULL || dir[0] == '\0') dir = "/tmp";
+            char path[4096];
+            snprintf(path, sizeof(path), "%s/crossjit_numpy_variant_decisions.ndjson", dir);
+            FILE *fp = fopen(path, "a");
+            if (fp != NULL) {
+                fprintf(fp,
+                    "{\"graph_id\":%" PRIu64
+                    ",\"property_key\":%" PRIu64
+                    ",\"size_bucket\":%u,\"atomic_sample_count\":%u"
+                    ",\"candidate_sample_count\":%u,\"atomic_total_ns\":%" PRIu64
+                    ",\"candidate_total_ns\":%" PRIu64
+                    ",\"decision\":\"%s\",\"selected_variant\":\"%s\"}\n",
+                    payload->region_graph_hash, entry->signature,
+                    (unsigned)entry->size_bucket,
+                    (unsigned)entry->profile.atomic_samples,
+                    (unsigned)entry->profile.candidate_samples, atomic, candidate,
+                    entry->decision == NUMPY_JIT_VARIANT_COMMITTED_CANDIDATE ?
+                        "CANDIDATE_FASTER" : "ATOMIC_FASTER",
+                    entry->decision == NUMPY_JIT_VARIANT_COMMITTED_CANDIDATE ?
+                        "CANDIDATE" : "ATOMIC");
+                fclose(fp);
+            }
+        }
+    }
+    return status;
+}
+
+static PyJitExtResult
+numpy_jit_region_dispatch_entry(NumpyJitPlanPayload *payload,
+                                NumpyJitDispatchEntry *entry,
+                                PyObject *const *args, Py_ssize_t nargs,
+                                PyObject **result)
+{
+    /* A committed DispatchEntry is the steady-state path: one guard/target
+       call.  Candidate enumeration, AOT/LLVM lookup, timing and force-mode
+       parsing are deliberately confined to probation/slow dispatch. */
+    if (entry->decision != NUMPY_JIT_VARIANT_PROBATION &&
+        entry->selected_execute != NULL) {
+        return entry->selected_execute(payload, entry, args, nargs, result);
+    }
+    return numpy_jit_region_execute_probation(
+        payload, entry, args, nargs, result);
 }
 
 static PyJitExtResult
@@ -6803,8 +7788,8 @@ numpy_outer_minimum_region_eval(NumpyJitPlanPayload *payload,
 }
 
 static PyJitExtResult
-numpy_region_eval(void *payload_obj, PyObject *const *args,
-                  Py_ssize_t nargs, PyObject **result)
+numpy_region_non_native_eval(void *payload_obj, PyObject *const *args,
+                             Py_ssize_t nargs, PyObject **result)
 {
     if (payload_obj == NULL || args == NULL) {
         return PYJIT_EXT_MISS;
@@ -6821,6 +7806,51 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
     if (payload->region_outer_minimum) {
         return numpy_outer_minimum_region_eval(
             payload, args, nargs, result);
+    }
+    if (payload->region_compiled_kind == 8 ||
+        payload->region_compiled_kind == 9) {
+        /* Schedule 8/9 cross over at 256 elements.  Select the small atomic
+         * recipe before entering the generic Region/PIC machinery: ADI
+         * executes this branch hundreds of thousands of times, so even a
+         * successful PIC envelope is material at its 98-element inner size.
+         * The scan is bounded by the three-input schedule and also handles a
+         * scalar occupying the first structural input. */
+        npy_intp elements = -1;
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            if (PyArray_CheckExact(args[i])) {
+                elements = PyArray_SIZE((PyArrayObject *)args[i]);
+                break;
+            }
+        }
+        if (elements >= 0 &&
+            elements < NUMPY_JIT_MUL_ADDSUB_REGION_MIN_ELEMENTS) {
+            if (payload->site != NULL) {
+                payload->site->region_lowering_name =
+                    "numpy.region.atomic_prefix.runtime";
+            }
+            return numpy_region_atomic_prefix_eval(
+                payload, args, nargs, result);
+        }
+    }
+    if (payload->region_compiled_kind == 5 &&
+        payload->region_node_count == 2 && nargs == 3) {
+        /* The structure ``(a +/- b) * scalar`` is also shared by hdiff's
+           three-array ``a * (b - c)`` form.  Its last multiply consumes the
+           temporary on the right, so it is not eligible for the scalar
+           schedule.  Decline the Region here: returning MISS lets CPython
+           replay the original atomic operations, retaining their independent
+           specialization/PICs without paying Region entry bookkeeping. */
+        NumpyJitKernelRegionNode *tail = &payload->region_nodes[1];
+        int temporary = payload->region_input_count;
+        int other = tail->left == temporary ? tail->right : tail->left;
+        if ((tail->left == temporary || tail->right == temporary) &&
+            other >= 0 && other < nargs && PyArray_CheckExact(args[other])) {
+            if (payload->site != NULL) {
+                payload->site->region_lowering_name =
+                    "numpy.region.atomic_prefix.role_mismatch";
+            }
+            return PYJIT_EXT_MISS;
+        }
     }
     PyJitExtPlan *region = payload->region_owner_plan;
     PyJitExtProvider *provider = region != NULL ? region->provider : NULL;
@@ -6840,18 +7870,16 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
     int fast_pic = payload->region_fast_pic != 0 ?
         (int)payload->region_fast_pic - 1 : -1;
     if (fast_pic >= 0 && fast_pic < payload->region_pic_count) {
-        NumpyJitRegionPICEntry *entry = &payload->region_pic[fast_pic];
-        /* All current lowered Region payloads share the provider-owned
-           property-independent body.  Bypass the PIC loop and indirect
-           guard call for the monomorphic steady state; the body remains the
-           authoritative dynamic guard, so property changes still miss
-           safely and continue through negative-cache handling below. */
-        PyJitExtResult evaluated = numpy_region_lowered_body(
-            payload, args, nargs, result);
-        if (evaluated == PYJIT_EXT_HIT) {
+        NumpyJitDispatchEntry *entry = &payload->region_pic[fast_pic];
+        /* This is the monomorphic fast entry.  The selector still owns the
+           choice between the lowered candidate and the atomic baseline. */
+        PyJitExtResult evaluated = numpy_jit_region_dispatch_entry(
+            payload, entry, args, nargs, result);
+        if (evaluated == PYJIT_EXT_HIT || evaluated == PYJIT_EXT_COLD) {
             numpy_jit_region_inc_u16(
                 site != NULL ? &site->region_pic_hit_count : NULL);
-            if (site != NULL) {
+            if (site != NULL &&
+                entry->decision != NUMPY_JIT_VARIANT_COMMITTED_ATOMIC) {
                 site->region_lowering_name = entry->lowered->debug_name;
             }
             return evaluated;
@@ -6864,16 +7892,17 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
         if (i == fast_pic) {
             continue;
         }
-        NumpyJitRegionPICEntry *entry = &payload->region_pic[i];
+        NumpyJitDispatchEntry *entry = &payload->region_pic[i];
         if (entry->negative) {
             continue;
         }
-        PyJitExtResult evaluated = entry->lowered->guard_eval(
-            entry->lowered->payload, args, nargs, result);
-        if (evaluated == PYJIT_EXT_HIT) {
+        PyJitExtResult evaluated = numpy_jit_region_dispatch_entry(
+            payload, entry, args, nargs, result);
+        if (evaluated == PYJIT_EXT_HIT || evaluated == PYJIT_EXT_COLD) {
             numpy_jit_region_inc_u16(
                 site != NULL ? &site->region_pic_hit_count : NULL);
-            if (site != NULL) {
+            if (site != NULL &&
+                entry->decision != NUMPY_JIT_VARIANT_COMMITTED_ATOMIC) {
                 site->region_lowering_name = entry->lowered->debug_name;
             }
             return evaluated;
@@ -6888,7 +7917,7 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
        this as a guard, not a site disable: if the argument later becomes a
        supported positive-stride layout, normal PIC probing resumes. */
     for (int i = 0; i < payload->region_pic_count; i++) {
-        NumpyJitRegionPICEntry *entry = &payload->region_pic[i];
+        NumpyJitDispatchEntry *entry = &payload->region_pic[i];
         uint8_t mask = entry->unsupported_layout_mask;
         if (!entry->negative || mask == 0 || nargs > 8) {
             continue;
@@ -6907,6 +7936,9 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
             numpy_jit_region_inc_u16(
                 payload->site != NULL ?
                     &payload->site->region_pic_miss_count : NULL);
+            if (site != NULL) {
+                site->region_lowering_name = "numpy.region.atomic.committed";
+            }
             return numpy_region_local_fallback(payload, args, nargs, result);
         }
     }
@@ -6921,14 +7953,18 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
         return numpy_region_local_fallback(payload, args, nargs, result);
     }
     for (int i = 0; i < payload->region_pic_count; i++) {
-        NumpyJitRegionPICEntry *entry = &payload->region_pic[i];
+        NumpyJitDispatchEntry *entry = &payload->region_pic[i];
         if (entry->signature != signature) {
             continue;
         }
         if (entry->negative) {
             numpy_jit_region_inc_u16(
                 site != NULL ? &site->region_pic_miss_count : NULL);
-            if (payload->region_runtime_miss_on_decline) {
+            if (site != NULL) {
+                site->region_lowering_name = "numpy.region.atomic.committed";
+            }
+            if (payload->region_runtime_miss_on_decline &&
+                payload->region_fast_pic == 0) {
                 return PYJIT_EXT_MISS;
             }
             return numpy_region_local_fallback(payload, args, nargs, result);
@@ -6962,11 +7998,23 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
     if (lowered == NULL && PyErr_Occurred()) {
         return PYJIT_EXT_ERROR;
     }
-    NumpyJitRegionPICEntry *entry =
+    NumpyJitDispatchEntry *entry =
         &payload->region_pic[payload->region_pic_count++];
     entry->signature = signature;
     entry->lowered = lowered;
     entry->negative = lowered == NULL;
+    npy_intp entry_size = 0;
+    for (Py_ssize_t i = 0; i < nargs; i++) {
+        if (PyArray_CheckExact(args[i])) {
+            entry_size = PyArray_SIZE((PyArrayObject *)args[i]);
+            break;
+        }
+    }
+    entry->size_bucket = (uint8_t)numpy_jit_region_size_bucket(entry_size);
+    entry->decision = lowered == NULL ? 0 : NUMPY_JIT_VARIANT_PROBATION;
+    entry->selected_variant = NUMPY_JIT_VARIANT_ATOMIC;
+    entry->selected_execute = lowered == NULL ?
+        numpy_jit_region_execute_atomic : NULL;
     if (lowered == NULL) {
         uint8_t unsupported_layout_mask = 0;
         for (Py_ssize_t i = 0; i < nargs && i < 8; i++) {
@@ -6981,18 +8029,23 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
             site != NULL ? &site->region_specialize_decline_count : NULL);
         numpy_jit_region_inc_u16(
             site != NULL ? &site->region_negative_count : NULL);
-        if (payload->region_runtime_miss_on_decline) {
+        if (site != NULL) {
+            site->region_lowering_name = "numpy.region.atomic.committed";
+        }
+        if (payload->region_runtime_miss_on_decline &&
+            payload->region_fast_pic == 0) {
             return PYJIT_EXT_MISS;
         }
         return numpy_region_local_fallback(payload, args, nargs, result);
     }
     payload->region_fast_pic = payload->region_pic_count;
-    PyJitExtResult evaluated = lowered->guard_eval(
-        lowered->payload, args, nargs, result);
-    if (evaluated == PYJIT_EXT_HIT) {
+    PyJitExtResult evaluated = numpy_jit_region_dispatch_entry(
+        payload, entry, args, nargs, result);
+    if (evaluated == PYJIT_EXT_HIT || evaluated == PYJIT_EXT_COLD) {
         numpy_jit_region_inc_u16(
             site != NULL ? &site->region_pic_hit_count : NULL);
-        if (site != NULL) {
+        if (site != NULL &&
+            entry->decision != NUMPY_JIT_VARIANT_COMMITTED_ATOMIC) {
             site->region_lowering_name = lowered->debug_name;
         }
         return evaluated;
@@ -7001,6 +8054,165 @@ numpy_region_eval(void *payload_obj, PyObject *const *args,
         return evaluated;
     }
     return numpy_region_local_fallback(payload, args, nargs, result);
+}
+
+static PyJitExtResult
+numpy_region_eval(void *payload_obj, PyObject *const *args,
+                  Py_ssize_t nargs, PyObject **result)
+{
+    if (payload_obj == NULL || args == NULL) {
+        return PYJIT_EXT_MISS;
+    }
+    NumpyJitPlanPayload *payload = (NumpyJitPlanPayload *)payload_obj;
+    if (!payload->region_generic || payload->inplace ||
+        (numpy_jit_llvm_mode() == NUMPY_JIT_LLVM_MODE_OFF &&
+         numpy_jit_aot_mode() == NUMPY_JIT_LLVM_MODE_OFF)) {
+        return numpy_region_non_native_eval(
+            payload_obj, args, nargs, result);
+    }
+
+    int fast_pic = payload->region_fast_pic != 0 ?
+        (int)payload->region_fast_pic - 1 : -1;
+    NumpyJitDispatchEntry *dispatch_entry =
+        fast_pic >= 0 && fast_pic < payload->region_pic_count ?
+            &payload->region_pic[fast_pic] : NULL;
+    /* Establish and commit the atomic/Region incumbent before asking native
+       producers for a challenger.  Thereafter this entry is the sole owner
+       of the final target for its PropertyKey. */
+    if (dispatch_entry == NULL ||
+        dispatch_entry->decision == NUMPY_JIT_VARIANT_PROBATION) {
+        return numpy_region_non_native_eval(
+            payload_obj, args, nargs, result);
+    }
+    if (dispatch_entry->selected_execute ==
+            numpy_jit_region_execute_native) {
+        PyJitExtResult evaluated = numpy_jit_region_dispatch_entry(
+            payload, dispatch_entry, args, nargs, result);
+        if (evaluated == PYJIT_EXT_HIT || evaluated == PYJIT_EXT_COLD ||
+            evaluated == PYJIT_EXT_ERROR) {
+            return evaluated;
+        }
+        /* A specialized native guard miss is a slow-path event. */
+    }
+
+    struct timespec probation_begin, probation_end;
+    int timing_started = 0;
+    if (payload->region_llvm_entry != NULL &&
+        numpy_jit_llvm_entry_state(payload->region_llvm_entry) ==
+            NUMPY_JIT_LLVM_READY) {
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            if (PyArray_CheckExact(args[i])) {
+                unsigned bucket = numpy_jit_llvm_size_bucket(
+                    PyArray_SIZE((PyArrayObject *)args[i]));
+                uint8_t decision =
+                    payload->region_llvm_bucket_decision[bucket];
+                if (decision == 3) {
+                    return numpy_region_non_native_eval(
+                        payload_obj, args, nargs, result);
+                }
+                if (decision == 0 || decision == 1) {
+                    timing_started = clock_gettime(
+                        CLOCK_MONOTONIC, &probation_begin) == 0;
+                }
+                break;
+            }
+        }
+    }
+    /* Once an AOT lookup is known not to serve this Region (or this size
+     * bucket), stay on the existing Region path when that decision rules out
+     * every native backend.  The old code rebuilt the complete direct-call
+     * property vector on every execution merely to rediscover the same AOT
+     * miss.  That fixed cost is visible for large square/subtract inputs,
+     * whose manifest deliberately excludes bucket 2. */
+    if (payload->region_aot_lookup_done) {
+        if (payload->region_aot_entry == NULL) {
+            if (numpy_jit_llvm_mode() == NUMPY_JIT_LLVM_MODE_OFF) {
+                return numpy_region_non_native_eval(
+                    payload_obj, args, nargs, result);
+            }
+        }
+        else {
+            npy_intp elements = -1;
+            for (Py_ssize_t i = 0; i < nargs; i++) {
+                if (PyArray_CheckExact(args[i])) {
+                    elements = PyArray_SIZE((PyArrayObject *)args[i]);
+                    break;
+                }
+            }
+            NumpyJitAOTEntryInfo aot_info = {0};
+            numpy_jit_aot_entry_info(payload->region_aot_entry, &aot_info);
+            if (elements >= 0 &&
+                (aot_info.accepted_bucket_mask &
+                 (1u << numpy_jit_llvm_size_bucket(elements))) == 0) {
+                return numpy_region_non_native_eval(
+                    payload_obj, args, nargs, result);
+            }
+        }
+    }
+    NumpyJitLLVMDirectCall call;
+    int prepared = numpy_jit_llvm_prepare_direct(
+        payload, args, nargs, &call, 1);
+    if (prepared < 0) {
+        return PYJIT_EXT_ERROR;
+    }
+    if (!prepared) {
+        return numpy_region_non_native_eval(
+            payload_obj, args, nargs, result);
+    }
+
+    unsigned selected_bucket = numpy_jit_llvm_size_bucket(
+        call.kernel_args.size);
+    NumpyJitVariant selected = {0};
+    int use_native = numpy_jit_variant_selector(
+        payload, call.dtype, call.scalar_mask, call.kernel_args.size,
+        &selected);
+    int measure_probation = selected.measure_probation != 0;
+    if (measure_probation && !timing_started) {
+        timing_started =
+            clock_gettime(CLOCK_MONOTONIC, &probation_begin) == 0;
+    }
+    PyJitExtResult status;
+    if (use_native) {
+        status = numpy_jit_compiled_execute_direct(
+            payload, &call, selected.function, result,
+            selected.kind == NUMPY_JIT_VARIANT_PRECOMPILED);
+        if (selected.kind == NUMPY_JIT_VARIANT_PRECOMPILED ||
+            (selected.kind == NUMPY_JIT_VARIANT_LLVM &&
+             payload->region_llvm_bucket_decision[selected_bucket] == 2)) {
+            dispatch_entry->selected_variant = (uint8_t)selected.kind;
+            dispatch_entry->selected_function = selected.function;
+            dispatch_entry->selected_execute =
+                numpy_jit_region_execute_native;
+        }
+        if (status == PYJIT_EXT_HIT && payload->site != NULL) {
+            payload->site->region_lowering_name =
+                selected.kind == NUMPY_JIT_VARIANT_PRECOMPILED ?
+                    "numpy.region.precompiled" : "numpy.region.llvm";
+        }
+    }
+    else {
+        payload->region_llvm_probation_old_active =
+            measure_probation != 0;
+        status = numpy_region_non_native_eval(
+            payload_obj, args, nargs, result);
+        payload->region_llvm_probation_old_active = 0;
+    }
+    if (measure_probation && timing_started &&
+        (status == PYJIT_EXT_HIT || status == PYJIT_EXT_COLD) &&
+        clock_gettime(CLOCK_MONOTONIC, &probation_end) == 0) {
+        numpy_jit_llvm_record_probation(
+            payload, use_native,
+            numpy_jit_elapsed_ns(&probation_begin, &probation_end),
+            call.kernel_args.size);
+        if (selected.function != NULL &&
+            payload->region_llvm_bucket_decision[selected_bucket] == 2) {
+            dispatch_entry->selected_variant = (uint8_t)selected.kind;
+            dispatch_entry->selected_function = selected.function;
+            dispatch_entry->selected_execute =
+                numpy_jit_region_execute_native;
+        }
+    }
+    return status;
 }
 
 static PyObject *
