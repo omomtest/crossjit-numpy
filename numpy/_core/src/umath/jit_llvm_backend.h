@@ -10,7 +10,10 @@
 extern "C" {
 #endif
 
-#define NUMPY_JIT_LLVM_MAX_INPUTS NUMPY_JIT_KERNEL_REGION_MAX_INPUTS
+/* The native call descriptor still uses an 8-bit scalar mask.  Region ABI
+ * v10 can describe 16 inputs, but wider graphs deliberately remain on the
+ * generic C path until this private backend ABI is widened. */
+#define NUMPY_JIT_LLVM_MAX_INPUTS 8
 #define NUMPY_JIT_LLVM_MAX_NODES NUMPY_JIT_KERNEL_REGION_MAX_NODES
 
 typedef struct {

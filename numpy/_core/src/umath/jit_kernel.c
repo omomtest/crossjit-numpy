@@ -3,6 +3,7 @@
 #define _UMATHMODULE
 
 #include "jit_kernel.h"
+#include "numpy/npy_math.h"
 
 #if defined(__GNUC__) && !defined(__clang__)
 #define NUMPY_JIT_REGION_OPTIMIZED __attribute__((optimize("O3")))
@@ -37,6 +38,58 @@ static inline npy_uint32
 numpy_jit_region_scalar_uint32(double value)
 {
     return (npy_uint32)(npy_int32)value;
+}
+
+static inline double
+numpy_jit_region_min_double(double left, double right)
+{
+    return (left <= right || npy_isnan(left)) ? left : right;
+}
+
+static inline double
+numpy_jit_region_max_double(double left, double right)
+{
+    return (left >= right || npy_isnan(left)) ? left : right;
+}
+
+static inline float
+numpy_jit_region_min_float(float left, float right)
+{
+    return (left <= right || npy_isnan(left)) ? left : right;
+}
+
+static inline float
+numpy_jit_region_max_float(float left, float right)
+{
+    return (left >= right || npy_isnan(left)) ? left : right;
+}
+
+/* Integer min/max lowering is currently declined by the adapter because
+ * generic integer slots use unsigned arithmetic for overflow-safe add/sub.
+ * Keep these definitions type-correct in case an unsupported node reaches a
+ * kernel, without changing signed NumPy comparison semantics. */
+static inline npy_uint32
+numpy_jit_region_min_uint32(npy_uint32 left, npy_uint32 right)
+{
+    return left < right ? left : right;
+}
+
+static inline npy_uint32
+numpy_jit_region_max_uint32(npy_uint32 left, npy_uint32 right)
+{
+    return left > right ? left : right;
+}
+
+static inline npy_uint64
+numpy_jit_region_min_uint64(npy_uint64 left, npy_uint64 right)
+{
+    return left < right ? left : right;
+}
+
+static inline npy_uint64
+numpy_jit_region_max_uint64(npy_uint64 left, npy_uint64 right)
+{
+    return left > right ? left : right;
 }
 
 #define DEFINE_REGION_CHUNK(TYPE, NAME)                                      \
@@ -90,6 +143,14 @@ numpy_jit_region_chunk_##NAME(                                               \
                     break;                                                   \
                 case NUMPY_JIT_KERNEL_REGION_NEGATIVE:                       \
                     slots[node->out][lane] = -left;                          \
+                    break;                                                   \
+                case NUMPY_JIT_KERNEL_REGION_MINIMUM:                       \
+                    slots[node->out][lane] = numpy_jit_region_min_##NAME(   \
+                        left, right);                                        \
+                    break;                                                   \
+                case NUMPY_JIT_KERNEL_REGION_MAXIMUM:                       \
+                    slots[node->out][lane] = numpy_jit_region_max_##NAME(   \
+                        left, right);                                        \
                     break;                                                   \
                 case NUMPY_JIT_KERNEL_REGION_FMA_ADD:                        \
                     slots[node->out][lane] =                                 \
@@ -427,6 +488,14 @@ numpy_jit_region_strided_##NAME(                                             \
                     break;                                                   \
                 case NUMPY_JIT_KERNEL_REGION_NEGATIVE:                       \
                     slots[node->out] = -left;                                \
+                    break;                                                   \
+                case NUMPY_JIT_KERNEL_REGION_MINIMUM:                       \
+                    slots[node->out] = numpy_jit_region_min_##NAME(         \
+                        left, right);                                        \
+                    break;                                                   \
+                case NUMPY_JIT_KERNEL_REGION_MAXIMUM:                       \
+                    slots[node->out] = numpy_jit_region_max_##NAME(         \
+                        left, right);                                        \
                     break;                                                   \
                 default:                                                     \
                     return 0;                                                \

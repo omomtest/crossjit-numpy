@@ -194,7 +194,7 @@ private:
                     pb.registerLoopAnalyses(lam);
                     pb.crossRegisterProxies(lam, fam, cgam, mam);
                     ModulePassManager mpm = pb.buildPerModuleDefaultPipeline(
-                        OptimizationLevel::O2);
+                        OptimizationLevel::O3);
                     mpm.run(m, mam);
                 });
                 if (active_entry_ != nullptr) {

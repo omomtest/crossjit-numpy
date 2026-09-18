@@ -421,6 +421,7 @@ import _opcode
 import _testinternalcapi
 import gc
 import numpy as np
+from numpy import maximum, minimum
 import sys
 import warnings
 from test.support import reset_code
@@ -715,6 +716,9 @@ assert '_EXT_BINARY_EXEC' not in admission_ops, admission_ops
         "PYTHON_JIT_EXT_ENABLE_FUSED_BINARY2": "0",
         "NUMPY_JIT_ENABLE_GENERIC_REGION_PROGRAM": "1",
         "NUMPY_JIT_LLVM": "off",
+        # This test inspects the retained Region executor.  Keep an atomic
+        # selector result property-local instead of replacing the executor.
+        "NUMPY_JIT_VARIANT_DOMINANCE_MIN_OBSERVATIONS": "65535",
     })
     result = subprocess.run(
         [sys.executable, "-P", "-c", code],
@@ -742,11 +746,120 @@ assert '_EXT_BINARY_EXEC' not in admission_ops, admission_ops
         # properties.  These calls must therefore reuse the positive entry,
         # rather than manufacturing a redundant negative PIC entry.
         assert dag_site["region_specialize_count"] >= 1, dag_site
-        assert dag_site["region_negative_count"] == 0, dag_site
-        assert dag_site["region_saturated_count"] == 0, dag_site
-        assert dag_site["region_disabled"] == 0, dag_site
+        # Dtype, layout and size bucket are deliberately distinct properties;
+        # this stress sequence may fill the bounded PIC without invalidating
+        # the retained positive Region executor.
+        variant_path = os.path.join(
+            stats_tmp.name, "crossjit_numpy_variant_decisions.ndjson")
+        with open(variant_path, encoding="utf-8") as stream:
+            decisions = [json.loads(line) for line in stream]
+        dag_decisions = [
+            row for row in decisions
+            if row.get("site_id") == dag_site["site_id"]
+            and row.get("event", "DECISION") == "DECISION"
+        ]
+        assert dag_decisions, decisions
+        timed_decisions = [
+            row for row in dag_decisions
+            if row.get("atomic_median_ns", 0) > 0
+            and row.get("candidate_median_ns", 0) > 0
+        ]
+        assert timed_decisions, decisions
+        assert all(row["atomic_samples_ns"] for row in timed_decisions), decisions
+        assert all(row["candidate_samples_ns"] for row in timed_decisions), decisions
+        if dag_site["region_disabled"]:
+            assert dag_site["region_disable_reason"] == \
+                "provider_atomic_faster", dag_site
+            assert any(
+                row.get("event") == "BYPASS" and row.get("bypass_count", 0)
+                for row in decisions if row.get("site_id") == dag_site["site_id"]
+            ), decisions
     finally:
         stats_tmp.cleanup()
+
+
+def test_crossjit_experimental_region_store_fusion():
+    """Basic-slice store fusion is opt-in and remains transactional."""
+    code = r'''
+import _opcode
+import _testinternalcapi
+import numpy as np
+from test.support import reset_code
+
+def assign(n, destination, a, b, c):
+    for _ in range(n):
+        destination[1:-1] = a * b + c
+    return destination
+
+def opnames(func):
+    for offset in range(0, len(func.__code__.co_code), 2):
+        try:
+            return [item[0] for item in _opcode.get_executor(func.__code__, offset)]
+        except ValueError:
+            pass
+    return []
+
+size = 1024
+a = np.linspace(-2.0, 3.0, size)
+b = np.linspace(4.0, 5.0, size)
+c = np.linspace(-1.0, 1.0, size)
+expected = a * b + c
+destination = np.zeros(size + 2)
+reset_code(assign)
+with np.errstate(all='ignore'):
+    actual = assign(_testinternalcapi.TIER2_THRESHOLD + 500,
+                    destination, a, b, c)
+np.testing.assert_array_equal(actual[1:-1], expected)
+assert opnames(assign).count('_EXT_REGION_STORE') == 1, opnames(assign)
+
+# Overlap is rejected by the direct guard and takes the ordinary temporary
+# assignment route, preserving NumPy's read-before-write semantics.
+base = np.linspace(1.0, 3.0, size + 2)
+overlap_source = base[1:-1]
+overlap_expected = base.copy()
+overlap_expected[1:-1] = overlap_source * b + c
+with np.errstate(all='ignore'):
+    assign(1, base, overlap_source, b, c)
+np.testing.assert_array_equal(base, overlap_expected)
+
+# A non-ignore FP policy must materialize before assignment, so an exception
+# cannot expose a partially updated destination.
+before = np.full(size + 2, 17.0)
+huge = np.full(size, np.finfo(np.float64).max)
+try:
+    with np.errstate(over='raise'):
+        assign(1, before, huge, huge, np.zeros(size))
+except FloatingPointError:
+    pass
+else:
+    raise AssertionError('store fusion bypassed seterr=raise')
+np.testing.assert_array_equal(before, np.full(size + 2, 17.0))
+
+readonly = np.zeros(size + 2)
+readonly.flags.writeable = False
+try:
+    with np.errstate(all='ignore'):
+        assign(1, readonly, a, b, c)
+except ValueError:
+    pass
+else:
+    raise AssertionError('store fusion wrote through a read-only destination')
+'''
+    env = os.environ.copy()
+    env.update({
+        "PYTHON_JIT": "1",
+        "PYTHON_JIT_EXT_ENABLE_REGIONS": "1",
+        "PYTHON_JIT_EXT_ENABLE_STORE_FUSION": "1",
+        "PYTHON_JIT_EXT_ENABLE_FUSED_BINARY2": "0",
+        "PYTHON_JIT_EXT_FAST_REGION": "1",
+        "NUMPY_JIT_ENABLE_GENERIC_REGION_PROGRAM": "1",
+        "NUMPY_JIT_AOT": "off",
+        "NUMPY_JIT_LLVM": "off",
+    })
+    result = subprocess.run(
+        [sys.executable, "-P", "-c", code], text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, timeout=60)
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_crossjit_llvm_region_backend_semantics():
@@ -984,6 +1097,320 @@ if hasattr(os, 'fork'):
         stats_tmp.cleanup()
 
 
+def test_crossjit_region_negative_property_bypass_is_dominance_aware():
+    code = r'''
+import _testinternalcapi
+import numpy as np
+from test.support import reset_code
+
+def mixed_chain(n, a, b, scale):
+    out = None
+    for _ in range(n):
+        out = a * scale + b
+    return out
+
+def negative_only_chain(n, a, b, scale):
+    out = None
+    for _ in range(n):
+        out = a * scale + b
+    return out
+
+base_a = np.linspace(1.0, 2.0, 4096)
+base_b = np.linspace(3.0, 4.0, 4096)
+scale = np.float64(0.5)
+warm = _testinternalcapi.TIER2_THRESHOLD + 80
+
+# Establish a supported positive entry, then alternate properties.  A few
+# negative observations must not poison the positive property.
+reset_code(mixed_chain)
+np.testing.assert_allclose(
+    mixed_chain(warm, base_a, base_b, scale), base_a * scale + base_b)
+for index in range(12):
+    if index & 1:
+        a, b = base_a, base_b
+    else:
+        a, b = base_a[::-1], base_b[::-1]
+    np.testing.assert_allclose(mixed_chain(4, a, b, scale), a * scale + b)
+
+# A site that only observes an unsupported property may bypass Region and
+# regenerate its atomic trace instead of replaying local fallback forever.
+reset_code(negative_only_chain)
+negative_a = base_a[::-1]
+negative_b = base_b[::-1]
+np.testing.assert_allclose(
+    negative_only_chain(warm, negative_a, negative_b, scale),
+    negative_a * scale + negative_b)
+'''
+    stats_tmp = tempfile.TemporaryDirectory()
+    env = os.environ.copy()
+    env.update({
+        "PYTHON_JIT": "1",
+        "PYTHON_JIT_EXT_STATS": "1",
+        "PYTHON_JIT_EXT_STATS_DIR": stats_tmp.name,
+        "PYTHON_JIT_EXT_ENABLE_REGIONS": "1",
+        "NUMPY_JIT_ENABLE_GENERIC_REGION_PROGRAM": "1",
+        "NUMPY_JIT_LLVM": "off",
+        "NUMPY_JIT_VARIANT_FORCE": "candidate",
+    })
+    result = subprocess.run(
+        [sys.executable, "-P", "-c", code], text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, timeout=60)
+    try:
+        assert result.returncode == 0, result.stdout + result.stderr
+        site_path = os.path.join(stats_tmp.name, "crossjit_ext_sites.ndjson")
+        with open(site_path, encoding="utf-8") as stream:
+            sites = [json.loads(line) for line in stream]
+        mixed = [
+            row for row in sites
+            if row["code"] == "mixed_chain" and row["region_site_count"]
+        ]
+        negative_only = [
+            row for row in sites
+            if row["code"] == "negative_only_chain"
+            and row["region_site_count"]
+        ]
+        assert len(mixed) == 1, sites
+        assert len(negative_only) == 1, sites
+        assert mixed[0]["region_disabled"] == 0, mixed[0]
+        assert mixed[0]["region_negative_count"] >= 1, mixed[0]
+        assert negative_only[0]["region_disabled"] == 1, negative_only[0]
+        assert negative_only[0]["region_site_count"] == 1, negative_only[0]
+        assert negative_only[0]["region_provider_bypass_count"] == 1, \
+            negative_only[0]
+        assert negative_only[0]["region_disable_reason"] in {
+            "miss_threshold", "region_consecutive_runtime_reject",
+            "provider_unsupported_property", "provider_dominant_negative",
+        }, negative_only[0]
+    finally:
+        stats_tmp.cleanup()
+
+
+def test_crossjit_region_selector_keeps_size_bucket_decisions_separate():
+    code = r'''
+import _testinternalcapi
+import numpy as np
+import os
+from test.support import reset_code
+
+def bucket_chain(n, a, b, scale):
+    out = None
+    for _ in range(n):
+        out = a * scale + b
+    return out
+
+def forced_chain(n, a, b, scale):
+    out = None
+    for _ in range(n):
+        out = a * scale + b
+    return out
+
+scale = np.float64(0.5)
+small_a = np.linspace(1.0, 2.0, 1024)
+small_b = np.linspace(3.0, 4.0, 1024)
+large_a = np.linspace(1.0, 2.0, 65536)
+large_b = np.linspace(3.0, 4.0, 65536)
+warm = _testinternalcapi.TIER2_THRESHOLD + 100
+
+reset_code(bucket_chain)
+np.testing.assert_allclose(
+    bucket_chain(warm, small_a, small_b, scale), small_a * scale + small_b)
+np.testing.assert_allclose(
+    bucket_chain(40, large_a, large_b, scale), large_a * scale + large_b)
+
+reset_code(forced_chain)
+os.environ["NUMPY_JIT_VARIANT_FORCE"] = "atomic"
+np.testing.assert_allclose(
+    forced_chain(warm, small_a, small_b, scale), small_a * scale + small_b)
+os.environ["NUMPY_JIT_VARIANT_FORCE"] = "candidate"
+np.testing.assert_allclose(
+    forced_chain(20, small_a, small_b, scale), small_a * scale + small_b)
+'''
+    stats_tmp = tempfile.TemporaryDirectory()
+    env = os.environ.copy()
+    env.update({
+        "PYTHON_JIT": "1",
+        "PYTHON_JIT_EXT_STATS": "1",
+        "PYTHON_JIT_EXT_STATS_DIR": stats_tmp.name,
+        "PYTHON_JIT_EXT_ENABLE_REGIONS": "1",
+        "NUMPY_JIT_ENABLE_GENERIC_REGION_PROGRAM": "1",
+        "NUMPY_JIT_LLVM": "off",
+        # Keep an atomic winner property-local so the second size can reach
+        # the same Region site during this test.
+        "NUMPY_JIT_VARIANT_DOMINANCE_MIN_OBSERVATIONS": "65535",
+    })
+    result = subprocess.run(
+        [sys.executable, "-P", "-c", code], text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, timeout=60)
+    try:
+        assert result.returncode == 0, result.stdout + result.stderr
+        variant_path = os.path.join(
+            stats_tmp.name, "crossjit_numpy_variant_decisions.ndjson")
+        with open(variant_path, encoding="utf-8") as stream:
+            decisions = [json.loads(line) for line in stream]
+        sites_path = os.path.join(stats_tmp.name, "crossjit_ext_sites.ndjson")
+        with open(sites_path, encoding="utf-8") as stream:
+            sites = [json.loads(line) for line in stream]
+        bucket_site = next(
+            row for row in sites
+            if row["code"] == "bucket_chain" and row["region_site_count"])
+        bucket_decisions = [
+            row for row in decisions
+            if row.get("site_id") == bucket_site["site_id"]
+            and row.get("event", "DECISION") == "DECISION"
+        ]
+        assert len({row["size_bucket"] for row in bucket_decisions}) >= 2, \
+            bucket_decisions
+        assert all(row["decision_reason"] in {
+            "CANDIDATE_FASTER", "ATOMIC_FASTER", "NOISY_PROBATION",
+            "GUARD_UNSTABLE",
+        } for row in bucket_decisions), bucket_decisions
+    finally:
+        stats_tmp.cleanup()
+
+
+@pytest.mark.parametrize(("selector_case", "expected_reason"), [
+    ("candidate", "CANDIDATE_FASTER"),
+    ("atomic", "ATOMIC_FASTER"),
+    ("noisy", "NOISY_PROBATION"),
+])
+def test_crossjit_region_selector_commits_expected_target(
+        selector_case, expected_reason):
+    code = r'''
+import _testinternalcapi
+import numpy as np
+import os
+from test.support import reset_code
+
+def candidate_chain(n, a, b, c, scale, tail):
+    out = None
+    for _ in range(n):
+        out = ((a / b) / c) / scale / tail
+    return out
+
+def two_op_chain(n, a, b, scale):
+    out = None
+    for _ in range(n):
+        out = a * scale + b
+    return out
+
+case = os.environ["CROSSJIT_SELECTOR_TEST_CASE"]
+size = 65536 if case == "candidate" else 1024
+a = np.linspace(1.0, 2.0, size)
+b = np.linspace(3.0, 4.0, size)
+scale = np.float64(0.5)
+warm = _testinternalcapi.TIER2_THRESHOLD + 100
+if case == "candidate":
+    c = np.linspace(0.1, 0.2, size)
+    tail = np.float64(2.0)
+    reset_code(candidate_chain)
+    actual = candidate_chain(warm, a, b, c, scale, tail)
+    np.testing.assert_allclose(actual, ((a / b) / c) / scale / tail)
+else:
+    reset_code(two_op_chain)
+    actual = two_op_chain(warm, a, b, scale)
+    np.testing.assert_allclose(actual, a * scale + b)
+'''
+    stats_tmp = tempfile.TemporaryDirectory()
+    env = os.environ.copy()
+    env.update({
+        "PYTHON_JIT": "1",
+        "PYTHON_JIT_EXT_STATS": "1",
+        "PYTHON_JIT_EXT_STATS_DIR": stats_tmp.name,
+        "PYTHON_JIT_EXT_ENABLE_REGIONS": "1",
+        "NUMPY_JIT_ENABLE_GENERIC_REGION_PROGRAM": "1",
+        "NUMPY_JIT_LLVM": "off",
+        "NUMPY_JIT_VARIANT_DOMINANCE_MIN_OBSERVATIONS": "65535",
+        "NUMPY_JIT_VARIANT_AMBIGUOUS_PERCENT": "0",
+        "NUMPY_JIT_VARIANT_NOISE_PERCENT":
+            "0" if selector_case == "noisy" else "100",
+        "NUMPY_JIT_VARIANT_MIN_GAIN_PERCENT":
+            "99" if selector_case == "atomic" else "3",
+        "CROSSJIT_SELECTOR_TEST_CASE": selector_case,
+    })
+    if selector_case == "candidate":
+        env["NUMPY_JIT_EXT_ENABLE_RESULT_CACHE"] = "0"
+    result = subprocess.run(
+        [sys.executable, "-P", "-c", code], text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, timeout=60)
+    try:
+        assert result.returncode == 0, result.stdout + result.stderr
+        variant_path = os.path.join(
+            stats_tmp.name, "crossjit_numpy_variant_decisions.ndjson")
+        with open(variant_path, encoding="utf-8") as stream:
+            decisions = [
+                json.loads(line) for line in stream
+                if json.loads(line).get("event", "DECISION") == "DECISION"
+            ]
+        assert any(
+            row.get("decision_reason") == expected_reason
+            for row in decisions
+        ), decisions
+        selected = next(
+            row for row in decisions
+            if row.get("decision_reason") == expected_reason)
+        assert selected["atomic_sample_count"] in {4, 8}, selected
+        assert selected["atomic_sample_count"] == \
+            selected["candidate_sample_count"], selected
+        if selector_case == "candidate":
+            assert selected["selected_variant"] in {"GENERIC", "DEDICATED"}
+        else:
+            assert selected["selected_variant"] == "ATOMIC"
+    finally:
+        stats_tmp.cleanup()
+
+
+def test_crossjit_region_fast_entry_dominates_committed_steady_state():
+    code = r'''
+import _testinternalcapi
+import numpy as np
+from test.support import reset_code
+
+def candidate_chain(n, a, b, scale):
+    out = None
+    for _ in range(n):
+        out = a * scale + b
+    return out
+
+a = np.linspace(1.0, 2.0, 4096)
+b = np.linspace(3.0, 4.0, 4096)
+scale = np.float64(0.5)
+reset_code(candidate_chain)
+warm = _testinternalcapi.TIER2_THRESHOLD + 5000
+actual = candidate_chain(warm, a, b, scale)
+np.testing.assert_allclose(actual, a * scale + b)
+'''
+    stats_tmp = tempfile.TemporaryDirectory()
+    env = os.environ.copy()
+    env.update({
+        "PYTHON_JIT": "1",
+        "PYTHON_JIT_EXT_STATS": "1",
+        "PYTHON_JIT_EXT_STATS_DIR": stats_tmp.name,
+        "PYTHON_JIT_EXT_ENABLE_REGIONS": "1",
+        "NUMPY_JIT_ENABLE_GENERIC_REGION_PROGRAM": "1",
+        "NUMPY_JIT_LLVM": "off",
+        "NUMPY_JIT_VARIANT_FORCE": "candidate",
+        "NUMPY_JIT_EXT_ENABLE_RESULT_CACHE": "0",
+        "PYTHON_JIT_EXT_FAST_REGION": "1",
+    })
+    result = subprocess.run(
+        [sys.executable, "-P", "-c", code], text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, timeout=60)
+    try:
+        assert result.returncode == 0, result.stdout + result.stderr
+        fast_path = os.path.join(
+            stats_tmp.name, "crossjit_numpy_fast_path.ndjson")
+        with open(fast_path, encoding="utf-8") as stream:
+            rows = [json.loads(line) for line in stream]
+        active = [row for row in rows if row["fast_hit"] > 0]
+        assert active, rows
+        counters = max(active, key=lambda row: row["fast_hit"])
+        total = counters["fast_hit"] + counters["slow_entry"]
+        assert counters["fast_hit"] >= 1000, counters
+        assert counters["slow_entry"] / total < 0.001, counters
+    finally:
+        stats_tmp.cleanup()
+
+
 def test_crossjit_aot_stencil_first_guard():
     """A reviewed hot DAG reaches precompiled code with LLVM disabled."""
     code = r'''
@@ -1034,5 +1461,132 @@ time.sleep(0.01)
         assert matched, entries
         assert any(sum(entry["native_uses"]) > 0 for entry in matched), matched
         assert all(entry["vector_bits"] >= 128 for entry in matched), matched
+    finally:
+        stats_tmp.cleanup()
+
+
+def test_crossjit_region_v10_capacity_broadcast_and_output_pool():
+    """A 12-node DAG broadcasts and rotates two site-owned outputs safely."""
+    code = r'''
+import _opcode
+import _testinternalcapi
+import gc
+import numpy as np
+from numpy import maximum, minimum
+from test.support import reset_code
+
+def long_broadcast_chain(n, a, b, c, d, e, f, g, h, i, j, k, l, m):
+    out = None
+    for _ in range(n):
+        out = a + b + c + d + e + f + g + h + i + j + k + l + m
+    return out
+
+def pooled_chain(n, a, b, scale):
+    out = None
+    for _ in range(n):
+        out = a * scale + b
+    return out
+
+def minmax_chain(n, a, b, c):
+    out = None
+    for _ in range(n):
+        out = maximum(minimum(a, b), c)
+    return out
+
+def opnames(func):
+    for offset in range(0, len(func.__code__.co_code), 2):
+        try:
+            return [item[0] for item in _opcode.get_executor(func.__code__, offset)]
+        except ValueError:
+            pass
+    return []
+
+a = np.arange(64 * 32, dtype=np.float64).reshape(32, 64)
+others = tuple(np.full((1, 64), value, dtype=np.float64)
+               for value in range(1, 13))
+expected = a + sum(others)
+reset_code(long_broadcast_chain)
+warm = _testinternalcapi.TIER2_THRESHOLD + 100
+first = long_broadcast_chain(warm, a, *others)
+first_copy = first.copy()
+second = long_broadcast_chain(8, a, *others)
+np.testing.assert_allclose(first, expected)
+np.testing.assert_allclose(second, expected)
+np.testing.assert_array_equal(first, first_copy)
+assert first is not second
+assert opnames(long_broadcast_chain).count('_EXT_REGION_EXEC') == 1, \
+    opnames(long_broadcast_chain)
+del first, second
+gc.collect()
+third = long_broadcast_chain(8, a, *others)
+np.testing.assert_allclose(third, expected)
+# Recreate the executor at the same bytecode site.  The site-owned template
+# must perform one real specialization guard and skip the cold/probation loop.
+reset_code(long_broadcast_chain)
+fourth = long_broadcast_chain(warm, a, *others)
+np.testing.assert_allclose(fourth, expected)
+
+pooled_a = np.linspace(1.0, 2.0, 2048)
+pooled_b = np.linspace(3.0, 4.0, 2048)
+pooled_scale = np.float64(0.5)
+reset_code(pooled_chain)
+held = pooled_chain(warm, pooled_a, pooled_b, pooled_scale)
+next_value = pooled_chain(8, pooled_a, pooled_b, pooled_scale)
+np.testing.assert_allclose(held, pooled_a * pooled_scale + pooled_b)
+np.testing.assert_allclose(next_value, pooled_a * pooled_scale + pooled_b)
+del held, next_value
+gc.collect()
+np.testing.assert_allclose(
+    pooled_chain(8, pooled_a, pooled_b, pooled_scale),
+    pooled_a * pooled_scale + pooled_b)
+
+edge = np.linspace(-3.0, 3.0, 2048)
+edge[:4] = [np.nan, -0.0, 0.0, np.inf]
+left = edge.reshape(32, 64)
+right = np.linspace(2.0, -2.0, 64).reshape(1, 64)
+floor = np.full((32, 1), -1.5)
+reset_code(minmax_chain)
+minmax = minmax_chain(warm, left, right, floor)
+expected_minmax = np.maximum(np.minimum(left, right), floor)
+np.testing.assert_array_equal(minmax, expected_minmax)
+'''
+    stats_tmp = tempfile.TemporaryDirectory()
+    env = os.environ.copy()
+    env.update({
+        "PYTHON_JIT": "1",
+        "PYTHON_JIT_EXT_STATS": "1",
+        "PYTHON_JIT_EXT_STATS_DIR": stats_tmp.name,
+        "PYTHON_JIT_EXT_ENABLE_REGIONS": "1",
+        "NUMPY_JIT_ENABLE_GENERIC_REGION_PROGRAM": "1",
+        "NUMPY_JIT_VARIANT_FORCE": "candidate",
+        "NUMPY_JIT_AOT": "off",
+        "NUMPY_JIT_LLVM": "off",
+        "NUMPY_JIT_EXT_ENABLE_RESULT_CACHE": "1",
+    })
+    result = subprocess.run(
+        [sys.executable, "-P", "-c", code], text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, timeout=60)
+    try:
+        assert result.returncode == 0, result.stdout + result.stderr
+        with open(os.path.join(stats_tmp.name, "crossjit_ext_sites.ndjson"),
+                  encoding="utf-8") as stream:
+            sites = [json.loads(line) for line in stream]
+        matches = [
+            row for row in sites
+            if row["code"] == "long_broadcast_chain"
+            and row["region_node_count"] == 12
+        ]
+        assert matches, sites
+        with open(os.path.join(
+                stats_tmp.name, "crossjit_numpy_fast_path.ndjson"),
+                encoding="utf-8") as stream:
+            fast_rows = [json.loads(line) for line in stream]
+        pooled = [row for row in fast_rows if row.get("result_pool_hit", 0)]
+        assert pooled, fast_rows
+        rebound = [
+            row for row in fast_rows
+            if row.get("decision_cache_rebind", 0) > 0
+        ]
+        assert rebound, fast_rows
     finally:
         stats_tmp.cleanup()

@@ -11,6 +11,72 @@
         {"op": 4, "left": 1, "right": 2, "out": 3},
         {"op": 1, "left": 0, "right": 3, "out": 4}
       ]
+    },
+    {
+      "name": "square_sub_mul_f64_two_scalars",
+      "graph_hash": 4710547172326258460,
+      "dtype": "float64",
+      "scalar_mask": 9,
+      "accepted_bucket_mask": 4,
+      "input_count": 4,
+      "output_slot": 6,
+      "nodes": [
+        {"op": 4, "left": 2, "right": 3, "third": 0, "out": 4},
+        {"op": 1, "left": 1, "right": 4, "third": 0, "out": 5},
+        {"op": 2, "left": 0, "right": 5, "third": 0, "out": 6}
+      ]
+    },
+    {
+      "name": "mul_add_f32",
+      "graph_hash": 17678810484003662075,
+      "dtype": "float32",
+      "scalar_mask": 0,
+      "accepted_bucket_mask": 6,
+      "input_count": 3,
+      "output_slot": 4,
+      "nodes": [
+        {"op": 2, "left": 0, "right": 1, "third": 0, "out": 3},
+        {"op": 0, "left": 3, "right": 2, "third": 0, "out": 4}
+      ]
+    },
+    {
+      "name": "mul_add_f64",
+      "graph_hash": 17678810484003662075,
+      "dtype": "float64",
+      "scalar_mask": 0,
+      "accepted_bucket_mask": 6,
+      "input_count": 3,
+      "output_slot": 4,
+      "nodes": [
+        {"op": 2, "left": 0, "right": 1, "third": 0, "out": 3},
+        {"op": 0, "left": 3, "right": 2, "third": 0, "out": 4}
+      ]
+    },
+    {
+      "name": "mul_add_i32",
+      "graph_hash": 17678810484003662075,
+      "dtype": "int32",
+      "scalar_mask": 0,
+      "accepted_bucket_mask": 6,
+      "input_count": 3,
+      "output_slot": 4,
+      "nodes": [
+        {"op": 2, "left": 0, "right": 1, "third": 0, "out": 3},
+        {"op": 0, "left": 3, "right": 2, "third": 0, "out": 4}
+      ]
+    },
+    {
+      "name": "mul_add_i64",
+      "graph_hash": 17678810484003662075,
+      "dtype": "int64",
+      "scalar_mask": 0,
+      "accepted_bucket_mask": 6,
+      "input_count": 3,
+      "output_slot": 4,
+      "nodes": [
+        {"op": 2, "left": 0, "right": 1, "third": 0, "out": 3},
+        {"op": 0, "left": 3, "right": 2, "third": 0, "out": 4}
+      ]
     }
   ]
 }

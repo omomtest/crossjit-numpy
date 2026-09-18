@@ -1255,18 +1255,7 @@ src_multiarray = multiarray_gen_headers + [
   'src/multiarray/fnv.c',
 ]
 
-numpy_jit_stencils_h = custom_target(
-  'numpy_jit_stencils_generated',
-  output: 'jit_stencils_generated.h',
-  command: [
-    py,
-    files('code_generators/generate_jit_stencils.py'),
-    '@OUTPUT@',
-  ],
-)
-
 src_umath = umath_gen_headers + [
-  numpy_jit_stencils_h,
   src_file.process('src/umath/funcs.inc.src'),
   src_file.process('src/umath/loops.c.src'),
   src_file.process('src/umath/matmul.c.src'),
