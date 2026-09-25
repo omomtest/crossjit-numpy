@@ -88,6 +88,14 @@ enum {
     NUMPY_CROSSJIT_ASSUME_SCALAR = 2,
 };
 
+typedef enum {
+    NUMPY_CROSSJIT_CONTIGUOUS_SAME_SHAPE = 1,
+    NUMPY_CROSSJIT_CONTIGUOUS_BROADCAST = 2,
+    NUMPY_CROSSJIT_ZERO_STRIDE = 3,
+    NUMPY_CROSSJIT_INNER_CONTIGUOUS = 4,
+    NUMPY_CROSSJIT_GENERAL_STRIDED = 5,
+} NumpyCrossJitIterationClass;
+
 static NumpyCrossJitState crossjit_state;
 static PyJitProviderKey crossjit_keys[64];
 static PyJitProviderSpec crossjit_provider;
@@ -130,6 +138,7 @@ numpy_crossjit_domain_elements(const NumpyCrossJitArrayFact *domain)
 /* Runtime guards copy every property needed to validate a region live-in. */
 struct PyJitGuardPlan {
     uint8_t input_count;          /* semantic live-ins in Host order */
+    uint8_t iteration_class;      /* lowering-time domain specialization */
     uint16_t scalar_mask;         /* Python scalar positions */
     uint16_t int_scalar_mask;     /* scalar positions needing exact int checks */
     NumpyCrossJitArrayFact domain; /* common output dtype, shape, and layout */
@@ -475,6 +484,51 @@ numpy_crossjit_build_guards(const PyJitRegionView *region,
             }
         }
     }
+    int all_contiguous = 1;
+    int any_broadcast = 0;
+    int inner_contiguous = domain_ndim != 0;
+    for (uint8_t i = 0; i < guards->input_count; i++) {
+        if (guards->scalar_mask & (1u << i)) {
+            continue;
+        }
+        NumpyCrossJitArrayFact *input = &guards->inputs[i];
+        const PyJitRegionValue *region_input =
+            PyJit_RegionGetInput(region, i);
+        PyArrayObject *array = (PyArrayObject *)
+            PyJit_ValueGetObservedObject(region_input->value);
+        all_contiguous &= input->c_contiguous;
+        int leading = (int)domain_ndim - input->ndim;
+        for (uint8_t axis = 0; axis < domain_ndim; axis++) {
+            int input_axis = (int)axis - leading;
+            if (input_axis < 0 ||
+                (input->dimensions[input_axis] == 1 &&
+                 guards->domain.dimensions[axis] != 1)) {
+                any_broadcast = 1;
+            }
+        }
+        if (input->ndim != 0 &&
+            input->dimensions[input->ndim - 1] > 1 &&
+            input->strides[input->ndim - 1] !=
+                PyArray_ITEMSIZE(array)) {
+            inner_contiguous = 0;
+        }
+    }
+    if (!any_broadcast && all_contiguous) {
+        guards->iteration_class =
+            NUMPY_CROSSJIT_CONTIGUOUS_SAME_SHAPE;
+    }
+    else if (any_broadcast && all_contiguous) {
+        guards->iteration_class = NUMPY_CROSSJIT_CONTIGUOUS_BROADCAST;
+    }
+    else if (any_broadcast) {
+        guards->iteration_class = NUMPY_CROSSJIT_ZERO_STRIDE;
+    }
+    else if (inner_contiguous) {
+        guards->iteration_class = NUMPY_CROSSJIT_INNER_CONTIGUOUS;
+    }
+    else {
+        guards->iteration_class = NUMPY_CROSSJIT_GENERAL_STRIDED;
+    }
     return 1;
 }
 
@@ -708,8 +762,26 @@ numpy_crossjit_run_guards(PyJitGuardPlan *opaque, PyObject *const *inputs,
             return PYJIT_RESULT_MISS;
         }
         NumpyCrossJitArrayFact current;
-        if (!numpy_crossjit_array_fact((PyArrayObject *)inputs[i], &current) ||
-            memcmp(&current, &plan->inputs[i], sizeof(current)) != 0) {
+        if (!numpy_crossjit_array_fact((PyArrayObject *)inputs[i], &current)) {
+            return PYJIT_RESULT_MISS;
+        }
+        const NumpyCrossJitArrayFact *expected = &plan->inputs[i];
+        if (current.typenum != expected->typenum ||
+            current.ndim != expected->ndim ||
+            current.c_contiguous != expected->c_contiguous ||
+            current.native_byteorder != expected->native_byteorder ||
+            current.aligned != expected->aligned ||
+            memcmp(current.dimensions, expected->dimensions,
+                   (size_t)current.ndim * sizeof(npy_intp)) != 0) {
+            return PYJIT_RESULT_MISS;
+        }
+        /* Contiguous strides are derived from dtype and dimensions.  The
+         * remaining classes retain exact stride guards for their kernels. */
+        if (plan->iteration_class !=
+                NUMPY_CROSSJIT_CONTIGUOUS_SAME_SHAPE &&
+            plan->iteration_class != NUMPY_CROSSJIT_CONTIGUOUS_BROADCAST &&
+            memcmp(current.strides, expected->strides,
+                   (size_t)current.ndim * sizeof(npy_intp)) != 0) {
             return PYJIT_RESULT_MISS;
         }
     }
