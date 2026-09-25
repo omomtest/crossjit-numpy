@@ -1265,6 +1265,8 @@ src_umath = umath_gen_headers + [
   'src/umath/clip.h',
   'src/umath/dispatching.cpp',
   'src/umath/extobj.c',
+  'src/umath/jit_provider.c',
+  'src/umath/jit_kernel.c',
   'src/umath/legacy_array_method.c',
   'src/umath/override.c',
   'src/umath/reduction.c',
