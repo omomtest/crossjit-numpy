@@ -669,6 +669,15 @@ numpy_crossjit_prepare_region(const PyJitRegionView *region,
                 .kind = NUMPY_CROSSJIT_ASSUME_ARRAY,
                 .dependencies = contract->dependencies[i],
                 .dependency_count = 1,
+                /* Object dtype can change Host callback, replayability, and
+                 * virtual-materialization facts projected into S_H.  The
+                 * exact ndarray/dtype guard justifies those facts at the
+                 * Host-selected region entry as well as specializing C_P. */
+                .semantic_property_mask =
+                    PYJIT_SEMANTIC_PROPERTY_MATERIALIZATION |
+                    PYJIT_SEMANTIC_PROPERTY_REPLAYABILITY |
+                    PYJIT_SEMANTIC_PROPERTY_MAY_CALL_HOST |
+                    PYJIT_SEMANTIC_PROPERTY_EXACT_RESULT_TYPE,
                 .canonical_key = &contract->execution.guards.inputs[i],
                 .canonical_key_size =
                     sizeof(contract->execution.guards.inputs[i]),
