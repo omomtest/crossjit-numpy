@@ -10,6 +10,7 @@
 #include <opcode.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "numpy/arrayobject.h"
 #include "numpy/npy_math.h"
@@ -96,9 +97,142 @@ typedef enum {
     NUMPY_CROSSJIT_GENERAL_STRIDED = 5,
 } NumpyCrossJitIterationClass;
 
+typedef enum {
+    NUMPY_CROSSJIT_REJECT_NONE = 0,
+    NUMPY_CROSSJIT_REJECT_LIVE_INS,
+    NUMPY_CROSSJIT_REJECT_INPUT_KIND,
+    NUMPY_CROSSJIT_REJECT_DTYPE_LAYOUT,
+    NUMPY_CROSSJIT_REJECT_DTYPE_MISMATCH,
+    NUMPY_CROSSJIT_REJECT_NO_ARRAY,
+    NUMPY_CROSSJIT_REJECT_BROADCAST,
+    NUMPY_CROSSJIT_REJECT_SCALAR_PROMOTION,
+    NUMPY_CROSSJIT_REJECT_SCALAR_RANGE,
+    NUMPY_CROSSJIT_REJECT_NODE_COUNT,
+    NUMPY_CROSSJIT_REJECT_UNPROFITABLE,
+    NUMPY_CROSSJIT_REJECT_KERNEL,
+    NUMPY_CROSSJIT_REJECT_VALUE_MAPPING,
+    NUMPY_CROSSJIT_REJECT_OTHER,
+    NUMPY_CROSSJIT_REJECT_COUNT,
+} NumpyCrossJitRejectReason;
+
+typedef enum {
+    NUMPY_CROSSJIT_DTYPE_OTHER = 0,
+    NUMPY_CROSSJIT_DTYPE_FLOAT32,
+    NUMPY_CROSSJIT_DTYPE_FLOAT64,
+    NUMPY_CROSSJIT_DTYPE_INT32,
+    NUMPY_CROSSJIT_DTYPE_INT64,
+    NUMPY_CROSSJIT_DTYPE_COUNT,
+} NumpyCrossJitDtypeClass;
+
+typedef struct {
+    uint64_t element_count;
+    uint64_t profitability_score;
+    uint64_t profitability_threshold;
+    uint8_t region_length;
+    uint8_t layout_class;
+    uint8_t dtype_class;
+    uint8_t operand_count;
+    uint8_t result_count;
+    uint8_t internal_value_count;
+    uint8_t eliminable_materialization_count;
+    uint8_t guard_count;
+    uint8_t unique_guard_count;
+    uint8_t prepare_decision;
+    uint8_t rejection_reason;
+} NumpyCrossJitCandidateDiagnostic;
+
+#define NUMPY_CROSSJIT_MAX_DIAGNOSTIC_CANDIDATES 1024
+
+typedef struct {
+    uint64_t nodes_recognized;
+    uint64_t regions_prepare_called;
+    uint64_t regions_provider_accepted;
+    uint64_t regions_rejected_unsupported_node;
+    uint64_t regions_rejected_unsupported_contract;
+    uint64_t regions_rejected_unprofitable;
+    uint64_t regions_rejected_other;
+    uint64_t guard_plans_lowered;
+    uint64_t execution_plans_lowered;
+    uint64_t regions_executed;
+    uint64_t guard_hit;
+    uint64_t guard_miss;
+    uint64_t guard_error;
+    uint64_t exec_hit;
+    uint64_t exec_miss;
+    uint64_t exec_error;
+    uint64_t guard_plans_destroyed;
+    uint64_t execution_plans_destroyed;
+    uint64_t guard_metadata_reads;
+    uint64_t guard_checks;
+    uint64_t guard_time_ns;
+    uint64_t region_time_ns;
+    uint64_t allocation_time_ns;
+    uint64_t kernel_time_ns;
+    uint64_t region_length_hist[NUMPY_CROSSJIT_MAX_NODES + 1];
+    uint64_t layout_hist[NUMPY_CROSSJIT_GENERAL_STRIDED + 1];
+    uint64_t dtype_hist[NUMPY_CROSSJIT_DTYPE_COUNT];
+    uint64_t rejection_hist[NUMPY_CROSSJIT_REJECT_COUNT];
+    NumpyCrossJitCandidateDiagnostic last;
+    NumpyCrossJitCandidateDiagnostic
+        candidates[NUMPY_CROSSJIT_MAX_DIAGNOSTIC_CANDIDATES];
+    uint64_t candidate_count;
+    uint64_t candidate_records_dropped;
+    int diagnostics_enabled;
+    int timing_enabled;
+} NumpyCrossJitStats;
+
 static NumpyCrossJitState crossjit_state;
 static PyJitProviderKey crossjit_keys[64];
 static PyJitProviderSpec crossjit_provider;
+static NumpyCrossJitStats crossjit_stats;
+
+static uint8_t
+numpy_crossjit_dtype_class(int typenum)
+{
+    if (typenum == NPY_FLOAT) {
+        return NUMPY_CROSSJIT_DTYPE_FLOAT32;
+    }
+    if (typenum == NPY_DOUBLE) {
+        return NUMPY_CROSSJIT_DTYPE_FLOAT64;
+    }
+    if (typenum == NPY_INT && sizeof(npy_int) == 4) {
+        return NUMPY_CROSSJIT_DTYPE_INT32;
+    }
+    if ((typenum == NPY_LONG && sizeof(npy_long) == 8) ||
+        (typenum == NPY_LONGLONG && sizeof(npy_longlong) == 8)) {
+        return NUMPY_CROSSJIT_DTYPE_INT64;
+    }
+    return NUMPY_CROSSJIT_DTYPE_OTHER;
+}
+
+static uint64_t
+numpy_crossjit_clock_ns(void)
+{
+    if (!crossjit_stats.timing_enabled) {
+        return 0;
+    }
+    struct timespec now;
+    if (clock_gettime(CLOCK_MONOTONIC, &now) != 0) {
+        return 0;
+    }
+    return (uint64_t)now.tv_sec * UINT64_C(1000000000) +
+        (uint64_t)now.tv_nsec;
+}
+
+static void
+numpy_crossjit_record_candidate(void)
+{
+    if (!crossjit_stats.diagnostics_enabled) {
+        return;
+    }
+    if (crossjit_stats.candidate_count >=
+            NUMPY_CROSSJIT_MAX_DIAGNOSTIC_CANDIDATES) {
+        crossjit_stats.candidate_records_dropped++;
+        return;
+    }
+    crossjit_stats.candidates[crossjit_stats.candidate_count++] =
+        crossjit_stats.last;
+}
 
 /* Reads the experimental profitability override without caching test state. */
 static uint64_t
@@ -248,6 +382,7 @@ numpy_crossjit_recognize(const PyJitRecognizeRequest *request,
     }
     recognition->semantic_id = ((uint64_t)op + 1) |
         (inplace ? NUMPY_CROSSJIT_INPLACE_FLAG : 0);
+    crossjit_stats.nodes_recognized++;
     return PYJIT_RESULT_HIT;
 }
 
@@ -314,8 +449,12 @@ numpy_crossjit_supported_dtype(int typenum)
 
 /* Emits opt-in provider diagnostics without exposing lowering policy to Host. */
 static int
-numpy_crossjit_lowering_reject(const char *reason)
+numpy_crossjit_lowering_reject(NumpyCrossJitRejectReason code,
+                               const char *reason)
 {
+    if (crossjit_stats.diagnostics_enabled) {
+        crossjit_stats.last.rejection_reason = (uint8_t)code;
+    }
     if (Py_GETENV("PYTHON_JIT_CROSSJIT_DEBUG") != NULL) {
         fprintf(stderr, "NumPy CrossJIT lowering rejected: %s\n", reason);
     }
@@ -394,7 +533,8 @@ numpy_crossjit_build_guards(const PyJitRegionView *region,
     guards->input_count = PyJit_RegionGetInputCount(region);
     if (guards->input_count == 0 ||
         guards->input_count > NUMPY_CROSSJIT_MAX_INPUTS) {
-        return numpy_crossjit_lowering_reject("invalid live-in count");
+        return numpy_crossjit_lowering_reject(
+            NUMPY_CROSSJIT_REJECT_LIVE_INS, "invalid live-in count");
     }
     int have_domain = 0;
     uint8_t domain_ndim = 0;
@@ -415,12 +555,14 @@ numpy_crossjit_build_guards(const PyJitRegionView *region,
             !numpy_crossjit_array_fact(
                 (PyArrayObject *)object, &guards->inputs[i])) {
             return numpy_crossjit_lowering_reject(
+                NUMPY_CROSSJIT_REJECT_INPUT_KIND,
                 "live-in is neither an exact ndarray nor an exact float");
         }
         NumpyCrossJitArrayFact *fact = &guards->inputs[i];
         if (!fact->native_byteorder || !fact->aligned ||
             !numpy_crossjit_supported_dtype(fact->typenum)) {
             return numpy_crossjit_lowering_reject(
+                NUMPY_CROSSJIT_REJECT_DTYPE_LAYOUT,
                 "array live-in has unsupported layout or dtype");
         }
         if (!have_domain) {
@@ -429,6 +571,7 @@ numpy_crossjit_build_guards(const PyJitRegionView *region,
         }
         else if (fact->typenum != guards->domain.typenum) {
             return numpy_crossjit_lowering_reject(
+                NUMPY_CROSSJIT_REJECT_DTYPE_MISMATCH,
                 "array live-ins have different dtypes");
         }
         if (fact->ndim > domain_ndim) {
@@ -438,7 +581,8 @@ numpy_crossjit_build_guards(const PyJitRegionView *region,
     /* Python floats participate in NumPy's weak scalar promotion for the
      * supported floating domains; integer-array promotion is left generic. */
     if (!have_domain) {
-        return numpy_crossjit_lowering_reject("region has no array domain");
+        return numpy_crossjit_lowering_reject(
+            NUMPY_CROSSJIT_REJECT_NO_ARRAY, "region has no array domain");
     }
     /* Build NumPy's trailing-axis broadcast domain.  Original input facts
      * remain untouched so the guard still checks exact runtime layouts. */
@@ -459,6 +603,7 @@ numpy_crossjit_build_guards(const PyJitRegionView *region,
                 input->dimensions[input_axis];
             if (candidate != 1 && dimension != 1 && candidate != dimension) {
                 return numpy_crossjit_lowering_reject(
+                    NUMPY_CROSSJIT_REJECT_BROADCAST,
                     "array live-ins cannot be broadcast together");
             }
             if (candidate != 1) {
@@ -470,6 +615,7 @@ numpy_crossjit_build_guards(const PyJitRegionView *region,
     if (guards->scalar_mask != 0 && guards->domain.typenum != NPY_FLOAT &&
         guards->domain.typenum != NPY_DOUBLE) {
         return numpy_crossjit_lowering_reject(
+            NUMPY_CROSSJIT_REJECT_SCALAR_PROMOTION,
             "Python float would promote the integer array domain");
     }
     for (uint8_t i = 0; i < guards->input_count; i++) {
@@ -480,6 +626,7 @@ numpy_crossjit_build_guards(const PyJitRegionView *region,
             if (object == NULL || !numpy_crossjit_safe_int_scalar(
                     object, guards->domain.typenum)) {
                 return numpy_crossjit_lowering_reject(
+                    NUMPY_CROSSJIT_REJECT_SCALAR_RANGE,
                     "Python int is not exact in the floating domain");
             }
         }
@@ -559,12 +706,35 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
                           struct PyJitExecPlan *plan)
 {
     memset(plan, 0, sizeof(*plan));
+    if (crossjit_stats.diagnostics_enabled) {
+        memset(&crossjit_stats.last, 0, sizeof(crossjit_stats.last));
+    }
     if (!numpy_crossjit_build_guards(region, &plan->guards)) {
         return PYJIT_PREPARE_UNSUPPORTED_CONTRACT;
     }
     plan->node_count = PyJit_RegionGetNodeCount(region);
+    if (crossjit_stats.diagnostics_enabled) {
+        crossjit_stats.last.region_length = plan->node_count;
+        crossjit_stats.last.layout_class = plan->guards.iteration_class;
+        crossjit_stats.last.dtype_class =
+            numpy_crossjit_dtype_class(plan->guards.domain.typenum);
+        crossjit_stats.last.operand_count = plan->guards.input_count;
+        crossjit_stats.last.result_count = PyJit_RegionGetResultCount(region);
+        crossjit_stats.last.guard_count = plan->guards.input_count;
+        if (plan->node_count <= NUMPY_CROSSJIT_MAX_NODES) {
+            crossjit_stats.region_length_hist[plan->node_count]++;
+        }
+        if (plan->guards.iteration_class <=
+                NUMPY_CROSSJIT_GENERAL_STRIDED) {
+            crossjit_stats.layout_hist[plan->guards.iteration_class]++;
+        }
+        if (crossjit_stats.last.dtype_class < NUMPY_CROSSJIT_DTYPE_COUNT) {
+            crossjit_stats.dtype_hist[crossjit_stats.last.dtype_class]++;
+        }
+    }
     if (plan->node_count < 2 || plan->node_count > 6) {
-        numpy_crossjit_lowering_reject("unsupported node count");
+        numpy_crossjit_lowering_reject(
+            NUMPY_CROSSJIT_REJECT_NODE_COUNT, "unsupported node count");
         return PYJIT_PREPARE_UNSUPPORTED_NODE;
     }
     uint64_t elements = numpy_crossjit_domain_elements(&plan->guards.domain);
@@ -572,6 +742,14 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
     uint64_t work = elements > UINT64_MAX / eliminated ? UINT64_MAX :
         elements * eliminated;
     uint64_t min_work = numpy_crossjit_min_work();
+    if (crossjit_stats.diagnostics_enabled) {
+        crossjit_stats.last.element_count = elements;
+        crossjit_stats.last.internal_value_count = (uint8_t)eliminated;
+        crossjit_stats.last.eliminable_materialization_count =
+            (uint8_t)eliminated;
+        crossjit_stats.last.profitability_score = work;
+        crossjit_stats.last.profitability_threshold = min_work;
+    }
     if (work < min_work) {
         if (Py_GETENV("PYTHON_JIT_CROSSJIT_DEBUG") != NULL) {
             fprintf(stderr,
@@ -581,6 +759,7 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
                     (unsigned long long)work, (unsigned long long)min_work);
         }
         numpy_crossjit_lowering_reject(
+            NUMPY_CROSSJIT_REJECT_UNPROFITABLE,
             "iteration domain is below the provider profitability threshold");
         return PYJIT_PREPARE_UNPROFITABLE;
     }
@@ -592,6 +771,7 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
             !numpy_crossjit_kernel_op(PyJit_NodeGetSemanticId(node), typenum,
                                       &lowered->op)) {
             numpy_crossjit_lowering_reject(
+                NUMPY_CROSSJIT_REJECT_KERNEL,
                 "semantic operation has no strict kernel");
             return PYJIT_PREPARE_UNSUPPORTED_NODE;
         }
@@ -604,6 +784,7 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
             left >= NUMPY_CROSSJIT_MAX_SLOTS ||
             right >= NUMPY_CROSSJIT_MAX_SLOTS) {
             numpy_crossjit_lowering_reject(
+                NUMPY_CROSSJIT_REJECT_VALUE_MAPPING,
                 "node operand is not a live-in or earlier virtual value");
             return PYJIT_PREPARE_UNSUPPORTED_CONTRACT;
         }
@@ -628,7 +809,9 @@ static PyJitResult
 numpy_crossjit_prepare_region(const PyJitRegionView *region,
                               PyJitPrepareResult *result)
 {
+    crossjit_stats.regions_prepare_called++;
     if (result == NULL || result->struct_size != sizeof(*result)) {
+        crossjit_stats.regions_rejected_other++;
         PyErr_SetString(PyExc_ValueError,
                         "invalid NumPy CrossJIT prepare result");
         return PYJIT_RESULT_ERROR;
@@ -636,16 +819,40 @@ numpy_crossjit_prepare_region(const PyJitRegionView *region,
     NumpyCrossJitContract *contract =
         PyMem_Calloc(1, sizeof(*contract));
     if (contract == NULL) {
+        crossjit_stats.regions_rejected_other++;
         PyErr_NoMemory();
         return PYJIT_RESULT_ERROR;
     }
     PyJitPrepareDecision decision = numpy_crossjit_build_exec(
         region, &contract->execution);
     result->decision = decision;
+    if (crossjit_stats.diagnostics_enabled) {
+        crossjit_stats.last.prepare_decision = (uint8_t)decision;
+    }
     if (decision != PYJIT_PREPARE_ACCEPT) {
+        if (crossjit_stats.diagnostics_enabled &&
+                crossjit_stats.last.rejection_reason <
+                NUMPY_CROSSJIT_REJECT_COUNT) {
+            crossjit_stats.rejection_hist[
+                crossjit_stats.last.rejection_reason]++;
+        }
+        if (decision == PYJIT_PREPARE_UNPROFITABLE) {
+            crossjit_stats.regions_rejected_unprofitable++;
+        }
+        else if (decision == PYJIT_PREPARE_UNSUPPORTED_NODE) {
+            crossjit_stats.regions_rejected_unsupported_node++;
+        }
+        else if (decision == PYJIT_PREPARE_UNSUPPORTED_CONTRACT) {
+            crossjit_stats.regions_rejected_unsupported_contract++;
+        }
+        else {
+            crossjit_stats.regions_rejected_other++;
+        }
+        numpy_crossjit_record_candidate();
         PyMem_Free(contract);
         return PYJIT_RESULT_HIT;
     }
+    crossjit_stats.regions_provider_accepted++;
 
     uint8_t input_count = PyJit_RegionGetInputCount(region);
     for (uint8_t i = 0; i < input_count; i++) {
@@ -688,6 +895,10 @@ numpy_crossjit_prepare_region(const PyJitRegionView *region,
     result->contract_size = sizeof(*contract);
     result->assumptions = contract->assumptions;
     result->assumption_count = input_count;
+    if (crossjit_stats.diagnostics_enabled) {
+        crossjit_stats.last.unique_guard_count = input_count;
+    }
+    numpy_crossjit_record_candidate();
     return PYJIT_RESULT_HIT;
 }
 
@@ -712,6 +923,11 @@ numpy_crossjit_lower_guards(
         return PYJIT_RESULT_ERROR;
     }
     *plan = contract->execution.guards;
+    crossjit_stats.guard_plans_lowered++;
+    if (crossjit_stats.diagnostics_enabled) {
+        crossjit_stats.last.unique_guard_count =
+            (uint8_t)specialization->assumption_count;
+    }
     *result = plan;
     return PYJIT_RESULT_HIT;
 }
@@ -735,6 +951,7 @@ numpy_crossjit_lower_region(
         return PYJIT_RESULT_ERROR;
     }
     *plan = contract->execution;
+    crossjit_stats.execution_plans_lowered++;
     *result = plan;
     return PYJIT_RESULT_HIT;
 }
@@ -745,36 +962,75 @@ numpy_crossjit_destroy_contract(void *contract)
     PyMem_Free(contract);
 }
 
+static PyJitResult
+numpy_crossjit_record_guard(PyJitResult status, uint64_t started)
+{
+    if (status == PYJIT_RESULT_HIT) {
+        crossjit_stats.guard_hit++;
+    }
+    else if (status == PYJIT_RESULT_MISS) {
+        crossjit_stats.guard_miss++;
+    }
+    else {
+        crossjit_stats.guard_error++;
+    }
+    if (started != 0) {
+        uint64_t ended = numpy_crossjit_clock_ns();
+        if (ended >= started) {
+            crossjit_stats.guard_time_ns += ended - started;
+        }
+    }
+    return status;
+}
+
 /* Checks current runtime arrays against an immutable lowering-time contract. */
 static PyJitResult
 numpy_crossjit_run_guards(PyJitGuardPlan *opaque, PyObject *const *inputs,
                           Py_ssize_t input_count)
 {
+    uint64_t started = numpy_crossjit_clock_ns();
     struct PyJitGuardPlan *plan = (struct PyJitGuardPlan *)opaque;
     if (plan == NULL || input_count != plan->input_count) {
-        return PYJIT_RESULT_MISS;
+        return numpy_crossjit_record_guard(PYJIT_RESULT_MISS, started);
     }
     for (uint8_t i = 0; i < plan->input_count; i++) {
         if (plan->scalar_mask & (1u << i)) {
+            if (crossjit_stats.diagnostics_enabled) {
+                crossjit_stats.guard_checks++;
+            }
             if (plan->int_scalar_mask & (1u << i)) {
                 if (!numpy_crossjit_safe_int_scalar(
                         inputs[i], plan->domain.typenum)) {
-                    return PYJIT_RESULT_MISS;
+                    return numpy_crossjit_record_guard(
+                        PYJIT_RESULT_MISS, started);
                 }
             }
             else if (!PyFloat_CheckExact(inputs[i])) {
-                return PYJIT_RESULT_MISS;
+                return numpy_crossjit_record_guard(
+                    PYJIT_RESULT_MISS, started);
             }
             continue;
         }
+        if (crossjit_stats.diagnostics_enabled) {
+            crossjit_stats.guard_checks++;
+        }
         if (!PyArray_CheckExact(inputs[i])) {
-            return PYJIT_RESULT_MISS;
+            return numpy_crossjit_record_guard(
+                PYJIT_RESULT_MISS, started);
         }
         NumpyCrossJitArrayFact current;
         if (!numpy_crossjit_array_fact((PyArrayObject *)inputs[i], &current)) {
-            return PYJIT_RESULT_MISS;
+            return numpy_crossjit_record_guard(
+                PYJIT_RESULT_MISS, started);
+        }
+        if (crossjit_stats.diagnostics_enabled) {
+            crossjit_stats.guard_metadata_reads +=
+                5 + (uint64_t)current.ndim * 2;
         }
         const NumpyCrossJitArrayFact *expected = &plan->inputs[i];
+        if (crossjit_stats.diagnostics_enabled) {
+            crossjit_stats.guard_checks += 5 + current.ndim;
+        }
         if (current.typenum != expected->typenum ||
             current.ndim != expected->ndim ||
             current.c_contiguous != expected->c_contiguous ||
@@ -782,7 +1038,8 @@ numpy_crossjit_run_guards(PyJitGuardPlan *opaque, PyObject *const *inputs,
             current.aligned != expected->aligned ||
             memcmp(current.dimensions, expected->dimensions,
                    (size_t)current.ndim * sizeof(npy_intp)) != 0) {
-            return PYJIT_RESULT_MISS;
+            return numpy_crossjit_record_guard(
+                PYJIT_RESULT_MISS, started);
         }
         /* Contiguous strides are derived from dtype and dimensions.  The
          * remaining classes retain exact stride guards for their kernels. */
@@ -791,10 +1048,38 @@ numpy_crossjit_run_guards(PyJitGuardPlan *opaque, PyObject *const *inputs,
             plan->iteration_class != NUMPY_CROSSJIT_CONTIGUOUS_BROADCAST &&
             memcmp(current.strides, expected->strides,
                    (size_t)current.ndim * sizeof(npy_intp)) != 0) {
-            return PYJIT_RESULT_MISS;
+            if (crossjit_stats.diagnostics_enabled) {
+                crossjit_stats.guard_checks += current.ndim;
+            }
+            return numpy_crossjit_record_guard(
+                PYJIT_RESULT_MISS, started);
         }
     }
-    return PYJIT_RESULT_HIT;
+    return numpy_crossjit_record_guard(PYJIT_RESULT_HIT, started);
+}
+
+static PyJitResult
+numpy_crossjit_record_exec(PyJitResult status, uint64_t started,
+                           uint64_t allocation_ns, uint64_t kernel_ns)
+{
+    if (status == PYJIT_RESULT_HIT) {
+        crossjit_stats.exec_hit++;
+    }
+    else if (status == PYJIT_RESULT_MISS) {
+        crossjit_stats.exec_miss++;
+    }
+    else {
+        crossjit_stats.exec_error++;
+    }
+    crossjit_stats.allocation_time_ns += allocation_ns;
+    crossjit_stats.kernel_time_ns += kernel_ns;
+    if (started != 0) {
+        uint64_t ended = numpy_crossjit_clock_ns();
+        if (ended >= started) {
+            crossjit_stats.region_time_ns += ended - started;
+        }
+    }
+    return status;
 }
 
 /* Executes without publishing output until allocation, kernel, and FPE checks pass. */
@@ -802,19 +1087,39 @@ static PyJitResult
 numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
                           Py_ssize_t input_count, PyObject **result)
 {
+    uint64_t started = numpy_crossjit_clock_ns();
+    uint64_t allocation_ns = 0;
+    uint64_t kernel_ns = 0;
+    crossjit_stats.regions_executed++;
     struct PyJitExecPlan *plan = (struct PyJitExecPlan *)opaque;
     *result = NULL;
+    const char *test_error = Py_GETENV("NPY_CROSSJIT_TEST_EXEC_ERROR");
+    if (test_error != NULL && strcmp(test_error, "1") == 0) {
+        PyErr_SetString(PyExc_RuntimeError,
+                        "injected NumPy CrossJIT execution error");
+        return numpy_crossjit_record_exec(
+            PYJIT_RESULT_ERROR, started, allocation_ns, kernel_ns);
+    }
     if (plan == NULL ||
         numpy_crossjit_run_guards(&plan->guards, inputs, input_count) !=
         PYJIT_RESULT_HIT) {
-        return PYJIT_RESULT_MISS;
+        return numpy_crossjit_record_exec(
+            PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
     }
     const NumpyCrossJitArrayFact *fact = &plan->guards.domain;
+    uint64_t allocation_started = numpy_crossjit_clock_ns();
     PyArrayObject *output = (PyArrayObject *)PyArray_SimpleNew(
         fact->ndim, fact->dimensions, fact->typenum);
+    if (allocation_started != 0) {
+        uint64_t allocation_ended = numpy_crossjit_clock_ns();
+        if (allocation_ended >= allocation_started) {
+            allocation_ns = allocation_ended - allocation_started;
+        }
+    }
     if (output == NULL) {
         PyErr_Clear();
-        return PYJIT_RESULT_MISS;
+        return numpy_crossjit_record_exec(
+            PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
     }
     const void *data[NUMPY_CROSSJIT_MAX_INPUTS];
     npy_intp input_strides[NUMPY_CROSSJIT_MAX_INPUTS][NPY_MAXDIMS] = {{0}};
@@ -828,7 +1133,8 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
             if (value == -1.0 && PyErr_Occurred()) {
                 PyErr_Clear();
                 Py_DECREF(output);
-                return PYJIT_RESULT_MISS;
+                return numpy_crossjit_record_exec(
+                    PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
             }
             if (fact->typenum == NPY_FLOAT) {
                 scalar_float[i] = (float)value;
@@ -881,6 +1187,7 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
     if (floating) {
         npy_clear_floatstatus_barrier(&fp_barrier);
     }
+    uint64_t kernel_started = numpy_crossjit_clock_ns();
     int ok = numpy_crossjit_kernel_strided(
         plan->nodes, plan->node_count, plan->guards.input_count,
         plan->guards.scalar_mask, plan->output_slot, fact->typenum,
@@ -888,19 +1195,28 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
         linear_domain ? &linear_dimension : fact->dimensions,
         PyArray_DATA(output),
         PyArray_SIZE(output));
+    if (kernel_started != 0) {
+        uint64_t kernel_ended = numpy_crossjit_clock_ns();
+        if (kernel_ended >= kernel_started) {
+            kernel_ns = kernel_ended - kernel_started;
+        }
+    }
     int fpe = floating ? npy_get_floatstatus_barrier(&fp_barrier) : 0;
     if (!ok || fpe != 0) {
         Py_DECREF(output);
-        return PYJIT_RESULT_MISS;
+        return numpy_crossjit_record_exec(
+            PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
     }
     *result = (PyObject *)output;
-    return PYJIT_RESULT_HIT;
+    return numpy_crossjit_record_exec(
+        PYJIT_RESULT_HIT, started, allocation_ns, kernel_ns);
 }
 
 /* Releases a guard plan exactly once when the owning executor is destroyed. */
 static void
 numpy_crossjit_destroy_guard(PyJitGuardPlan *plan)
 {
+    crossjit_stats.guard_plans_destroyed++;
     PyMem_Free(plan);
 }
 
@@ -908,8 +1224,215 @@ numpy_crossjit_destroy_guard(PyJitGuardPlan *plan)
 static void
 numpy_crossjit_destroy_exec(PyJitExecPlan *plan)
 {
+    crossjit_stats.execution_plans_destroyed++;
     PyMem_Free(plan);
 }
+
+static int
+numpy_crossjit_dict_u64(PyObject *dict, const char *name, uint64_t value)
+{
+    PyObject *number = PyLong_FromUnsignedLongLong(value);
+    if (number == NULL) {
+        return -1;
+    }
+    int status = PyDict_SetItemString(dict, name, number);
+    Py_DECREF(number);
+    return status;
+}
+
+static PyObject *
+numpy_crossjit_u64_tuple(const uint64_t *values, Py_ssize_t count)
+{
+    PyObject *tuple = PyTuple_New(count);
+    if (tuple == NULL) {
+        return NULL;
+    }
+    for (Py_ssize_t i = 0; i < count; i++) {
+        PyObject *number = PyLong_FromUnsignedLongLong(values[i]);
+        if (number == NULL) {
+            Py_DECREF(tuple);
+            return NULL;
+        }
+        PyTuple_SET_ITEM(tuple, i, number);
+    }
+    return tuple;
+}
+
+static PyObject *
+numpy_crossjit_candidate_dict(
+    const NumpyCrossJitCandidateDiagnostic *candidate)
+{
+    PyObject *result = PyDict_New();
+    if (result == NULL) {
+        return NULL;
+    }
+#define ADD_CANDIDATE(name) do {                                          \
+        if (numpy_crossjit_dict_u64(result, #name,                         \
+                                    candidate->name) < 0) {                \
+            Py_DECREF(result);                                             \
+            return NULL;                                                   \
+        }                                                                  \
+    } while (0)
+    ADD_CANDIDATE(element_count);
+    ADD_CANDIDATE(profitability_score);
+    ADD_CANDIDATE(profitability_threshold);
+    ADD_CANDIDATE(region_length);
+    ADD_CANDIDATE(layout_class);
+    ADD_CANDIDATE(dtype_class);
+    ADD_CANDIDATE(operand_count);
+    ADD_CANDIDATE(result_count);
+    ADD_CANDIDATE(internal_value_count);
+    ADD_CANDIDATE(eliminable_materialization_count);
+    ADD_CANDIDATE(guard_count);
+    ADD_CANDIDATE(unique_guard_count);
+    ADD_CANDIDATE(prepare_decision);
+    ADD_CANDIDATE(rejection_reason);
+#undef ADD_CANDIDATE
+    return result;
+}
+
+static PyObject *
+numpy_crossjit_get_stats(PyObject *NPY_UNUSED(module),
+                         PyObject *NPY_UNUSED(ignored))
+{
+    PyObject *result = PyDict_New();
+    PyObject *last = NULL;
+    PyObject *candidates = NULL;
+    PyObject *region_lengths = NULL;
+    PyObject *layouts = NULL;
+    PyObject *dtypes = NULL;
+    PyObject *rejections = NULL;
+    if (result == NULL) {
+        return NULL;
+    }
+#define ADD_COUNTER(name) do {                                             \
+        if (numpy_crossjit_dict_u64(result, #name,                         \
+                                    crossjit_stats.name) < 0) {            \
+            goto error;                                                    \
+        }                                                                  \
+    } while (0)
+    ADD_COUNTER(nodes_recognized);
+    ADD_COUNTER(regions_prepare_called);
+    ADD_COUNTER(regions_provider_accepted);
+    ADD_COUNTER(regions_rejected_unsupported_node);
+    ADD_COUNTER(regions_rejected_unsupported_contract);
+    ADD_COUNTER(regions_rejected_unprofitable);
+    ADD_COUNTER(regions_rejected_other);
+    ADD_COUNTER(guard_plans_lowered);
+    ADD_COUNTER(execution_plans_lowered);
+    ADD_COUNTER(regions_executed);
+    ADD_COUNTER(guard_hit);
+    ADD_COUNTER(guard_miss);
+    ADD_COUNTER(guard_error);
+    ADD_COUNTER(exec_hit);
+    ADD_COUNTER(exec_miss);
+    ADD_COUNTER(exec_error);
+    ADD_COUNTER(guard_plans_destroyed);
+    ADD_COUNTER(execution_plans_destroyed);
+    ADD_COUNTER(guard_metadata_reads);
+    ADD_COUNTER(guard_checks);
+    ADD_COUNTER(guard_time_ns);
+    ADD_COUNTER(region_time_ns);
+    ADD_COUNTER(allocation_time_ns);
+    ADD_COUNTER(kernel_time_ns);
+    ADD_COUNTER(candidate_records_dropped);
+#undef ADD_COUNTER
+
+    last = crossjit_stats.diagnostics_enabled ?
+        numpy_crossjit_candidate_dict(&crossjit_stats.last) :
+        Py_NewRef(Py_None);
+    candidates = PyTuple_New((Py_ssize_t)crossjit_stats.candidate_count);
+    if (last == NULL || candidates == NULL) {
+        goto error;
+    }
+    for (Py_ssize_t i = 0;
+         i < (Py_ssize_t)crossjit_stats.candidate_count; i++) {
+        PyObject *candidate = numpy_crossjit_candidate_dict(
+            &crossjit_stats.candidates[i]);
+        if (candidate == NULL) {
+            goto error;
+        }
+        PyTuple_SET_ITEM(candidates, i, candidate);
+    }
+    if (PyDict_SetItemString(result, "last_candidate", last) < 0 ||
+        PyDict_SetItemString(result, "candidates", candidates) < 0) {
+        goto error;
+    }
+    Py_CLEAR(last);
+    Py_CLEAR(candidates);
+
+    region_lengths = numpy_crossjit_u64_tuple(
+        crossjit_stats.region_length_hist,
+        Py_ARRAY_LENGTH(crossjit_stats.region_length_hist));
+    layouts = numpy_crossjit_u64_tuple(
+        crossjit_stats.layout_hist,
+        Py_ARRAY_LENGTH(crossjit_stats.layout_hist));
+    dtypes = numpy_crossjit_u64_tuple(
+        crossjit_stats.dtype_hist,
+        Py_ARRAY_LENGTH(crossjit_stats.dtype_hist));
+    rejections = numpy_crossjit_u64_tuple(
+        crossjit_stats.rejection_hist,
+        Py_ARRAY_LENGTH(crossjit_stats.rejection_hist));
+    if (region_lengths == NULL || layouts == NULL || dtypes == NULL ||
+        rejections == NULL ||
+        PyDict_SetItemString(result, "region_length_histogram",
+                             region_lengths) < 0 ||
+        PyDict_SetItemString(result, "layout_histogram", layouts) < 0 ||
+        PyDict_SetItemString(result, "dtype_histogram", dtypes) < 0 ||
+        PyDict_SetItemString(result, "rejection_histogram", rejections) < 0) {
+        goto error;
+    }
+    Py_CLEAR(region_lengths);
+    Py_CLEAR(layouts);
+    Py_CLEAR(dtypes);
+    Py_CLEAR(rejections);
+    if (PyDict_SetItemString(
+            result, "diagnostics_enabled",
+            crossjit_stats.diagnostics_enabled ? Py_True : Py_False) < 0 ||
+        PyDict_SetItemString(
+            result, "timing_enabled",
+            crossjit_stats.timing_enabled ? Py_True : Py_False) < 0) {
+        goto error;
+    }
+    return result;
+
+error:
+    Py_XDECREF(last);
+    Py_XDECREF(candidates);
+    Py_XDECREF(region_lengths);
+    Py_XDECREF(layouts);
+    Py_XDECREF(dtypes);
+    Py_XDECREF(rejections);
+    Py_DECREF(result);
+    return NULL;
+}
+
+static void
+numpy_crossjit_reset_stats_data(void)
+{
+    memset(&crossjit_stats, 0, sizeof(crossjit_stats));
+    const char *diagnostics = Py_GETENV("NPY_CROSSJIT_DIAGNOSTICS");
+    const char *timing = Py_GETENV("NPY_CROSSJIT_TELEMETRY_TIMING");
+    crossjit_stats.diagnostics_enabled =
+        diagnostics != NULL && strcmp(diagnostics, "1") == 0;
+    crossjit_stats.timing_enabled =
+        crossjit_stats.diagnostics_enabled &&
+        timing != NULL && strcmp(timing, "1") == 0;
+}
+
+static PyObject *
+numpy_crossjit_reset_stats(PyObject *NPY_UNUSED(module),
+                           PyObject *NPY_UNUSED(ignored))
+{
+    numpy_crossjit_reset_stats_data();
+    Py_RETURN_NONE;
+}
+
+static PyMethodDef numpy_crossjit_methods[] = {
+    {"_crossjit_stats", numpy_crossjit_get_stats, METH_NOARGS, NULL},
+    {"_crossjit_reset_stats", numpy_crossjit_reset_stats, METH_NOARGS, NULL},
+    {NULL, NULL, 0, NULL},
+};
 
 /* Adds an exact ufunc callable to the static provider registration table. */
 static int
@@ -933,6 +1456,10 @@ numpy_crossjit_init(PyObject *module)
     /* This provider's facts use the standard GIL build's NumPy globals. */
     return 0;
 #else
+    numpy_crossjit_reset_stats_data();
+    if (PyModule_AddFunctions(module, numpy_crossjit_methods) < 0) {
+        return -1;
+    }
     size_t count = 0;
     const int binary_ops[] = {
         NB_ADD, NB_INPLACE_ADD, NB_SUBTRACT, NB_INPLACE_SUBTRACT,

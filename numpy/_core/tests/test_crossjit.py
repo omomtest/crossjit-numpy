@@ -27,10 +27,103 @@ def _runtime():
     return internal
 
 
+def _provider_runtime():
+    from numpy._core import _multiarray_umath as umath
+    if not hasattr(umath, "_crossjit_stats"):
+        pytest.skip("NumPy was built without the CrossJIT provider API")
+    return umath
+
+
+def test_provider_optimization_funnel_telemetry(monkeypatch):
+    """Host and Provider counters distinguish every optimization stage."""
+    internal = _runtime()
+    provider = _provider_runtime()
+    monkeypatch.setenv("NPY_CROSSJIT_DIAGNOSTICS", "1")
+    internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
+
+    def fused(left, right, scale, count):
+        for _ in range(count):
+            result = (left + right) * scale
+        return result
+
+    left = np.arange(64.0)
+    result = fused(
+        left, left + 1, left + 2, internal.TIER2_THRESHOLD * 2)
+    np.testing.assert_allclose(result, (left + left + 1) * (left + 2))
+
+    host = internal.crossjit_stats()
+    stats = provider._crossjit_stats()
+    assert host["recognized_nodes"] == 2
+    assert host["host_regions_proven"] == 1
+    assert stats["regions_prepare_called"] == 1
+    assert stats["regions_provider_accepted"] == 1
+    assert stats["guard_plans_lowered"] == 1
+    assert stats["execution_plans_lowered"] == 1
+    assert host["rewritten_regions"] == 1
+    assert host["published_regions"] == 1
+    assert stats["regions_executed"] >= 1
+    assert stats["guard_hit"] >= 1
+    assert stats["exec_hit"] >= 1
+    assert host["published_regions"] <= stats["regions_provider_accepted"]
+    assert (stats["regions_provider_accepted"] <=
+            stats["regions_prepare_called"])
+    assert (stats["exec_hit"] + stats["exec_miss"] + stats["exec_error"] ==
+            stats["regions_executed"])
+    assert stats["diagnostics_enabled"] is True
+    assert len(stats["candidates"]) == 1
+
+    candidate = stats["last_candidate"]
+    assert candidate["region_length"] == 2
+    assert candidate["element_count"] == 64
+    assert candidate["layout_class"] == 1  # CONTIGUOUS_SAME_SHAPE
+    assert candidate["dtype_class"] == 2  # float64
+    assert candidate["operand_count"] == 3
+    assert candidate["result_count"] == 1
+    assert candidate["internal_value_count"] == 1
+    assert candidate["eliminable_materialization_count"] == 1
+    assert candidate["guard_count"] == 3
+    assert candidate["unique_guard_count"] == 3
+    assert candidate["profitability_score"] == 64
+    assert candidate["profitability_threshold"] == 0
+    assert candidate["prepare_decision"] == 1
+    assert stats["candidates"][0] == candidate
+
+
+def test_provider_detailed_diagnostics_are_opt_in(monkeypatch):
+    """The ordinary counter path does not retain candidate records or timers."""
+    internal = _runtime()
+    provider = _provider_runtime()
+    monkeypatch.delenv("NPY_CROSSJIT_DIAGNOSTICS", raising=False)
+    monkeypatch.setenv("NPY_CROSSJIT_TELEMETRY_TIMING", "1")
+    internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
+
+    def fused(left, right, scale, count):
+        for _ in range(count):
+            result = (left + right) * scale
+        return result
+
+    left = np.arange(64.0)
+    fused(left, left + 1, left + 2, internal.TIER2_THRESHOLD * 2)
+    stats = provider._crossjit_stats()
+    assert stats["regions_provider_accepted"] == 1
+    assert stats["exec_hit"] >= 1
+    assert stats["diagnostics_enabled"] is False
+    assert stats["timing_enabled"] is False
+    assert stats["last_candidate"] is None
+    assert stats["candidates"] == ()
+    assert stats["guard_checks"] == 0
+    assert stats["guard_time_ns"] == 0
+    assert stats["region_time_ns"] == 0
+
+
 def test_host_region_hit_and_guard_miss():
     """A two-node DAG fuses, while changed shape resumes normal NumPy."""
     internal = _runtime()
+    provider = _provider_runtime()
     internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
 
     def fused(left, right, scale, count):
         for _ in range(count):
@@ -54,12 +147,18 @@ def test_host_region_hit_and_guard_miss():
     assert stats["virtual_values"] == 1
     assert stats["guard_misses"] >= 1
     assert stats["exec_hits"] >= 1
+    provider_stats = provider._crossjit_stats()
+    assert provider_stats["guard_hit"] >= 1
+    assert provider_stats["guard_miss"] >= 1
+    assert provider_stats["exec_hit"] >= 1
 
 
 def test_floating_exception_soft_miss():
     """A fused FPE is discarded so NumPy owns warning behavior."""
     internal = _runtime()
+    provider = _provider_runtime()
     internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
 
     def fused(left, right, count):
         for _ in range(count):
@@ -76,6 +175,7 @@ def test_floating_exception_soft_miss():
     assert np.isnan(result).all()
     assert caught
     assert internal.crossjit_stats()["exec_misses"] >= 1
+    assert provider._crossjit_stats()["exec_miss"] >= 1
 
 
 def test_rewrite_releases_trace_observations():
@@ -152,7 +252,9 @@ def test_ufunc_calls_build_the_same_semantic_dag():
 def test_provider_rejection_retries_a_shorter_host_region():
     """An unsupported tail cannot discard a legal elementwise prefix."""
     internal = _runtime()
+    provider = _provider_runtime()
     internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
 
     def partially_supported(left, right, scale, exponent, count):
         for _ in range(count):
@@ -173,6 +275,56 @@ def test_provider_rejection_retries_a_shorter_host_region():
     assert stats["formed_regions"] == 1
     assert stats["rewritten_regions"] == 1
     assert stats["exec_hits"] >= 1
+    provider_stats = provider._crossjit_stats()
+    assert provider_stats["regions_rejected_unsupported_node"] >= 1
+    assert provider_stats["regions_provider_accepted"] == 1
+
+
+def test_provider_reports_unsupported_contract():
+    """A semantically legal DAG can remain outside NumPy's fixed contract."""
+    internal = _runtime()
+    provider = _provider_runtime()
+    internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
+
+    def mixed(array, scalar, scale, count):
+        for _ in range(count):
+            result = (array + scalar) * scale
+        return result
+
+    array = np.arange(32, dtype=np.int64)
+    result = mixed(array, 0.5, array + 1, internal.TIER2_THRESHOLD * 2)
+    np.testing.assert_array_equal(result, (array + 0.5) * (array + 1))
+    stats = provider._crossjit_stats()
+    assert stats["regions_prepare_called"] >= 1
+    assert stats["regions_rejected_unsupported_contract"] >= 1
+    assert stats["regions_provider_accepted"] == 0
+    assert stats["regions_executed"] == 0
+
+
+def test_provider_execution_error_is_observable(monkeypatch):
+    """Provider ERROR is counted and propagates without publishing a result."""
+    internal = _runtime()
+    provider = _provider_runtime()
+    internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
+
+    def fused(left, right, scale, count):
+        for _ in range(count):
+            result = (left + right) * scale
+        return result
+
+    left = np.arange(32.0)
+    right = left + 1
+    scale = left + 2
+    fused(left, right, scale, internal.TIER2_THRESHOLD * 2)
+    before = provider._crossjit_stats()
+    monkeypatch.setenv("NPY_CROSSJIT_TEST_EXEC_ERROR", "1")
+    with pytest.raises(RuntimeError, match="injected NumPy CrossJIT"):
+        fused(left, right, scale, 2)
+    after = provider._crossjit_stats()
+    assert after["exec_error"] == before["exec_error"] + 1
+    assert after["regions_executed"] == before["regions_executed"] + 1
 
 
 def test_semantics_only_ablation_does_not_rewrite():
@@ -357,18 +509,29 @@ def test_default_short_region_threshold_declines_tiny_arrays():
 import json
 import numpy as np
 import _testinternalcapi as internal
+from numpy._core import _multiarray_umath as umath
 
 internal.crossjit_reset_stats()
+umath._crossjit_reset_stats()
+
+def fused(left, right, scale, count):
+    for _ in range(count):
+        result = (left + right) * scale
+    return result
+
 left = np.arange(32.0)
 right = left + 1
 scale = left + 2
-for _ in range(internal.TIER2_THRESHOLD * 2):
-    result = (left + right) * scale
+result = fused(left, right, scale, internal.TIER2_THRESHOLD * 2)
 np.testing.assert_array_equal(result, (left + right) * scale)
-print(json.dumps(internal.crossjit_stats()))
+print(json.dumps({
+    "host": internal.crossjit_stats(),
+    "provider": umath._crossjit_stats(),
+}))
 """
     env = os.environ.copy()
     env.pop("NPY_CROSSJIT_MIN_WORK", None)
+    env["NPY_CROSSJIT_DIAGNOSTICS"] = "1"
     completed = subprocess.run(
         [sys.executable, "-c", program],
         check=True,
@@ -377,10 +540,20 @@ print(json.dumps(internal.crossjit_stats()))
         env=env,
     )
     stats = json.loads(completed.stdout)
-    assert stats["recognized_nodes"] == 2
-    assert stats["formed_regions"] == 0
-    assert stats["rewritten_regions"] == 0
-    assert stats["exec_hits"] == 0
+    host = stats["host"]
+    provider = stats["provider"]
+    assert host["recognized_nodes"] == 2
+    assert host["host_regions_proven"] == 1
+    assert host["formed_regions"] == 1
+    assert host["rewritten_regions"] == 0
+    assert host["exec_hits"] == 0
+    assert provider["regions_prepare_called"] == 1
+    assert provider["regions_provider_accepted"] == 0
+    assert provider["regions_rejected_unprofitable"] == 1
+    assert provider["regions_executed"] == 0
+    assert provider["last_candidate"]["region_length"] == 2
+    assert provider["last_candidate"]["element_count"] == 32
+    assert provider["last_candidate"]["prepare_decision"] == 4
 
 
 def test_exact_python_int_scalars_and_range_guard():
