@@ -164,6 +164,10 @@ typedef struct {
     uint64_t fixed_generic_path_hit;
     uint64_t fixed_fast_plans_built;
     uint64_t fixed_generic_plans_built;
+    uint64_t generated_registry_hit;
+    uint64_t generated_registry_miss;
+    uint64_t generated_exec_hit;
+    uint64_t generic_fallback_hit;
     uint64_t output_allocations;
     uint64_t internal_allocations;
     uint64_t guard_plans_destroyed;
@@ -820,17 +824,20 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
     if (plan->guards.iteration_class ==
             NUMPY_CROSSJIT_CONTIGUOUS_SAME_SHAPE &&
         plan->guards.domain.typenum == NPY_DOUBLE) {
-        if (numpy_crossjit_build_contiguous_double_plan(
+        if (numpy_crossjit_generated_registry_lookup(
             plan->nodes, plan->node_count, plan->guards.input_count,
             plan->guards.scalar_mask, plan->output_slot, &plan->fixed)) {
             crossjit_stats.fixed_fast_plans_built++;
+            crossjit_stats.generated_registry_hit++;
         }
         else {
             crossjit_stats.fixed_generic_plans_built++;
+            crossjit_stats.generated_registry_miss++;
         }
     }
     else {
         crossjit_stats.fixed_generic_plans_built++;
+        crossjit_stats.generated_registry_miss++;
     }
     if (Py_GETENV("PYTHON_JIT_CROSSJIT_DEBUG") != NULL) {
         fprintf(stderr, "NumPy CrossJIT accepted %u-node kernel:",
@@ -1213,8 +1220,9 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
         npy_clear_floatstatus_barrier(&fp_barrier);
         kernel_started = numpy_crossjit_clock_ns();
         plan->fixed.entry(role_inputs, (double *)PyArray_DATA(output),
-                          PyArray_SIZE(output));
+                          (size_t)PyArray_SIZE(output));
         crossjit_stats.fixed_fast_path_hit++;
+        crossjit_stats.generated_exec_hit++;
     }
     else {
         const void *data[NUMPY_CROSSJIT_MAX_INPUTS];
@@ -1290,6 +1298,7 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
             PyArray_DATA(output), PyArray_SIZE(output));
         if (ok) {
             crossjit_stats.fixed_generic_path_hit++;
+            crossjit_stats.generic_fallback_hit++;
         }
     }
     if (kernel_started != 0) {
@@ -1428,6 +1437,10 @@ numpy_crossjit_get_stats(PyObject *NPY_UNUSED(module),
     ADD_COUNTER(fixed_generic_path_hit);
     ADD_COUNTER(fixed_fast_plans_built);
     ADD_COUNTER(fixed_generic_plans_built);
+    ADD_COUNTER(generated_registry_hit);
+    ADD_COUNTER(generated_registry_miss);
+    ADD_COUNTER(generated_exec_hit);
+    ADD_COUNTER(generic_fallback_hit);
     ADD_COUNTER(output_allocations);
     ADD_COUNTER(internal_allocations);
     ADD_COUNTER(guard_plans_destroyed);

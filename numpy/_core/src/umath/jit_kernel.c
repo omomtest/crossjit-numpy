@@ -5,6 +5,7 @@
 
 #include <string.h>
 
+#include "generated_crossjit_kernels.h"
 #include "jit_kernel.h"
 #include "numpy/npy_math.h"
 
@@ -33,155 +34,6 @@ crossjit_max_float(float left, float right)
 {
     return (left >= right || npy_isnan(left)) ? left : right;
 }
-
-/*
- * A deliberately bounded set of float64, contiguous, straight-line kernels.
- * These signatures cover the calibration families and the common arithmetic
- * chains already exercised by the provider tests.  Unlike the generic fixed
- * interpreter below, each function exposes the whole fused expression to the
- * compiler in one loop.  Operand-role mapping is resolved once before entry;
- * there is no opcode or slot dispatch in the element loop.
- */
-#define DOUBLE_INPUT(INDEX) ((const double *)inputs[INDEX])
-
-static void
-crossjit_double_add_multiply(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double *a = DOUBLE_INPUT(0);
-    const double *b = DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = (a[i] + b[i]) * c[i];
-    }
-}
-
-static void
-crossjit_double_add_scalar_multiply(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double *a = DOUBLE_INPUT(0);
-    const double b = *DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = (a[i] + b) * c[i];
-    }
-}
-
-static void
-crossjit_double_scalar_multiply_add(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double a = *DOUBLE_INPUT(0);
-    const double *b = DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = (a * b[i]) + c[i];
-    }
-}
-
-static void
-crossjit_double_add_multiply_subtract(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double *a = DOUBLE_INPUT(0);
-    const double *b = DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    const double *d = DOUBLE_INPUT(3);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = (a[i] + b[i]) * c[i] - d[i];
-    }
-}
-
-static void
-crossjit_double_add_multiply_subtract_divide(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double *a = DOUBLE_INPUT(0);
-    const double *b = DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    const double *d = DOUBLE_INPUT(3);
-    const double *e = DOUBLE_INPUT(4);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = ((a[i] + b[i]) * c[i] - d[i]) / e[i];
-    }
-}
-
-static void
-crossjit_double_add_multiply_subtract_divide_add(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double *a = DOUBLE_INPUT(0);
-    const double *b = DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    const double *d = DOUBLE_INPUT(3);
-    const double *e = DOUBLE_INPUT(4);
-    const double *f = DOUBLE_INPUT(5);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = ((a[i] + b[i]) * c[i] - d[i]) / e[i] + f[i];
-    }
-}
-
-static void
-crossjit_double_add_multiply_subtract_divide_add_multiply(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double *a = DOUBLE_INPUT(0);
-    const double *b = DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    const double *d = DOUBLE_INPUT(3);
-    const double *e = DOUBLE_INPUT(4);
-    const double *f = DOUBLE_INPUT(5);
-    const double *g = DOUBLE_INPUT(6);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = (((a[i] + b[i]) * c[i] - d[i]) / e[i] + f[i]) * g[i];
-    }
-}
-
-static void
-crossjit_double_add_multiply_add_multiply(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double *a = DOUBLE_INPUT(0);
-    const double *b = DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    const double *d = DOUBLE_INPUT(3);
-    const double *e = DOUBLE_INPUT(4);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = (((a[i] + b[i]) * c[i]) + d[i]) * e[i];
-    }
-}
-
-static void
-crossjit_double_add_multiply_add_multiply_subtract_add(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double *a = DOUBLE_INPUT(0);
-    const double *b = DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    const double *d = DOUBLE_INPUT(3);
-    const double *e = DOUBLE_INPUT(4);
-    const double *f = DOUBLE_INPUT(5);
-    const double *g = DOUBLE_INPUT(6);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = (((((a[i] + b[i]) * c[i]) + d[i]) * e[i]) - f[i]) + g[i];
-    }
-}
-
-static void
-crossjit_double_multiply_multiply_add(
-    const void *const *inputs, double *restrict output, npy_intp size)
-{
-    const double *a = DOUBLE_INPUT(0);
-    const double *b = DOUBLE_INPUT(1);
-    const double *c = DOUBLE_INPUT(2);
-    const double *d = DOUBLE_INPUT(3);
-    for (npy_intp i = 0; i < size; i++) {
-        output[i] = (a[i] * b[i]) + (c[i] * d[i]);
-    }
-}
-
-#undef DOUBLE_INPUT
 
 static int
 crossjit_ops_equal(const NumpyCrossJitKernelNode *nodes,
@@ -217,29 +69,14 @@ crossjit_linear_roles(const NumpyCrossJitKernelNode *nodes,
     return output_slot == input_count + node_count - 1;
 }
 
-static uint16_t
-crossjit_role_scalar_mask(const uint8_t *roles, uint8_t role_count,
-                          uint16_t scalar_mask)
-{
-    uint16_t role_mask = 0;
-    for (uint8_t i = 0; i < role_count; i++) {
-        if (scalar_mask & (1u << roles[i])) {
-            role_mask |= (uint16_t)(1u << i);
-        }
-    }
-    return role_mask;
-}
-
 int
-numpy_crossjit_build_contiguous_double_plan(
+numpy_crossjit_generated_registry_lookup(
     const NumpyCrossJitKernelNode *nodes, uint8_t node_count,
     uint8_t input_count, uint16_t scalar_mask, uint8_t output_slot,
     NumpyCrossJitFixedPlan *plan)
 {
     static const uint8_t linear_2[] = {
         NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY};
-    static const uint8_t scalar_2[] = {
-        NUMPY_CROSSJIT_KERNEL_MULTIPLY, NUMPY_CROSSJIT_KERNEL_ADD};
     static const uint8_t linear_3[] = {
         NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
         NUMPY_CROSSJIT_KERNEL_SUBTRACT};
@@ -254,13 +91,6 @@ numpy_crossjit_build_contiguous_double_plan(
         NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
         NUMPY_CROSSJIT_KERNEL_SUBTRACT, NUMPY_CROSSJIT_KERNEL_TRUE_DIVIDE,
         NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY};
-    static const uint8_t test_4[] = {
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY};
-    static const uint8_t test_6[] = {
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
-        NUMPY_CROSSJIT_KERNEL_SUBTRACT, NUMPY_CROSSJIT_KERNEL_ADD};
     if (plan == NULL) {
         return 0;
     }
@@ -286,50 +116,37 @@ numpy_crossjit_build_contiguous_double_plan(
         roles[2] = nodes[1].left;
         roles[3] = nodes[1].right;
         role_count = 4;
-        kernel = crossjit_double_multiply_multiply_add;
+        kernel = numpy_crossjit_generated_registry[
+            NPY_CROSSJIT_GENERATED_BRANCHED_3_MULTIPLY_MULTIPLY_ADD].entry;
     }
     else if (node_count >= 2 && node_count <= 6 &&
              crossjit_linear_roles(nodes, node_count, input_count,
                                    output_slot, roles)) {
         role_count = (uint8_t)(node_count + 1);
-        uint16_t role_scalar_mask = crossjit_role_scalar_mask(
-            roles, role_count, scalar_mask);
-        if (node_count == 2 && crossjit_ops_equal(nodes, linear_2, 2)) {
-            if (role_scalar_mask == 0) {
-                kernel = crossjit_double_add_multiply;
-            }
-            else if (role_scalar_mask == (1u << 1)) {
-                kernel = crossjit_double_add_scalar_multiply;
-            }
+        if (scalar_mask == 0 && node_count == 2 &&
+                 crossjit_ops_equal(nodes, linear_2, 2)) {
+            kernel = numpy_crossjit_generated_registry[
+                NPY_CROSSJIT_GENERATED_LINEAR_2_ADD_MULTIPLY].entry;
         }
-        else if (node_count == 2 &&
-                 crossjit_ops_equal(nodes, scalar_2, 2) &&
-                 role_scalar_mask == 1u) {
-            kernel = crossjit_double_scalar_multiply_add;
-        }
-        else if (role_scalar_mask == 0 && node_count == 3 &&
+        else if (scalar_mask == 0 && node_count == 3 &&
                  crossjit_ops_equal(nodes, linear_3, 3)) {
-            kernel = crossjit_double_add_multiply_subtract;
+            kernel = numpy_crossjit_generated_registry[
+                NPY_CROSSJIT_GENERATED_LINEAR_3_ADD_MULTIPLY_SUBTRACT].entry;
         }
-        else if (role_scalar_mask == 0 && node_count == 4 &&
+        else if (scalar_mask == 0 && node_count == 4 &&
                  crossjit_ops_equal(nodes, linear_4, 4)) {
-            kernel = crossjit_double_add_multiply_subtract_divide;
+            kernel = numpy_crossjit_generated_registry[
+                NPY_CROSSJIT_GENERATED_LINEAR_4_ADD_MULTIPLY_SUBTRACT_DIVIDE].entry;
         }
-        else if (role_scalar_mask == 0 && node_count == 5 &&
+        else if (scalar_mask == 0 && node_count == 5 &&
                  crossjit_ops_equal(nodes, linear_5, 5)) {
-            kernel = crossjit_double_add_multiply_subtract_divide_add;
+            kernel = numpy_crossjit_generated_registry[
+                NPY_CROSSJIT_GENERATED_LINEAR_5_ADD_MULTIPLY_SUBTRACT_DIVIDE_ADD].entry;
         }
-        else if (role_scalar_mask == 0 && node_count == 6 &&
+        else if (scalar_mask == 0 && node_count == 6 &&
                  crossjit_ops_equal(nodes, linear_6, 6)) {
-            kernel = crossjit_double_add_multiply_subtract_divide_add_multiply;
-        }
-        else if (role_scalar_mask == 0 && node_count == 4 &&
-                 crossjit_ops_equal(nodes, test_4, 4)) {
-            kernel = crossjit_double_add_multiply_add_multiply;
-        }
-        else if (role_scalar_mask == 0 && node_count == 6 &&
-                 crossjit_ops_equal(nodes, test_6, 6)) {
-            kernel = crossjit_double_add_multiply_add_multiply_subtract_add;
+            kernel = numpy_crossjit_generated_registry[
+                NPY_CROSSJIT_GENERATED_LINEAR_6_ADD_MULTIPLY_SUBTRACT_DIVIDE_ADD_MULTIPLY].entry;
         }
     }
     if (kernel == NULL) {

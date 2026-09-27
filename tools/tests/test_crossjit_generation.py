@@ -42,3 +42,14 @@ def test_build_time_generation_is_reproducible(tmp_path):
     assert source.count("for (") == 6
     assert "switch" not in source
     assert "Python.h" not in source
+    header = outputs[1].read_text()
+    assert "numpy_crossjit_generated_registry" in source
+    assert "NPY_CROSSJIT_GENERATED_COUNT = 6" in header
+    for signature_id in {
+        kernel["signature_id"] for kernel in metadata["kernels"]
+    }:
+        enum_name = "NPY_CROSSJIT_GENERATED_" + "".join(
+            character.upper() if character.isalnum() else "_"
+            for character in signature_id
+        )
+        assert enum_name in header

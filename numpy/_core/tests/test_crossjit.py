@@ -561,12 +561,16 @@ def test_contiguous_float64_straight_line_fast_paths(node_count, expression):
     assert stats["fixed_generic_path_hit"] == 0
     assert stats["fixed_fast_plans_built"] == 1
     assert stats["fixed_generic_plans_built"] == 0
+    assert stats["generated_registry_hit"] == 1
+    assert stats["generated_registry_miss"] == 0
+    assert stats["generated_exec_hit"] == stats["exec_hit"]
+    assert stats["generic_fallback_hit"] == 0
     assert stats["output_allocations"] == stats["exec_hit"]
     assert stats["internal_allocations"] == 0
 
 
-def test_contiguous_float64_branched_and_scalar_fast_paths():
-    """Branched and both scalar orientations have dispatch-free templates."""
+def test_contiguous_float64_branched_registry_and_scalar_fallbacks():
+    """The generated branched kernel hits; scalar contracts stay generic."""
     internal = _runtime()
     provider = _provider_runtime()
 
@@ -588,22 +592,26 @@ def test_contiguous_float64_branched_and_scalar_fast_paths():
     a = np.arange(193.0) / 193 + 1
     arrays = (a, a + 1, a + 2, a + 3)
     cases = (
-        (branched, arrays, arrays[0] * arrays[1] + arrays[2] * arrays[3]),
+        (branched, arrays, arrays[0] * arrays[1] + arrays[2] * arrays[3], True),
         (array_scalar, (arrays[0], 0.25, arrays[1]),
-         (arrays[0] + 0.25) * arrays[1]),
+         (arrays[0] + 0.25) * arrays[1], False),
         (scalar_array, (0.25, arrays[0], arrays[1]),
-         0.25 * arrays[0] + arrays[1]),
+         0.25 * arrays[0] + arrays[1], False),
     )
-    for function, args, expected in cases:
+    for function, args, expected, generated in cases:
         internal.crossjit_reset_stats()
         provider._crossjit_reset_stats()
         result = function(*args, internal.TIER2_THRESHOLD * 2)
         np.testing.assert_array_equal(result, expected)
         stats = provider._crossjit_stats()
-        assert stats["fixed_fast_path_hit"] == stats["exec_hit"]
-        assert stats["fixed_generic_path_hit"] == 0
-        assert stats["fixed_fast_plans_built"] == 1
-        assert stats["fixed_generic_plans_built"] == 0
+        if generated:
+            assert stats["generated_registry_hit"] == 1
+            assert stats["generated_exec_hit"] == stats["exec_hit"]
+            assert stats["generic_fallback_hit"] == 0
+        else:
+            assert stats["generated_registry_miss"] == 1
+            assert stats["generated_exec_hit"] == 0
+            assert stats["generic_fallback_hit"] == stats["exec_hit"]
         assert stats["output_allocations"] == stats["exec_hit"]
         assert stats["internal_allocations"] == 0
 
@@ -630,6 +638,10 @@ def test_fixed_generic_fallback_preserves_special_values():
     assert hit_stats["fixed_generic_path_hit"] == hit_stats["exec_hit"]
     assert hit_stats["fixed_fast_plans_built"] == 0
     assert hit_stats["fixed_generic_plans_built"] == 1
+    assert hit_stats["generated_registry_hit"] == 0
+    assert hit_stats["generated_registry_miss"] == 1
+    assert hit_stats["generated_exec_hit"] == 0
+    assert hit_stats["generic_fallback_hit"] == hit_stats["exec_hit"]
 
     left = np.array([np.nan, np.inf, -np.inf, -0.0, 0.0, 3.0])
     right = np.array([1.0, np.inf, -2.0, -0.0, 0.0, np.nan])

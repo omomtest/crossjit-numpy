@@ -24,6 +24,61 @@ def _write_if_changed(path: Path, content: str) -> None:
     path.write_text(content)
 
 
+def _registry_name(signature_id: str) -> str:
+    normalized = "".join(
+        character.upper() if character.isalnum() else "_"
+        for character in signature_id
+    )
+    return f"NPY_CROSSJIT_GENERATED_{normalized}"
+
+
+def _add_numpy_registry(header: str, source: str, kernels: list[dict]):
+    """Emit a NumPy-owned static registry around generic generated kernels."""
+
+    ordered = sorted(kernels, key=lambda kernel: kernel["signature_id"])
+    enum_rows = [
+        f"    {_registry_name(kernel['signature_id'])} = {index},"
+        for index, kernel in enumerate(ordered)
+    ]
+    declarations = "\n".join((
+        "typedef void (*NumpyCrossJitGeneratedKernelEntry)(",
+        "    const void *const *inputs, double *restrict output, size_t size);",
+        "",
+        "typedef enum {",
+        *enum_rows,
+        f"    NPY_CROSSJIT_GENERATED_COUNT = {len(ordered)}",
+        "} NumpyCrossJitGeneratedSignature;",
+        "",
+        "typedef struct {",
+        "    const char *signature_id;",
+        "    unsigned char input_count;",
+        "    NumpyCrossJitGeneratedKernelEntry entry;",
+        "} NumpyCrossJitGeneratedKernel;",
+        "",
+        "extern const NumpyCrossJitGeneratedKernel",
+        "    numpy_crossjit_generated_registry[NPY_CROSSJIT_GENERATED_COUNT];",
+        "",
+    ))
+    marker = "#endif /* GENERATED_CROSSJIT_KERNELS_H */"
+    if marker not in header:
+        raise ValueError("unexpected generated header guard")
+    header = header.replace(marker, declarations + marker)
+    registry_rows = [
+        f'    [{_registry_name(kernel["signature_id"])}] = '
+        f'{{"{kernel["signature_id"]}", {kernel["input_count"]}, '
+        f'{kernel["symbol"]}}},'
+        for kernel in ordered
+    ]
+    source += "\n" + "\n".join((
+        "const NumpyCrossJitGeneratedKernel",
+        "numpy_crossjit_generated_registry[NPY_CROSSJIT_GENERATED_COUNT] = {",
+        *registry_rows,
+        "};",
+        "",
+    ))
+    return header, source
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--generator-root", type=Path, required=True)
@@ -71,13 +126,15 @@ def main() -> int:
     })
     for kernel in metadata["kernels"]:
         kernel["signature_id"] = signature_ids[kernel["candidate_hash"]]
+    header_text, source_text = _add_numpy_registry(
+        bundle.header, bundle.source, metadata["kernels"])
     metadata_text = json.dumps(
         metadata, ensure_ascii=True, indent=2, sort_keys=True) + "\n"
 
     for output in (args.output_c, args.output_h, args.output_json):
         output.parent.mkdir(parents=True, exist_ok=True)
-    _write_if_changed(args.output_c, bundle.source)
-    _write_if_changed(args.output_h, bundle.header)
+    _write_if_changed(args.output_c, source_text)
+    _write_if_changed(args.output_h, header_text)
     _write_if_changed(args.output_json, metadata_text)
     return 0
 

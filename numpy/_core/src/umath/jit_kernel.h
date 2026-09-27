@@ -30,7 +30,7 @@ typedef struct {
 #define NUMPY_CROSSJIT_MAX_FAST_INPUTS 7
 
 typedef void (*NumpyCrossJitDoubleKernelEntry)(
-    const void *const *inputs, double *restrict output, npy_intp size);
+    const void *const *inputs, double *restrict output, size_t size);
 
 /* A prepare-time-selected straight-line loop and its compact operand roles. */
 typedef struct {
@@ -39,7 +39,7 @@ typedef struct {
     uint8_t input_count;
 } NumpyCrossJitFixedPlan;
 
-int numpy_crossjit_build_contiguous_double_plan(
+int numpy_crossjit_generated_registry_lookup(
     const NumpyCrossJitKernelNode *nodes, uint8_t node_count,
     uint8_t input_count, uint16_t scalar_mask, uint8_t output_slot,
     NumpyCrossJitFixedPlan *plan);
