@@ -27,3 +27,19 @@ build with `PYTHON_JIT=1` and `PYTHON_JIT_CROSSJIT=0`.
 The layout fixture layer also supports `CONTIGUOUS_BROADCAST`, `ZERO_STRIDE`,
 `INNER_CONTIGUOUS`, and `GENERAL_STRIDED` for later P7 experiments.  Those
 layouts are deliberately not calibrated or enabled by P1.
+
+## Generator G0 feasibility oracle
+
+`run_generator_feasibility.py` compiles the benchmark-only L2/L4/L6
+straight-line C oracle, runs the complete P1 N grid in independent processes,
+joins the measurements to the immutable P1 JSON, and emits compiler
+vectorization and assembly evidence:
+
+```bash
+/path/to/crossjit/venv/bin/python3 \
+  benchmarks/benchmarks/crossjit/run_generator_feasibility.py
+```
+
+The quantitative gate decision and methodology are recorded in
+`G0_RESULTS.md`.  `g0-build/` contains reproducible compiler artifacts and is
+not a source directory.
