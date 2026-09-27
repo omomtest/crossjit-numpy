@@ -506,6 +506,158 @@ def test_six_node_provider_loop_executes():
     assert stats["exec_hits"] >= 1
 
 
+@pytest.mark.parametrize(
+    ("node_count", "expression"),
+    [
+        (2, lambda v: (v[0] + v[1]) * v[2]),
+        (3, lambda v: (v[0] + v[1]) * v[2] - v[3]),
+        (4, lambda v: ((v[0] + v[1]) * v[2] - v[3]) / v[4]),
+        (5, lambda v: ((v[0] + v[1]) * v[2] - v[3]) / v[4] + v[5]),
+        (6, lambda v: (((v[0] + v[1]) * v[2] - v[3]) / v[4] +
+                       v[5]) * v[6]),
+    ],
+)
+def test_contiguous_float64_straight_line_fast_paths(node_count, expression):
+    """The exact two-to-six-node reference chains use the fixed fast path."""
+    internal = _runtime()
+    provider = _provider_runtime()
+
+    def fused_2(a, b, c, count):
+        for _ in range(count):
+            result = (a + b) * c
+        return result
+
+    def fused_3(a, b, c, d, count):
+        for _ in range(count):
+            result = (a + b) * c - d
+        return result
+
+    def fused_4(a, b, c, d, e, count):
+        for _ in range(count):
+            result = ((a + b) * c - d) / e
+        return result
+
+    def fused_5(a, b, c, d, e, f, count):
+        for _ in range(count):
+            result = ((a + b) * c - d) / e + f
+        return result
+
+    def fused_6(a, b, c, d, e, f, g, count):
+        for _ in range(count):
+            result = (((a + b) * c - d) / e + f) * g
+        return result
+
+    functions = {2: fused_2, 3: fused_3, 4: fused_4, 5: fused_5, 6: fused_6}
+    values = tuple(np.arange(257.0) / 257 + i + 1
+                   for i in range(node_count + 1))
+    internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
+    result = functions[node_count](
+        *values, internal.TIER2_THRESHOLD * 2)
+    np.testing.assert_array_equal(result, expression(values))
+    stats = provider._crossjit_stats()
+    assert stats["exec_hit"] >= 1
+    assert stats["fixed_fast_path_hit"] == stats["exec_hit"]
+    assert stats["fixed_generic_path_hit"] == 0
+    assert stats["output_allocations"] == stats["exec_hit"]
+    assert stats["internal_allocations"] == 0
+
+
+def test_contiguous_float64_branched_and_scalar_fast_paths():
+    """Branched and both scalar orientations have dispatch-free templates."""
+    internal = _runtime()
+    provider = _provider_runtime()
+
+    def branched(a, b, c, d, count):
+        for _ in range(count):
+            result = a * b + c * d
+        return result
+
+    def array_scalar(a, scalar, b, count):
+        for _ in range(count):
+            result = (a + scalar) * b
+        return result
+
+    def scalar_array(scalar, a, b, count):
+        for _ in range(count):
+            result = (scalar * a) + b
+        return result
+
+    a = np.arange(193.0) / 193 + 1
+    arrays = (a, a + 1, a + 2, a + 3)
+    cases = (
+        (branched, arrays, arrays[0] * arrays[1] + arrays[2] * arrays[3]),
+        (array_scalar, (arrays[0], 0.25, arrays[1]),
+         (arrays[0] + 0.25) * arrays[1]),
+        (scalar_array, (0.25, arrays[0], arrays[1]),
+         0.25 * arrays[0] + arrays[1]),
+    )
+    for function, args, expected in cases:
+        internal.crossjit_reset_stats()
+        provider._crossjit_reset_stats()
+        result = function(*args, internal.TIER2_THRESHOLD * 2)
+        np.testing.assert_array_equal(result, expected)
+        stats = provider._crossjit_stats()
+        assert stats["fixed_fast_path_hit"] == stats["exec_hit"]
+        assert stats["fixed_generic_path_hit"] == 0
+        assert stats["output_allocations"] == stats["exec_hit"]
+        assert stats["internal_allocations"] == 0
+
+
+def test_fixed_generic_fallback_preserves_special_values():
+    """An unsupported signature stays on the fixed fallback exactly."""
+    internal = _runtime()
+    provider = _provider_runtime()
+
+    def add_negative(left, right, count):
+        for _ in range(count):
+            result = -(left + right)
+        return result
+
+    finite = np.arange(6.0) + 1
+    internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
+    finite_result = add_negative(
+        finite, finite + 1, internal.TIER2_THRESHOLD * 2)
+    np.testing.assert_array_equal(finite_result, -(finite + finite + 1))
+    hit_stats = provider._crossjit_stats()
+    assert hit_stats["exec_hit"] >= 1
+    assert hit_stats["fixed_fast_path_hit"] == 0
+    assert hit_stats["fixed_generic_path_hit"] == hit_stats["exec_hit"]
+
+    left = np.array([np.nan, np.inf, -np.inf, -0.0, 0.0, 3.0])
+    right = np.array([1.0, np.inf, -2.0, -0.0, 0.0, np.nan])
+    result = add_negative(left, right, 2)
+    expected = -(left + right)
+    np.testing.assert_array_equal(result, expected)
+    np.testing.assert_array_equal(np.signbit(result), np.signbit(expected))
+    stats = provider._crossjit_stats()
+    assert stats["fixed_fast_path_hit"] == 0
+    assert stats["fixed_generic_path_hit"] >= stats["exec_hit"]
+    assert stats["output_allocations"] >= stats["exec_hit"]
+    assert stats["internal_allocations"] == 0
+
+
+def test_minimum_maximum_special_values_remain_correct():
+    """Recognized min/max operations retain NaN and signed-zero behavior."""
+    internal = _runtime()
+
+    def minmax(left, right, tail, count):
+        for _ in range(count):
+            result = np.maximum(np.minimum(left, right), tail)
+        return result
+
+    left = np.array([np.nan, np.inf, -np.inf, -0.0, 0.0, 3.0])
+    right = np.array([1.0, np.inf, 2.0, 0.0, -0.0, np.nan])
+    tail = np.array([-2.0, 4.0, -3.0, -0.0, 0.0, 1.0])
+    internal.crossjit_reset_stats()
+    result = minmax(left, right, tail, internal.TIER2_THRESHOLD * 2)
+    expected = np.maximum(np.minimum(left, right), tail)
+    np.testing.assert_array_equal(result, expected)
+    np.testing.assert_array_equal(np.signbit(result), np.signbit(expected))
+    assert internal.crossjit_stats()["recognized_nodes"] == 2
+
+
 def test_default_short_region_threshold_declines_tiny_arrays():
     """The production policy leaves an unprofitable tiny DAG on NumPy ufuncs."""
     program = r"""

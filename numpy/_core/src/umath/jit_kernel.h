@@ -27,6 +27,11 @@ typedef struct {
     uint8_t output;              /* virtual slot defined by this node */
 } NumpyCrossJitKernelNode;
 
+typedef enum {
+    NUMPY_CROSSJIT_FIXED_GENERIC_PATH = 0,
+    NUMPY_CROSSJIT_FIXED_FAST_PATH = 1,
+} NumpyCrossJitFixedPath;
+
 /* Executes a validated two-to-six-node DAG over one strided iteration domain.
  * Returns zero without publishing partial output when the program is invalid. */
 int numpy_crossjit_kernel_strided(
@@ -34,6 +39,7 @@ int numpy_crossjit_kernel_strided(
     uint8_t input_count, uint16_t scalar_mask, uint8_t output_slot, int typenum,
     const void *const *inputs,
     const npy_intp input_strides[][NPY_MAXDIMS], uint8_t ndim,
-    const npy_intp *dimensions, void *output, npy_intp size);
+    const npy_intp *dimensions, void *output, npy_intp size,
+    int allow_fast_path, NumpyCrossJitFixedPath *executed_path);
 
 #endif

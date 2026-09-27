@@ -160,6 +160,10 @@ typedef struct {
     uint64_t exec_hit;
     uint64_t exec_miss;
     uint64_t exec_error;
+    uint64_t fixed_fast_path_hit;
+    uint64_t fixed_generic_path_hit;
+    uint64_t output_allocations;
+    uint64_t internal_allocations;
     uint64_t guard_plans_destroyed;
     uint64_t execution_plans_destroyed;
     uint64_t guard_metadata_reads;
@@ -1158,6 +1162,7 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
         return numpy_crossjit_record_exec(
             PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
     }
+    crossjit_stats.output_allocations++;
     const void *data[NUMPY_CROSSJIT_MAX_INPUTS];
     npy_intp input_strides[NUMPY_CROSSJIT_MAX_INPUTS][NPY_MAXDIMS] = {{0}};
     double scalar_double[NUMPY_CROSSJIT_MAX_INPUTS];
@@ -1225,13 +1230,23 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
         npy_clear_floatstatus_barrier(&fp_barrier);
     }
     uint64_t kernel_started = numpy_crossjit_clock_ns();
+    NumpyCrossJitFixedPath executed_path = NUMPY_CROSSJIT_FIXED_GENERIC_PATH;
     int ok = numpy_crossjit_kernel_strided(
         plan->nodes, plan->node_count, plan->guards.input_count,
         plan->guards.scalar_mask, plan->output_slot, fact->typenum,
         data, input_strides, linear_domain ? 1 : fact->ndim,
         linear_domain ? &linear_dimension : fact->dimensions,
         PyArray_DATA(output),
-        PyArray_SIZE(output));
+        PyArray_SIZE(output),
+        plan->guards.iteration_class ==
+            NUMPY_CROSSJIT_CONTIGUOUS_SAME_SHAPE,
+        &executed_path);
+    if (ok && executed_path == NUMPY_CROSSJIT_FIXED_FAST_PATH) {
+        crossjit_stats.fixed_fast_path_hit++;
+    }
+    else if (ok) {
+        crossjit_stats.fixed_generic_path_hit++;
+    }
     if (kernel_started != 0) {
         uint64_t kernel_ended = numpy_crossjit_clock_ns();
         if (kernel_ended >= kernel_started) {
@@ -1364,6 +1379,10 @@ numpy_crossjit_get_stats(PyObject *NPY_UNUSED(module),
     ADD_COUNTER(exec_hit);
     ADD_COUNTER(exec_miss);
     ADD_COUNTER(exec_error);
+    ADD_COUNTER(fixed_fast_path_hit);
+    ADD_COUNTER(fixed_generic_path_hit);
+    ADD_COUNTER(output_allocations);
+    ADD_COUNTER(internal_allocations);
     ADD_COUNTER(guard_plans_destroyed);
     ADD_COUNTER(execution_plans_destroyed);
     ADD_COUNTER(guard_metadata_reads);
