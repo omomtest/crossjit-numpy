@@ -725,6 +725,42 @@ src_ufunc_api = custom_target('__ufunc_api',
   install_tag: 'devel'
 )
 
+# Generate CrossJIT Provider kernels at build time.  The Generator is a
+# sibling build tool; generated code is compiled into NumPy and is not needed
+# at runtime.
+crossjit_generator_root = meson.project_source_root() / '..' / 'crossjit-generator'
+if not fs.exists(crossjit_generator_root / 'pyproject.toml')
+  error('CrossJIT Generator sibling repository not found: ' + crossjit_generator_root)
+endif
+src_crossjit_generated = custom_target('generated_crossjit_kernels',
+  output : [
+    'generated_crossjit_kernels.c',
+    'generated_crossjit_kernels.h',
+    'generated_crossjit_kernels.json',
+  ],
+  input : [
+    'code_generators/generate_crossjit_kernels.py',
+    'code_generators/crossjit_kernel_manifest.json',
+    'code_generators/crossjit_lowering.py',
+    'code_generators/crossjit_recipes.py',
+  ],
+  command : [
+    py, '@INPUT0@',
+    '--generator-root', crossjit_generator_root,
+    '--manifest', '@INPUT1@',
+    '--output-c', '@OUTPUT0@',
+    '--output-h', '@OUTPUT1@',
+    '--output-json', '@OUTPUT2@',
+  ],
+  depend_files : [
+    crossjit_generator_root / 'crossjit_generator/backend/c/backend.py',
+    crossjit_generator_root / 'crossjit_generator/candidate/model.py',
+    crossjit_generator_root / 'crossjit_generator/domains/elementwise/optimizer.py',
+    crossjit_generator_root / 'crossjit_generator/ir/elementwise.py',
+    crossjit_generator_root / 'crossjit_generator/recipe/model.py',
+  ],
+)
+
 # Write out pkg-config file
 # -------------------------
 
@@ -1256,6 +1292,8 @@ src_multiarray = multiarray_gen_headers + [
 ]
 
 src_umath = umath_gen_headers + [
+  src_crossjit_generated[0],
+  src_crossjit_generated[1],
   src_file.process('src/umath/funcs.inc.src'),
   src_file.process('src/umath/loops.c.src'),
   src_file.process('src/umath/matmul.c.src'),
