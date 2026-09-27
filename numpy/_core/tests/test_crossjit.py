@@ -114,6 +114,9 @@ def test_provider_detailed_diagnostics_are_opt_in(monkeypatch):
     assert stats["last_candidate"] is None
     assert stats["candidates"] == ()
     assert stats["guard_checks"] == 0
+    assert stats["prepare_time_ns"] == 0
+    assert stats["guard_lower_time_ns"] == 0
+    assert stats["execution_lower_time_ns"] == 0
     assert stats["guard_time_ns"] == 0
     assert stats["region_time_ns"] == 0
 

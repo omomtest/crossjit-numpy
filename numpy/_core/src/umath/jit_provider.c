@@ -164,6 +164,9 @@ typedef struct {
     uint64_t execution_plans_destroyed;
     uint64_t guard_metadata_reads;
     uint64_t guard_checks;
+    uint64_t prepare_time_ns;
+    uint64_t guard_lower_time_ns;
+    uint64_t execution_lower_time_ns;
     uint64_t guard_time_ns;
     uint64_t region_time_ns;
     uint64_t allocation_time_ns;
@@ -217,6 +220,18 @@ numpy_crossjit_clock_ns(void)
     }
     return (uint64_t)now.tv_sec * UINT64_C(1000000000) +
         (uint64_t)now.tv_nsec;
+}
+
+static void
+numpy_crossjit_record_elapsed(uint64_t *total, uint64_t started)
+{
+    if (started == 0) {
+        return;
+    }
+    uint64_t ended = numpy_crossjit_clock_ns();
+    if (ended >= started) {
+        *total += ended - started;
+    }
 }
 
 static void
@@ -809,11 +824,14 @@ static PyJitResult
 numpy_crossjit_prepare_region(const PyJitRegionView *region,
                               PyJitPrepareResult *result)
 {
+    uint64_t started = numpy_crossjit_clock_ns();
     crossjit_stats.regions_prepare_called++;
     if (result == NULL || result->struct_size != sizeof(*result)) {
         crossjit_stats.regions_rejected_other++;
         PyErr_SetString(PyExc_ValueError,
                         "invalid NumPy CrossJIT prepare result");
+        numpy_crossjit_record_elapsed(&crossjit_stats.prepare_time_ns,
+                                      started);
         return PYJIT_RESULT_ERROR;
     }
     NumpyCrossJitContract *contract =
@@ -821,6 +839,8 @@ numpy_crossjit_prepare_region(const PyJitRegionView *region,
     if (contract == NULL) {
         crossjit_stats.regions_rejected_other++;
         PyErr_NoMemory();
+        numpy_crossjit_record_elapsed(&crossjit_stats.prepare_time_ns,
+                                      started);
         return PYJIT_RESULT_ERROR;
     }
     PyJitPrepareDecision decision = numpy_crossjit_build_exec(
@@ -850,6 +870,8 @@ numpy_crossjit_prepare_region(const PyJitRegionView *region,
         }
         numpy_crossjit_record_candidate();
         PyMem_Free(contract);
+        numpy_crossjit_record_elapsed(&crossjit_stats.prepare_time_ns,
+                                      started);
         return PYJIT_RESULT_HIT;
     }
     crossjit_stats.regions_provider_accepted++;
@@ -899,6 +921,7 @@ numpy_crossjit_prepare_region(const PyJitRegionView *region,
         crossjit_stats.last.unique_guard_count = input_count;
     }
     numpy_crossjit_record_candidate();
+    numpy_crossjit_record_elapsed(&crossjit_stats.prepare_time_ns, started);
     return PYJIT_RESULT_HIT;
 }
 
@@ -909,10 +932,13 @@ numpy_crossjit_lower_guards(
     const PyJitSpecializationView *specialization,
     PyJitGuardPlan **result)
 {
+    uint64_t started = numpy_crossjit_clock_ns();
     *result = NULL;
     if (specialization == NULL ||
         specialization->contract_size != sizeof(NumpyCrossJitContract) ||
         specialization->assumption_count == 0) {
+        numpy_crossjit_record_elapsed(&crossjit_stats.guard_lower_time_ns,
+                                      started);
         return PYJIT_RESULT_MISS;
     }
     const NumpyCrossJitContract *contract =
@@ -920,6 +946,8 @@ numpy_crossjit_lower_guards(
     struct PyJitGuardPlan *plan = PyMem_Malloc(sizeof(*plan));
     if (plan == NULL) {
         PyErr_NoMemory();
+        numpy_crossjit_record_elapsed(&crossjit_stats.guard_lower_time_ns,
+                                      started);
         return PYJIT_RESULT_ERROR;
     }
     *plan = contract->execution.guards;
@@ -929,6 +957,8 @@ numpy_crossjit_lower_guards(
             (uint8_t)specialization->assumption_count;
     }
     *result = plan;
+    numpy_crossjit_record_elapsed(&crossjit_stats.guard_lower_time_ns,
+                                  started);
     return PYJIT_RESULT_HIT;
 }
 
@@ -938,9 +968,12 @@ numpy_crossjit_lower_region(
     const PyJitSpecializationView *specialization,
     PyJitExecPlan **result)
 {
+    uint64_t started = numpy_crossjit_clock_ns();
     *result = NULL;
     if (specialization == NULL ||
         specialization->contract_size != sizeof(NumpyCrossJitContract)) {
+        numpy_crossjit_record_elapsed(
+            &crossjit_stats.execution_lower_time_ns, started);
         return PYJIT_RESULT_MISS;
     }
     const NumpyCrossJitContract *contract =
@@ -948,11 +981,15 @@ numpy_crossjit_lower_region(
     struct PyJitExecPlan *plan = PyMem_Malloc(sizeof(*plan));
     if (plan == NULL) {
         PyErr_NoMemory();
+        numpy_crossjit_record_elapsed(
+            &crossjit_stats.execution_lower_time_ns, started);
         return PYJIT_RESULT_ERROR;
     }
     *plan = contract->execution;
     crossjit_stats.execution_plans_lowered++;
     *result = plan;
+    numpy_crossjit_record_elapsed(&crossjit_stats.execution_lower_time_ns,
+                                  started);
     return PYJIT_RESULT_HIT;
 }
 
@@ -1331,6 +1368,9 @@ numpy_crossjit_get_stats(PyObject *NPY_UNUSED(module),
     ADD_COUNTER(execution_plans_destroyed);
     ADD_COUNTER(guard_metadata_reads);
     ADD_COUNTER(guard_checks);
+    ADD_COUNTER(prepare_time_ns);
+    ADD_COUNTER(guard_lower_time_ns);
+    ADD_COUNTER(execution_lower_time_ns);
     ADD_COUNTER(guard_time_ns);
     ADD_COUNTER(region_time_ns);
     ADD_COUNTER(allocation_time_ns);
