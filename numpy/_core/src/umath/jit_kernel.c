@@ -3,6 +3,8 @@
 #define _MULTIARRAYMODULE
 #define _UMATHMODULE
 
+#include <string.h>
+
 #include "jit_kernel.h"
 #include "numpy/npy_math.h"
 
@@ -40,9 +42,6 @@ crossjit_max_float(float left, float right)
  * compiler in one loop.  Operand-role mapping is resolved once before entry;
  * there is no opcode or slot dispatch in the element loop.
  */
-typedef void (*CrossJitDoubleFastKernel)(
-    const void *const *inputs, double *restrict output, npy_intp size);
-
 #define DOUBLE_INPUT(INDEX) ((const double *)inputs[INDEX])
 
 static void
@@ -231,11 +230,11 @@ crossjit_role_scalar_mask(const uint8_t *roles, uint8_t role_count,
     return role_mask;
 }
 
-static int
-crossjit_try_double_fast_path(
+int
+numpy_crossjit_build_contiguous_double_plan(
     const NumpyCrossJitKernelNode *nodes, uint8_t node_count,
     uint8_t input_count, uint16_t scalar_mask, uint8_t output_slot,
-    const void *const *inputs, double *output, npy_intp size)
+    NumpyCrossJitFixedPlan *plan)
 {
     static const uint8_t linear_2[] = {
         NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY};
@@ -262,9 +261,12 @@ crossjit_try_double_fast_path(
         NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
         NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
         NUMPY_CROSSJIT_KERNEL_SUBTRACT, NUMPY_CROSSJIT_KERNEL_ADD};
-    uint8_t roles[7];
-    const void *role_inputs[7];
-    CrossJitDoubleFastKernel kernel = NULL;
+    if (plan == NULL) {
+        return 0;
+    }
+    memset(plan, 0, sizeof(*plan));
+    uint8_t *roles = plan->input_slots;
+    NumpyCrossJitDoubleKernelEntry kernel = NULL;
     uint8_t role_count = 0;
 
     if (node_count == 3 && scalar_mask == 0 && input_count == 4 &&
@@ -333,10 +335,8 @@ crossjit_try_double_fast_path(
     if (kernel == NULL) {
         return 0;
     }
-    for (uint8_t i = 0; i < role_count; i++) {
-        role_inputs[i] = inputs[roles[i]];
-    }
-    kernel(role_inputs, output, size);
+    plan->entry = kernel;
+    plan->input_count = role_count;
     return 1;
 }
 
@@ -994,12 +994,8 @@ numpy_crossjit_kernel_strided(
     uint8_t input_count, uint16_t scalar_mask, uint8_t output_slot, int typenum,
     const void *const *inputs,
     const npy_intp input_strides[][NPY_MAXDIMS], uint8_t ndim,
-    const npy_intp *dimensions, void *output, npy_intp size,
-    int allow_fast_path, NumpyCrossJitFixedPath *executed_path)
+    const npy_intp *dimensions, void *output, npy_intp size)
 {
-    if (executed_path != NULL) {
-        *executed_path = NUMPY_CROSSJIT_FIXED_GENERIC_PATH;
-    }
     if (nodes == NULL || inputs == NULL || input_strides == NULL ||
         dimensions == NULL || ndim > NPY_MAXDIMS ||
         (output == NULL && size != 0) ||
@@ -1010,15 +1006,6 @@ numpy_crossjit_kernel_strided(
         return 0;
     }
     if (typenum == NPY_DOUBLE) {
-        if (allow_fast_path && ndim == 1 &&
-            crossjit_try_double_fast_path(
-                nodes, node_count, input_count, scalar_mask, output_slot,
-                inputs, (double *)output, size)) {
-            if (executed_path != NULL) {
-                *executed_path = NUMPY_CROSSJIT_FIXED_FAST_PATH;
-            }
-            return 1;
-        }
         return crossjit_kernel_double(nodes, node_count, input_count, scalar_mask,
                                       output_slot, inputs, input_strides,
                                       ndim, dimensions, output, size);

@@ -162,6 +162,8 @@ typedef struct {
     uint64_t exec_error;
     uint64_t fixed_fast_path_hit;
     uint64_t fixed_generic_path_hit;
+    uint64_t fixed_fast_plans_built;
+    uint64_t fixed_generic_plans_built;
     uint64_t output_allocations;
     uint64_t internal_allocations;
     uint64_t guard_plans_destroyed;
@@ -307,6 +309,9 @@ struct PyJitExecPlan {
     uint8_t node_count;           /* selects a two-to-six-node loop body */
     uint8_t output_slot;          /* final virtual slot written to the ndarray */
     NumpyCrossJitKernelNode nodes[NUMPY_CROSSJIT_MAX_NODES]; /* topological DAG */
+    /* Non-NULL entry means prepare_region() completely resolved the float64
+     * contiguous signature, DAG shape, scalar roles, and operand slot map. */
+    NumpyCrossJitFixedPlan fixed;
 };
 
 /* C_NumPy is created only after HostRegionProof.  It owns every dtype,
@@ -812,6 +817,21 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
         lowered->output = plan->guards.input_count + i;
     }
     plan->output_slot = plan->guards.input_count + plan->node_count - 1;
+    if (plan->guards.iteration_class ==
+            NUMPY_CROSSJIT_CONTIGUOUS_SAME_SHAPE &&
+        plan->guards.domain.typenum == NPY_DOUBLE) {
+        if (numpy_crossjit_build_contiguous_double_plan(
+            plan->nodes, plan->node_count, plan->guards.input_count,
+            plan->guards.scalar_mask, plan->output_slot, &plan->fixed)) {
+            crossjit_stats.fixed_fast_plans_built++;
+        }
+        else {
+            crossjit_stats.fixed_generic_plans_built++;
+        }
+    }
+    else {
+        crossjit_stats.fixed_generic_plans_built++;
+    }
     if (Py_GETENV("PYTHON_JIT_CROSSJIT_DEBUG") != NULL) {
         fprintf(stderr, "NumPy CrossJIT accepted %u-node kernel:",
                 plan->node_count);
@@ -1163,89 +1183,114 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
             PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
     }
     crossjit_stats.output_allocations++;
-    const void *data[NUMPY_CROSSJIT_MAX_INPUTS];
-    npy_intp input_strides[NUMPY_CROSSJIT_MAX_INPUTS][NPY_MAXDIMS] = {{0}};
-    double scalar_double[NUMPY_CROSSJIT_MAX_INPUTS];
-    float scalar_float[NUMPY_CROSSJIT_MAX_INPUTS];
-    int linear_domain = 1;
-    for (uint8_t i = 0; i < plan->guards.input_count; i++) {
-        if (plan->guards.scalar_mask & (1u << i)) {
-            double value = plan->guards.int_scalar_mask & (1u << i) ?
-                PyLong_AsDouble(inputs[i]) : PyFloat_AS_DOUBLE(inputs[i]);
-            if (value == -1.0 && PyErr_Occurred()) {
-                PyErr_Clear();
-                Py_DECREF(output);
-                return numpy_crossjit_record_exec(
-                    PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
-            }
-            if (fact->typenum == NPY_FLOAT) {
-                scalar_float[i] = (float)value;
-                data[i] = &scalar_float[i];
+    char fp_barrier;
+    int floating = fact->typenum == NPY_FLOAT || fact->typenum == NPY_DOUBLE;
+    uint64_t kernel_started = 0;
+    int ok = 1;
+    if (plan->fixed.entry != NULL) {
+        const void *role_inputs[NUMPY_CROSSJIT_MAX_FAST_INPUTS];
+        double scalar_values[NUMPY_CROSSJIT_MAX_FAST_INPUTS];
+        for (uint8_t role = 0; role < plan->fixed.input_count; role++) {
+            uint8_t slot = plan->fixed.input_slots[role];
+            if (plan->guards.scalar_mask & (1u << slot)) {
+                double value = plan->guards.int_scalar_mask & (1u << slot) ?
+                    PyLong_AsDouble(inputs[slot]) :
+                    PyFloat_AS_DOUBLE(inputs[slot]);
+                if (value == -1.0 && PyErr_Occurred()) {
+                    PyErr_Clear();
+                    Py_DECREF(output);
+                    return numpy_crossjit_record_exec(
+                        PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
+                }
+                scalar_values[role] = value;
+                role_inputs[role] = &scalar_values[role];
             }
             else {
-                scalar_double[i] = value;
-                data[i] = &scalar_double[i];
+                role_inputs[role] = PyArray_DATA(
+                    (PyArrayObject *)inputs[slot]);
             }
         }
-        else {
-            PyArrayObject *array = (PyArrayObject *)inputs[i];
-            data[i] = PyArray_DATA(array);
-            int same_domain = PyArray_NDIM(array) == fact->ndim &&
-                memcmp(PyArray_DIMS(array), fact->dimensions,
-                       (size_t)fact->ndim * sizeof(npy_intp)) == 0;
-            if (!same_domain ||
-                (!PyArray_IS_C_CONTIGUOUS(array) && fact->ndim != 1)) {
-                linear_domain = 0;
-            }
-            int leading = (int)fact->ndim - PyArray_NDIM(array);
-            for (uint8_t axis = 0; axis < fact->ndim; axis++) {
-                int input_axis = (int)axis - leading;
-                if (input_axis < 0 || PyArray_DIM(array, input_axis) == 1) {
-                    input_strides[i][axis] = 0;
-                }
-                else {
-                    input_strides[i][axis] = PyArray_STRIDE(array, input_axis);
-                }
-            }
-        }
+        npy_clear_floatstatus_barrier(&fp_barrier);
+        kernel_started = numpy_crossjit_clock_ns();
+        plan->fixed.entry(role_inputs, (double *)PyArray_DATA(output),
+                          PyArray_SIZE(output));
+        crossjit_stats.fixed_fast_path_hit++;
     }
-    npy_intp linear_dimension = PyArray_SIZE(output);
-    if (linear_domain) {
-        /* Collapse C-contiguous arrays and one-dimensional views to the
-         * low-overhead pointer-increment loop used by the common path. */
+    else {
+        const void *data[NUMPY_CROSSJIT_MAX_INPUTS];
+        npy_intp input_strides[NUMPY_CROSSJIT_MAX_INPUTS][NPY_MAXDIMS] = {{0}};
+        double scalar_double[NUMPY_CROSSJIT_MAX_INPUTS];
+        float scalar_float[NUMPY_CROSSJIT_MAX_INPUTS];
+        int linear_domain = 1;
         for (uint8_t i = 0; i < plan->guards.input_count; i++) {
             if (plan->guards.scalar_mask & (1u << i)) {
-                input_strides[i][0] = 0;
+                double value = plan->guards.int_scalar_mask & (1u << i) ?
+                    PyLong_AsDouble(inputs[i]) : PyFloat_AS_DOUBLE(inputs[i]);
+                if (value == -1.0 && PyErr_Occurred()) {
+                    PyErr_Clear();
+                    Py_DECREF(output);
+                    return numpy_crossjit_record_exec(
+                        PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
+                }
+                if (fact->typenum == NPY_FLOAT) {
+                    scalar_float[i] = (float)value;
+                    data[i] = &scalar_float[i];
+                }
+                else {
+                    scalar_double[i] = value;
+                    data[i] = &scalar_double[i];
+                }
             }
             else {
                 PyArrayObject *array = (PyArrayObject *)inputs[i];
-                input_strides[i][0] = PyArray_IS_C_CONTIGUOUS(array) ?
-                    PyArray_ITEMSIZE(array) : PyArray_STRIDE(array, 0);
+                data[i] = PyArray_DATA(array);
+                int same_domain = PyArray_NDIM(array) == fact->ndim &&
+                    memcmp(PyArray_DIMS(array), fact->dimensions,
+                           (size_t)fact->ndim * sizeof(npy_intp)) == 0;
+                if (!same_domain ||
+                    (!PyArray_IS_C_CONTIGUOUS(array) && fact->ndim != 1)) {
+                    linear_domain = 0;
+                }
+                int leading = (int)fact->ndim - PyArray_NDIM(array);
+                for (uint8_t axis = 0; axis < fact->ndim; axis++) {
+                    int input_axis = (int)axis - leading;
+                    if (input_axis < 0 ||
+                        PyArray_DIM(array, input_axis) == 1) {
+                        input_strides[i][axis] = 0;
+                    }
+                    else {
+                        input_strides[i][axis] =
+                            PyArray_STRIDE(array, input_axis);
+                    }
+                }
             }
         }
-    }
-    char fp_barrier;
-    int floating = fact->typenum == NPY_FLOAT || fact->typenum == NPY_DOUBLE;
-    if (floating) {
-        npy_clear_floatstatus_barrier(&fp_barrier);
-    }
-    uint64_t kernel_started = numpy_crossjit_clock_ns();
-    NumpyCrossJitFixedPath executed_path = NUMPY_CROSSJIT_FIXED_GENERIC_PATH;
-    int ok = numpy_crossjit_kernel_strided(
-        plan->nodes, plan->node_count, plan->guards.input_count,
-        plan->guards.scalar_mask, plan->output_slot, fact->typenum,
-        data, input_strides, linear_domain ? 1 : fact->ndim,
-        linear_domain ? &linear_dimension : fact->dimensions,
-        PyArray_DATA(output),
-        PyArray_SIZE(output),
-        plan->guards.iteration_class ==
-            NUMPY_CROSSJIT_CONTIGUOUS_SAME_SHAPE,
-        &executed_path);
-    if (ok && executed_path == NUMPY_CROSSJIT_FIXED_FAST_PATH) {
-        crossjit_stats.fixed_fast_path_hit++;
-    }
-    else if (ok) {
-        crossjit_stats.fixed_generic_path_hit++;
+        npy_intp linear_dimension = PyArray_SIZE(output);
+        if (linear_domain) {
+            for (uint8_t i = 0; i < plan->guards.input_count; i++) {
+                if (plan->guards.scalar_mask & (1u << i)) {
+                    input_strides[i][0] = 0;
+                }
+                else {
+                    PyArrayObject *array = (PyArrayObject *)inputs[i];
+                    input_strides[i][0] = PyArray_IS_C_CONTIGUOUS(array) ?
+                        PyArray_ITEMSIZE(array) : PyArray_STRIDE(array, 0);
+                }
+            }
+        }
+        if (floating) {
+            npy_clear_floatstatus_barrier(&fp_barrier);
+        }
+        kernel_started = numpy_crossjit_clock_ns();
+        ok = numpy_crossjit_kernel_strided(
+            plan->nodes, plan->node_count, plan->guards.input_count,
+            plan->guards.scalar_mask, plan->output_slot, fact->typenum,
+            data, input_strides, linear_domain ? 1 : fact->ndim,
+            linear_domain ? &linear_dimension : fact->dimensions,
+            PyArray_DATA(output), PyArray_SIZE(output));
+        if (ok) {
+            crossjit_stats.fixed_generic_path_hit++;
+        }
     }
     if (kernel_started != 0) {
         uint64_t kernel_ended = numpy_crossjit_clock_ns();
@@ -1381,6 +1426,8 @@ numpy_crossjit_get_stats(PyObject *NPY_UNUSED(module),
     ADD_COUNTER(exec_error);
     ADD_COUNTER(fixed_fast_path_hit);
     ADD_COUNTER(fixed_generic_path_hit);
+    ADD_COUNTER(fixed_fast_plans_built);
+    ADD_COUNTER(fixed_generic_plans_built);
     ADD_COUNTER(output_allocations);
     ADD_COUNTER(internal_allocations);
     ADD_COUNTER(guard_plans_destroyed);

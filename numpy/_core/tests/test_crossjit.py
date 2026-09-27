@@ -559,6 +559,8 @@ def test_contiguous_float64_straight_line_fast_paths(node_count, expression):
     assert stats["exec_hit"] >= 1
     assert stats["fixed_fast_path_hit"] == stats["exec_hit"]
     assert stats["fixed_generic_path_hit"] == 0
+    assert stats["fixed_fast_plans_built"] == 1
+    assert stats["fixed_generic_plans_built"] == 0
     assert stats["output_allocations"] == stats["exec_hit"]
     assert stats["internal_allocations"] == 0
 
@@ -600,6 +602,8 @@ def test_contiguous_float64_branched_and_scalar_fast_paths():
         stats = provider._crossjit_stats()
         assert stats["fixed_fast_path_hit"] == stats["exec_hit"]
         assert stats["fixed_generic_path_hit"] == 0
+        assert stats["fixed_fast_plans_built"] == 1
+        assert stats["fixed_generic_plans_built"] == 0
         assert stats["output_allocations"] == stats["exec_hit"]
         assert stats["internal_allocations"] == 0
 
@@ -624,6 +628,8 @@ def test_fixed_generic_fallback_preserves_special_values():
     assert hit_stats["exec_hit"] >= 1
     assert hit_stats["fixed_fast_path_hit"] == 0
     assert hit_stats["fixed_generic_path_hit"] == hit_stats["exec_hit"]
+    assert hit_stats["fixed_fast_plans_built"] == 0
+    assert hit_stats["fixed_generic_plans_built"] == 1
 
     left = np.array([np.nan, np.inf, -np.inf, -0.0, 0.0, 3.0])
     right = np.array([1.0, np.inf, -2.0, -0.0, 0.0, np.nan])
