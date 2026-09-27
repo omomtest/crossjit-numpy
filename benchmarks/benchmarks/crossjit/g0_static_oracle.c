@@ -72,6 +72,8 @@ g0_oracle_linear_6(const double *const *inputs, double *restrict output,
     }
 }
 
+#ifndef G0_ORACLE_LIBRARY_ONLY
+
 /* Volatile temporaries make this an independent scalar operation-order oracle. */
 NOINLINE static void
 reference(const double *const *inputs, double *output, size_t size,
@@ -290,3 +292,5 @@ main(int argc, char **argv)
     }
     return 0;
 }
+
+#endif /* G0_ORACLE_LIBRARY_ONLY */
