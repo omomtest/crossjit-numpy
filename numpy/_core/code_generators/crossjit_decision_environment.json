@@ -1,0 +1,32 @@
+{
+  "artifact_format_version": 1,
+  "compiler_flags": [
+    "-std=c11",
+    "-O3",
+    "-fno-strict-aliasing",
+    "-msse",
+    "-msse2",
+    "-msse3",
+    "-mssse3",
+    "-msse4.1",
+    "-msse4.2",
+    "-mpopcnt",
+    "-msahf",
+    "-mcx16",
+    "-fPIC"
+  ],
+  "compiler_id": "gcc",
+  "compiler_version": "13.3.0",
+  "target_features": [
+    "cx16",
+    "popcnt",
+    "sahf",
+    "sse",
+    "sse2",
+    "sse3",
+    "sse4.1",
+    "sse4.2",
+    "ssse3"
+  ],
+  "target_triple": "x86_64-linux-gnu"
+}

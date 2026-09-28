@@ -87,12 +87,14 @@ def main() -> int:
     parser.add_argument("--output-h", type=Path, required=True)
     parser.add_argument("--output-json", type=Path, required=True)
     parser.add_argument("--observations", type=Path, action="append", default=[])
+    parser.add_argument("--decision-db", type=Path)
+    parser.add_argument("--decision-environment", type=Path)
     args = parser.parse_args()
 
     generator_root = args.generator_root.resolve()
     sys.path.insert(0, str(generator_root))
     import crossjit_generator
-    from crossjit_generator.backend.c import generate_bundle
+    from crossjit_generator.backend.c import CBackend, generate_bundle
     from crossjit_generator.domains.elementwise import ElementwiseOptimizer
     from crossjit_generator.signature import (
         GenerationMode,
@@ -102,6 +104,8 @@ def main() -> int:
         optimization_signature_from_ir,
         resolve_generation_requests,
     )
+    from crossjit_generator.decision import (
+        ArtifactDecision, DecisionDB, DecisionEnvironment)
 
     lowering = _load_module(
         "numpy_crossjit_lowering", Path(__file__).with_name("crossjit_lowering.py"))
@@ -146,7 +150,48 @@ def main() -> int:
             requests.append(request)
             payloads[request.request_id] = candidate
 
-    resolution = resolve_generation_requests(requests)
+    selected_hashes = None
+    decision_db_hash = None
+    decision_environment_data = None
+    if args.decision_db is not None or args.decision_environment is not None:
+        if args.decision_db is None or args.decision_environment is None:
+            raise ValueError(
+                "DecisionDB and decision environment must be supplied together")
+        decision_db_text = args.decision_db.read_text()
+        decision_db = DecisionDB.from_data(json.loads(decision_db_text))
+        decision_environment_data = json.loads(
+            args.decision_environment.read_text())
+        selected_hashes = set()
+        for request in requests:
+            environment = DecisionEnvironment(
+                provider=request.signature.provider,
+                provider_abi_version=request.signature.provider_abi_version,
+                recipe_hashes=tuple(
+                    operation.recipe_hash
+                    for operation in request.signature.operations),
+                generator_version=crossjit_generator.__version__,
+                optimizer_version=ElementwiseOptimizer.VERSION,
+                backend_version=CBackend.VERSION,
+                target_triple=decision_environment_data["target_triple"],
+                target_features=tuple(
+                    decision_environment_data["target_features"]),
+                compiler_id=decision_environment_data["compiler_id"],
+                compiler_version=decision_environment_data["compiler_version"],
+                compiler_flags=tuple(
+                    decision_environment_data["compiler_flags"]),
+                artifact_format_version=decision_environment_data[
+                    "artifact_format_version"],
+            )
+            lookup = decision_db.lookup(request.signature, environment)
+            if (lookup is not None and lookup.record is not None and
+                    lookup.state in (ArtifactDecision.AUTO_SELECTED,
+                                     ArtifactDecision.FORCED)):
+                selected_hashes.add(request.signature.stable_hash())
+        selected_hashes = frozenset(selected_hashes)
+        decision_db_hash = hashlib.sha256(
+            decision_db_text.encode("utf-8")).hexdigest()
+    resolution = resolve_generation_requests(
+        requests, auto_selected_hashes=selected_hashes)
     enabled = tuple(
         (request, payloads[request.request_id])
         for request in resolution.generated
@@ -179,6 +224,8 @@ def main() -> int:
             "unsupported_observed_signature_count": len(unsupported_observed),
             "validation_seed_count": resolution.validation_seed_count,
         },
+        "decision_db_sha256": decision_db_hash,
+        "decision_environment": decision_environment_data,
         "unsupported_observed_signatures": sorted(
             unsupported_observed, key=lambda item: item["signature_hash"]),
     })

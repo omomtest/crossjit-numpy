@@ -938,9 +938,12 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
         lowered->output = plan->guards.input_count + i;
     }
     plan->output_slot = plan->guards.input_count + plan->node_count - 1;
+    const char *disable_generated = Py_GETENV(
+        "NPY_CROSSJIT_DIAGNOSTIC_DISABLE_GENERATED");
     if (plan->guards.iteration_class ==
             NUMPY_CROSSJIT_CONTIGUOUS_SAME_SHAPE &&
-        plan->guards.domain.typenum == NPY_DOUBLE) {
+        plan->guards.domain.typenum == NPY_DOUBLE &&
+        (disable_generated == NULL || strcmp(disable_generated, "1") != 0)) {
         if (numpy_crossjit_generated_registry_lookup(
             plan->nodes, plan->node_count, plan->guards.input_count,
             plan->guards.scalar_mask, plan->output_slot, &plan->fixed)) {
