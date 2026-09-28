@@ -35,126 +35,67 @@ crossjit_max_float(float left, float right)
     return (left >= right || npy_isnan(left)) ? left : right;
 }
 
-static int
-crossjit_ops_equal(const NumpyCrossJitKernelNode *nodes,
-                   const uint8_t *ops, uint8_t node_count)
-{
-    for (uint8_t i = 0; i < node_count; i++) {
-        if (nodes[i].op != ops[i]) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-static int
-crossjit_linear_roles(const NumpyCrossJitKernelNode *nodes,
-                      uint8_t node_count, uint8_t input_count,
-                      uint8_t output_slot, uint8_t *roles)
-{
-    if (nodes[0].left >= input_count || nodes[0].right >= input_count ||
-        nodes[0].output != input_count) {
-        return 0;
-    }
-    roles[0] = nodes[0].left;
-    roles[1] = nodes[0].right;
-    for (uint8_t i = 1; i < node_count; i++) {
-        uint8_t prior = (uint8_t)(input_count + i - 1);
-        if (nodes[i].left != prior || nodes[i].right >= input_count ||
-            nodes[i].output != input_count + i) {
-            return 0;
-        }
-        roles[i + 1] = nodes[i].right;
-    }
-    return output_slot == input_count + node_count - 1;
-}
-
-int
+NumpyCrossJitPolicyDecision
 numpy_crossjit_generated_registry_lookup(
     const NumpyCrossJitKernelNode *nodes, uint8_t node_count,
     uint8_t input_count, uint16_t scalar_mask, uint8_t output_slot,
-    NumpyCrossJitFixedPlan *plan)
+    uint64_t element_count, NumpyCrossJitFixedPlan *plan)
 {
-    static const uint8_t linear_2[] = {
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY};
-    static const uint8_t linear_3[] = {
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
-        NUMPY_CROSSJIT_KERNEL_SUBTRACT};
-    static const uint8_t linear_4[] = {
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
-        NUMPY_CROSSJIT_KERNEL_SUBTRACT, NUMPY_CROSSJIT_KERNEL_TRUE_DIVIDE};
-    static const uint8_t linear_5[] = {
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
-        NUMPY_CROSSJIT_KERNEL_SUBTRACT, NUMPY_CROSSJIT_KERNEL_TRUE_DIVIDE,
-        NUMPY_CROSSJIT_KERNEL_ADD};
-    static const uint8_t linear_6[] = {
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY,
-        NUMPY_CROSSJIT_KERNEL_SUBTRACT, NUMPY_CROSSJIT_KERNEL_TRUE_DIVIDE,
-        NUMPY_CROSSJIT_KERNEL_ADD, NUMPY_CROSSJIT_KERNEL_MULTIPLY};
     if (plan == NULL) {
-        return 0;
+        return NUMPY_CROSSJIT_POLICY_ORIGINAL;
     }
     memset(plan, 0, sizeof(*plan));
-    uint8_t *roles = plan->input_slots;
-    NumpyCrossJitDoubleKernelEntry kernel = NULL;
-    uint8_t role_count = 0;
-
-    if (node_count == 3 && scalar_mask == 0 && input_count == 4 &&
-        nodes[0].op == NUMPY_CROSSJIT_KERNEL_MULTIPLY &&
-        nodes[1].op == NUMPY_CROSSJIT_KERNEL_MULTIPLY &&
-        nodes[2].op == NUMPY_CROSSJIT_KERNEL_ADD &&
-        nodes[0].left < input_count && nodes[0].right < input_count &&
-        nodes[1].left < input_count && nodes[1].right < input_count &&
-        nodes[0].output == input_count &&
-        nodes[1].output == input_count + 1 &&
-        nodes[2].left == input_count &&
-        nodes[2].right == input_count + 1 &&
-        nodes[2].output == input_count + 2 &&
-        output_slot == input_count + 2) {
-        roles[0] = nodes[0].left;
-        roles[1] = nodes[0].right;
-        roles[2] = nodes[1].left;
-        roles[3] = nodes[1].right;
-        role_count = 4;
-        kernel = numpy_crossjit_generated_registry[
-            NPY_CROSSJIT_GENERATED_BRANCHED_3_MULTIPLY_MULTIPLY_ADD].entry;
+    for (size_t policy_index = 0;
+         policy_index < NPY_CROSSJIT_PRODUCTION_POLICY_COUNT;
+         policy_index++) {
+        const NumpyCrossJitGeneratedPolicy *policy =
+            &numpy_crossjit_production_policies[policy_index];
+        if (policy->input_count != input_count ||
+            policy->node_count != node_count ||
+            policy->scalar_mask != scalar_mask ||
+            policy->output_slot != output_slot) {
+            continue;
+        }
+        int matches = 1;
+        for (uint8_t node_index = 0; node_index < node_count; node_index++) {
+            const NumpyCrossJitGeneratedPolicyNode *expected =
+                &policy->nodes[node_index];
+            if (nodes[node_index].op != expected->op ||
+                nodes[node_index].left != expected->left ||
+                nodes[node_index].right != expected->right ||
+                nodes[node_index].output != expected->output) {
+                matches = 0;
+                break;
+            }
+        }
+        if (!matches) {
+            continue;
+        }
+        for (uint8_t range_index = 0;
+             range_index < policy->range_count; range_index++) {
+            const NumpyCrossJitGeneratedPolicyRange *range =
+                &policy->ranges[range_index];
+            if (element_count < range->min_elements ||
+                element_count > range->max_elements) {
+                continue;
+            }
+            if (range->decision == NUMPY_CROSSJIT_POLICY_GENERATED &&
+                    policy->entry != NULL) {
+                plan->entry = policy->entry;
+                plan->input_count = input_count;
+                for (uint8_t i = 0; i < input_count; i++) {
+                    plan->input_slots[i] = i;
+                }
+                return NUMPY_CROSSJIT_POLICY_GENERATED;
+            }
+            if (range->decision == NUMPY_CROSSJIT_POLICY_GENERIC) {
+                return NUMPY_CROSSJIT_POLICY_GENERIC;
+            }
+            return NUMPY_CROSSJIT_POLICY_ORIGINAL;
+        }
+        return NUMPY_CROSSJIT_POLICY_ORIGINAL;
     }
-    else if (node_count >= 2 && node_count <= 6 &&
-             crossjit_linear_roles(nodes, node_count, input_count,
-                                   output_slot, roles)) {
-        role_count = (uint8_t)(node_count + 1);
-        if (scalar_mask == 0 && node_count == 2 &&
-                 crossjit_ops_equal(nodes, linear_2, 2)) {
-            kernel = numpy_crossjit_generated_registry[
-                NPY_CROSSJIT_GENERATED_LINEAR_2_ADD_MULTIPLY].entry;
-        }
-        else if (scalar_mask == 0 && node_count == 3 &&
-                 crossjit_ops_equal(nodes, linear_3, 3)) {
-            kernel = numpy_crossjit_generated_registry[
-                NPY_CROSSJIT_GENERATED_LINEAR_3_ADD_MULTIPLY_SUBTRACT].entry;
-        }
-        else if (scalar_mask == 0 && node_count == 4 &&
-                 crossjit_ops_equal(nodes, linear_4, 4)) {
-            kernel = numpy_crossjit_generated_registry[
-                NPY_CROSSJIT_GENERATED_LINEAR_4_ADD_MULTIPLY_SUBTRACT_DIVIDE].entry;
-        }
-        else if (scalar_mask == 0 && node_count == 5 &&
-                 crossjit_ops_equal(nodes, linear_5, 5)) {
-            kernel = numpy_crossjit_generated_registry[
-                NPY_CROSSJIT_GENERATED_LINEAR_5_ADD_MULTIPLY_SUBTRACT_DIVIDE_ADD].entry;
-        }
-        else if (scalar_mask == 0 && node_count == 6 &&
-                 crossjit_ops_equal(nodes, linear_6, 6)) {
-            kernel = numpy_crossjit_generated_registry[
-                NPY_CROSSJIT_GENERATED_LINEAR_6_ADD_MULTIPLY_SUBTRACT_DIVIDE_ADD_MULTIPLY].entry;
-        }
-    }
-    if (kernel == NULL) {
-        return 0;
-    }
-    plan->entry = kernel;
-    plan->input_count = role_count;
-    return 1;
+    return NUMPY_CROSSJIT_POLICY_ORIGINAL;
 }
 
 /*

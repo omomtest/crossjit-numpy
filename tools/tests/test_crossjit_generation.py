@@ -131,3 +131,37 @@ def test_observed_force_disable_union_is_bounded(tmp_path):
     assert {kernel["generation_mode"] for kernel in metadata["kernels"]} == {
         "AUTO", "FORCE"}
     assert len(metadata["kernels"]) == 6
+
+
+def test_decisiondb_selection_and_stale_environment_fail_closed(tmp_path):
+    root = Path(__file__).parents[2]
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    decision_db = (root /
+        "benchmarks/benchmarks/crossjit/results/g12/g12_decision_db.json")
+    environment = (root /
+        "numpy/_core/code_generators/crossjit_decision_environment.json")
+    outputs = (tmp_path / "selected.c", tmp_path / "selected.h",
+               tmp_path / "selected.json")
+    subprocess.run(_command(
+        root, manifest, outputs,
+        "--decision-db", decision_db,
+        "--decision-environment", environment), check=True)
+    selected = json.loads(outputs[2].read_text())
+    assert len(selected["kernels"]) == 6
+    assert len(selected["production_policies"]) == 8
+    assert selected["decision_db_sha256"] == (
+        "e91373c3ab1b035ed558542e58d64df91a58e838a405e5d12f1e6beeb14ae33c")
+
+    stale_data = json.loads(environment.read_text())
+    stale_data["compiler_version"] = "stale-compiler"
+    stale_environment = tmp_path / "stale_environment.json"
+    stale_environment.write_text(json.dumps(stale_data))
+    stale_outputs = (tmp_path / "stale.c", tmp_path / "stale.h",
+                     tmp_path / "stale.json")
+    subprocess.run(_command(
+        root, manifest, stale_outputs,
+        "--decision-db", decision_db,
+        "--decision-environment", stale_environment), check=True)
+    stale = json.loads(stale_outputs[2].read_text())
+    assert stale["kernels"] == []
+    assert stale["production_policies"] == []

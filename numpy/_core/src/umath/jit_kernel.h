@@ -39,10 +39,16 @@ typedef struct {
     uint8_t input_count;
 } NumpyCrossJitFixedPlan;
 
-int numpy_crossjit_generated_registry_lookup(
+typedef enum {
+    NUMPY_CROSSJIT_POLICY_ORIGINAL = 0,
+    NUMPY_CROSSJIT_POLICY_GENERATED = 1,
+    NUMPY_CROSSJIT_POLICY_GENERIC = 2,
+} NumpyCrossJitPolicyDecision;
+
+NumpyCrossJitPolicyDecision numpy_crossjit_generated_registry_lookup(
     const NumpyCrossJitKernelNode *nodes, uint8_t node_count,
     uint8_t input_count, uint16_t scalar_mask, uint8_t output_slot,
-    NumpyCrossJitFixedPlan *plan);
+    uint64_t element_count, NumpyCrossJitFixedPlan *plan);
 
 /* Executes a validated two-to-six-node DAG over one strided iteration domain.
  * Returns zero without publishing partial output when the program is invalid. */

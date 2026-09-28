@@ -9,6 +9,7 @@ import warnings
 # Unit tests exercise lowering independently of the production profitability
 # policy.  Dedicated subprocess tests below verify the default threshold.
 os.environ.setdefault("NPY_CROSSJIT_MIN_WORK", "0")
+os.environ.setdefault("NPY_CROSSJIT_DIAGNOSTIC_FORCE_FALLBACK", "1")
 
 import numpy as np
 import pytest
@@ -689,34 +690,67 @@ def test_minimum_maximum_special_values_remain_correct():
     assert internal.crossjit_stats()["recognized_nodes"] == 2
 
 
-def test_default_short_region_threshold_declines_tiny_arrays():
-    """The production policy leaves an unprofitable tiny DAG on NumPy ufuncs."""
+def test_production_decisiondb_policy_without_forced_admission():
+    """Generated, generic, and original choices follow measured envelopes."""
     program = r"""
 import json
 import numpy as np
 import _testinternalcapi as internal
 from numpy._core import _multiarray_umath as umath
 
-internal.crossjit_reset_stats()
-umath._crossjit_reset_stats()
-
 def fused(left, right, scale, count):
     for _ in range(count):
         result = (left + right) * scale
     return result
 
+def fused_tiny(left, right, scale, count):
+    for _ in range(count):
+        result = (left + right) * scale
+    return result
+
+def array_scalar(left, scalar, right, count):
+    for _ in range(count):
+        result = (left + scalar) * right
+    return result
+
+def scalar_array(scalar, left, right, count):
+    for _ in range(count):
+        result = (scalar * left) + right
+    return result
+
+def run(function, values, expected):
+    internal.crossjit_reset_stats()
+    umath._crossjit_reset_stats()
+    result = function(*values, internal.TIER2_THRESHOLD * 2)
+    np.testing.assert_array_equal(result, expected)
+    return {
+        "host": internal.crossjit_stats(),
+        "provider": umath._crossjit_stats(),
+    }
+
 left = np.arange(32.0)
-right = left + 1
-scale = left + 2
-result = fused(left, right, scale, internal.TIER2_THRESHOLD * 2)
-np.testing.assert_array_equal(result, (left + right) * scale)
+generated = run(fused, (left, left + 1, left + 2),
+                (left + left + 1) * (left + 2))
+
+tiny = np.arange(8.0)
+unmeasured = run(fused_tiny, (tiny, tiny + 1, tiny + 2),
+                 (tiny + tiny + 1) * (tiny + 2))
+
+medium = np.arange(256.0)
+generic_profitable = run(array_scalar, (medium, 0.25, medium + 1),
+                         (medium + 0.25) * (medium + 1))
+generic_regressive = run(scalar_array, (0.25, medium, medium + 1),
+                         0.25 * medium + medium + 1)
 print(json.dumps({
-    "host": internal.crossjit_stats(),
-    "provider": umath._crossjit_stats(),
+    "generated": generated,
+    "unmeasured": unmeasured,
+    "generic_profitable": generic_profitable,
+    "generic_regressive": generic_regressive,
 }))
 """
     env = os.environ.copy()
     env.pop("NPY_CROSSJIT_MIN_WORK", None)
+    env.pop("NPY_CROSSJIT_DIAGNOSTIC_FORCE_FALLBACK", None)
     env["NPY_CROSSJIT_DIAGNOSTICS"] = "1"
     completed = subprocess.run(
         [sys.executable, "-c", program],
@@ -726,20 +760,26 @@ print(json.dumps({
         env=env,
     )
     stats = json.loads(completed.stdout)
-    host = stats["host"]
-    provider = stats["provider"]
-    assert host["recognized_nodes"] == 2
-    assert host["host_regions_proven"] == 1
-    assert host["formed_regions"] == 1
-    assert host["rewritten_regions"] == 0
-    assert host["exec_hits"] == 0
-    assert provider["regions_prepare_called"] == 1
-    assert provider["regions_provider_accepted"] == 0
-    assert provider["regions_rejected_unprofitable"] == 1
-    assert provider["regions_executed"] == 0
-    assert provider["last_candidate"]["region_length"] == 2
-    assert provider["last_candidate"]["element_count"] == 32
-    assert provider["last_candidate"]["prepare_decision"] == 4
+
+    generated = stats["generated"]
+    assert generated["host"]["rewritten_regions"] == 1
+    assert generated["provider"]["generated_registry_hit"] == 1
+    assert generated["provider"]["generated_exec_hit"] >= 1
+
+    unmeasured = stats["unmeasured"]
+    assert unmeasured["host"]["rewritten_regions"] == 0
+    assert unmeasured["provider"]["regions_rejected_unprofitable"] == 1
+    assert unmeasured["provider"]["regions_executed"] == 0
+
+    generic = stats["generic_profitable"]
+    assert generic["host"]["rewritten_regions"] == 1
+    assert generic["provider"]["generated_registry_hit"] == 0
+    assert generic["provider"]["generic_fallback_hit"] >= 1
+
+    regressive = stats["generic_regressive"]
+    assert regressive["host"]["rewritten_regions"] == 0
+    assert regressive["provider"]["regions_rejected_unprofitable"] == 1
+    assert regressive["provider"]["generic_fallback_hit"] == 0
 
 
 def test_exact_python_int_scalars_and_range_guard():

@@ -49,9 +49,10 @@ typedef enum {
  * One work unit represents one eliminated intermediate-array element.  The
  * default keeps short regions on NumPy's mature ufunc loops, while allowing
  * a larger DAG to amortize dispatch and allocation costs at a smaller array
- * size.  NPY_CROSSJIT_MIN_WORK=0 disables the profitability threshold.
+ * size.  The historical global threshold is no longer production policy;
+ * NPY_CROSSJIT_MIN_WORK remains a diagnostic/test override only.
  */
-#define NUMPY_CROSSJIT_DEFAULT_MIN_WORK UINT64_C(16384)
+#define NUMPY_CROSSJIT_DEFAULT_MIN_WORK UINT64_C(0)
 
 typedef struct {
     /* Borrowed exact callable identities owned by the initialized umath
@@ -147,9 +148,10 @@ typedef struct {
 
 typedef enum {
     NUMPY_CROSSJIT_OBSERVED_PREPARE = 0,
-    NUMPY_CROSSJIT_OBSERVED_EXECUTION = 1,
-    NUMPY_CROSSJIT_OBSERVED_GENERATED = 2,
-    NUMPY_CROSSJIT_OBSERVED_GENERIC = 3,
+    NUMPY_CROSSJIT_OBSERVED_ACCEPTED = 1,
+    NUMPY_CROSSJIT_OBSERVED_EXECUTION = 2,
+    NUMPY_CROSSJIT_OBSERVED_GENERATED = 3,
+    NUMPY_CROSSJIT_OBSERVED_GENERIC = 4,
 } NumpyCrossJitObservedEvent;
 
 typedef struct {
@@ -411,6 +413,8 @@ numpy_crossjit_record_observed_signature(
     switch (event) {
         case NUMPY_CROSSJIT_OBSERVED_PREPARE:
             observed->prepare_count++;
+            break;
+        case NUMPY_CROSSJIT_OBSERVED_ACCEPTED:
             observed->accepted_count++;
             break;
         case NUMPY_CROSSJIT_OBSERVED_EXECUTION: {
@@ -938,29 +942,47 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
         lowered->output = plan->guards.input_count + i;
     }
     plan->output_slot = plan->guards.input_count + plan->node_count - 1;
-    const char *disable_generated = Py_GETENV(
-        "NPY_CROSSJIT_DIAGNOSTIC_DISABLE_GENERATED");
+    numpy_crossjit_record_observed_signature(
+        plan, NUMPY_CROSSJIT_OBSERVED_PREPARE);
+    NumpyCrossJitPolicyDecision policy = NUMPY_CROSSJIT_POLICY_ORIGINAL;
     if (plan->guards.iteration_class ==
             NUMPY_CROSSJIT_CONTIGUOUS_SAME_SHAPE &&
-        plan->guards.domain.typenum == NPY_DOUBLE &&
-        (disable_generated == NULL || strcmp(disable_generated, "1") != 0)) {
-        if (numpy_crossjit_generated_registry_lookup(
+        plan->guards.domain.typenum == NPY_DOUBLE) {
+        policy = numpy_crossjit_generated_registry_lookup(
             plan->nodes, plan->node_count, plan->guards.input_count,
-            plan->guards.scalar_mask, plan->output_slot, &plan->fixed)) {
-            crossjit_stats.fixed_fast_plans_built++;
-            crossjit_stats.generated_registry_hit++;
-        }
-        else {
-            crossjit_stats.fixed_generic_plans_built++;
-            crossjit_stats.generated_registry_miss++;
-        }
+            plan->guards.scalar_mask, plan->output_slot, elements,
+            &plan->fixed);
     }
-    else {
+    const char *disable_generated = Py_GETENV(
+        "NPY_CROSSJIT_DIAGNOSTIC_DISABLE_GENERATED");
+    if (policy == NUMPY_CROSSJIT_POLICY_GENERATED &&
+            disable_generated != NULL && strcmp(disable_generated, "1") == 0) {
+        memset(&plan->fixed, 0, sizeof(plan->fixed));
+        policy = NUMPY_CROSSJIT_POLICY_GENERIC;
+    }
+    const char *force_fallback = Py_GETENV(
+        "NPY_CROSSJIT_DIAGNOSTIC_FORCE_FALLBACK");
+    if (policy == NUMPY_CROSSJIT_POLICY_ORIGINAL &&
+            force_fallback != NULL && strcmp(force_fallback, "1") == 0) {
+        policy = NUMPY_CROSSJIT_POLICY_GENERIC;
+    }
+    if (policy == NUMPY_CROSSJIT_POLICY_GENERATED) {
+        crossjit_stats.fixed_fast_plans_built++;
+        crossjit_stats.generated_registry_hit++;
+    }
+    else if (policy == NUMPY_CROSSJIT_POLICY_GENERIC) {
         crossjit_stats.fixed_generic_plans_built++;
         crossjit_stats.generated_registry_miss++;
     }
+    else {
+        crossjit_stats.generated_registry_miss++;
+        numpy_crossjit_lowering_reject(
+            NUMPY_CROSSJIT_REJECT_UNPROFITABLE,
+            "DecisionDB has no measured-profitable runtime path");
+        return PYJIT_PREPARE_UNPROFITABLE;
+    }
     numpy_crossjit_record_observed_signature(
-        plan, NUMPY_CROSSJIT_OBSERVED_PREPARE);
+        plan, NUMPY_CROSSJIT_OBSERVED_ACCEPTED);
     if (Py_GETENV("PYTHON_JIT_CROSSJIT_DEBUG") != NULL) {
         fprintf(stderr, "NumPy CrossJIT accepted %u-node kernel:",
                 plan->node_count);

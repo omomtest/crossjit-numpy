@@ -32,7 +32,8 @@ def _registry_name(signature_id: str) -> str:
     return f"NPY_CROSSJIT_GENERATED_{normalized}"
 
 
-def _add_numpy_registry(header: str, source: str, kernels: list[dict]):
+def _add_numpy_registry(
+        header: str, source: str, kernels: list[dict], policies: list[dict]):
     """Emit a NumPy-owned static registry around generic generated kernels."""
 
     ordered = sorted(kernels, key=lambda kernel: kernel["signature_id"])
@@ -58,6 +59,27 @@ def _add_numpy_registry(header: str, source: str, kernels: list[dict]):
         "extern const NumpyCrossJitGeneratedKernel",
         "    numpy_crossjit_generated_registry[NPY_CROSSJIT_GENERATED_COUNT];",
         "",
+        "typedef struct {",
+        "    unsigned char op, left, right, output;",
+        "} NumpyCrossJitGeneratedPolicyNode;",
+        "typedef struct {",
+        "    unsigned long long min_elements, max_elements;",
+        "    unsigned char decision;",
+        "} NumpyCrossJitGeneratedPolicyRange;",
+        "typedef struct {",
+        "    const char *signature_hash;",
+        "    unsigned char input_count, node_count;",
+        "    unsigned short scalar_mask;",
+        "    unsigned char output_slot, range_count;",
+        "    NumpyCrossJitGeneratedPolicyNode nodes[6];",
+        "    NumpyCrossJitGeneratedPolicyRange ranges[13];",
+        "    NumpyCrossJitGeneratedKernelEntry entry;",
+        "} NumpyCrossJitGeneratedPolicy;",
+        f"#define NPY_CROSSJIT_PRODUCTION_POLICY_COUNT {len(policies)}",
+        "extern const NumpyCrossJitGeneratedPolicy",
+        "    numpy_crossjit_production_policies[",
+        "        NPY_CROSSJIT_PRODUCTION_POLICY_COUNT];",
+        "",
     ))
     marker = "#endif /* GENERATED_CROSSJIT_KERNELS_H */"
     if marker not in header:
@@ -73,6 +95,47 @@ def _add_numpy_registry(header: str, source: str, kernels: list[dict]):
         "const NumpyCrossJitGeneratedKernel",
         "numpy_crossjit_generated_registry[NPY_CROSSJIT_GENERATED_COUNT] = {",
         *registry_rows,
+        "};",
+        "",
+    ))
+    operation_codes = {
+        "numpy.add": 0,
+        "numpy.subtract": 1,
+        "numpy.multiply": 2,
+        "numpy.true_divide": 3,
+    }
+    policy_rows = []
+    for policy in sorted(policies, key=lambda item: item["signature_hash"]):
+        signature = policy["signature"]
+        nodes = []
+        for index, operation in enumerate(signature["operations"]):
+            operands = operation["operands"]
+            nodes.append(
+                "{" + ", ".join(map(str, (
+                    operation_codes[operation["operation_id"]], operands[0],
+                    operands[1], signature["input_count"] + index))) + "}")
+        ranges = [
+            "{" + f"{point['min_elements']}ULL, "
+            f"{point['max_elements']}ULL, {policy['runtime_codes'][index]}" + "}"
+            for index, point in enumerate(policy["points"])
+        ]
+        policy_rows.append("\n".join((
+            "    {",
+            f'        "{policy["signature_hash"]}",',
+            f"        {signature['input_count']}, "
+            f"{len(signature['operations'])}, {signature['scalar_mask']},",
+            f"        {signature['input_count'] + len(signature['operations']) - 1}, "
+            f"{len(ranges)},",
+            "        {" + ", ".join(nodes) + "},",
+            "        {" + ", ".join(ranges) + "},",
+            f"        {policy['symbol'] or 'NULL'},",
+            "    },",
+        )))
+    source += "\n" + "\n".join((
+        "const NumpyCrossJitGeneratedPolicy",
+        "numpy_crossjit_production_policies[",
+        "        NPY_CROSSJIT_PRODUCTION_POLICY_COUNT] = {",
+        *policy_rows,
         "};",
         "",
     ))
@@ -153,6 +216,7 @@ def main() -> int:
     selected_hashes = None
     decision_db_hash = None
     decision_environment_data = None
+    production_records = []
     if args.decision_db is not None or args.decision_environment is not None:
         if args.decision_db is None or args.decision_environment is None:
             raise ValueError(
@@ -162,6 +226,29 @@ def main() -> int:
         decision_environment_data = json.loads(
             args.decision_environment.read_text())
         selected_hashes = set()
+        for record in decision_db.records():
+            environment = DecisionEnvironment(
+                provider=record.signature.provider,
+                provider_abi_version=record.signature.provider_abi_version,
+                recipe_hashes=tuple(
+                    operation.recipe_hash
+                    for operation in record.signature.operations),
+                generator_version=crossjit_generator.__version__,
+                optimizer_version=ElementwiseOptimizer.VERSION,
+                backend_version=CBackend.VERSION,
+                target_triple=decision_environment_data["target_triple"],
+                target_features=tuple(
+                    decision_environment_data["target_features"]),
+                compiler_id=decision_environment_data["compiler_id"],
+                compiler_version=decision_environment_data["compiler_version"],
+                compiler_flags=tuple(
+                    decision_environment_data["compiler_flags"]),
+                artifact_format_version=decision_environment_data[
+                    "artifact_format_version"],
+            )
+            lookup = decision_db.lookup(record.signature, environment)
+            if lookup is not None and lookup.record is not None:
+                production_records.append(lookup.record)
         for request in requests:
             environment = DecisionEnvironment(
                 provider=request.signature.provider,
@@ -237,8 +324,26 @@ def main() -> int:
         kernel["optimization_signature_hash"] = (
             request.signature.stable_hash())
         kernel["signature_id"] = request.request_id
+    symbols = {
+        kernel["optimization_signature_hash"]: kernel["symbol"]
+        for kernel in metadata["kernels"]
+    }
+    runtime_codes = {"ORIGINAL": 0, "GENERATED": 1, "GENERIC_FALLBACK": 2}
+    policies = []
+    for record in production_records:
+        policies.append({
+            "artifact_decision": record.artifact_decision.value,
+            "points": [point.to_data()
+                       for point in record.profitability.points],
+            "runtime_codes": [runtime_codes[point.decision.value]
+                              for point in record.profitability.points],
+            "signature": record.signature.to_data(),
+            "signature_hash": record.signature.stable_hash(),
+            "symbol": symbols.get(record.signature.stable_hash()),
+        })
+    metadata["production_policies"] = policies
     header_text, source_text = _add_numpy_registry(
-        bundle.header, bundle.source, metadata["kernels"])
+        bundle.header, bundle.source, metadata["kernels"], policies)
     metadata_text = json.dumps(
         metadata, ensure_ascii=True, indent=2, sort_keys=True) + "\n"
 
