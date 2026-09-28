@@ -89,6 +89,8 @@ def test_provider_optimization_funnel_telemetry(monkeypatch):
     assert sum(observed["prepare_element_buckets"]) == 1
     assert observed["refined_layout_class"] == 1  # FULL_CONTIGUOUS
     assert observed["iteration_rank_class"] == 1
+    assert observed["iteration_descriptor_version"] == 1
+    assert observed["outer_shape_class"] == 0  # NONE for flat iteration
     assert observed["outer_count"] == 1
     assert observed["inner_extent"] == 64
     assert observed["access_kinds"] == (1, 1, 1)  # CONTIGUOUS

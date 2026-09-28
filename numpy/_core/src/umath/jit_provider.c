@@ -117,6 +117,55 @@ typedef enum {
     NUMPY_CROSSJIT_ACCESS_GENERAL_STRIDED = 5,
 } NumpyCrossJitProfileAccessKind;
 
+/* Versioned Provider projection consumed by generated iteration backends.
+ * The historical execution class and canonical signature remain unchanged;
+ * this descriptor makes their concrete iteration meaning explicit. */
+#define NUMPY_CROSSJIT_ITERATION_DESCRIPTOR_VERSION 1
+
+typedef enum {
+    NUMPY_CROSSJIT_ITERATION_FLAT = 1,
+    NUMPY_CROSSJIT_ITERATION_OUTER_INNER = 2,
+} NumpyCrossJitIterationRankClass;
+
+typedef enum {
+    NUMPY_CROSSJIT_OUTER_NONE = 0,
+    NUMPY_CROSSJIT_OUTER_AFFINE_ROWS = 1,
+    NUMPY_CROSSJIT_OUTER_GENERAL = 2,
+} NumpyCrossJitOuterShapeClass;
+
+typedef enum {
+    NUMPY_CROSSJIT_BROADCAST_NONE = 0,
+    NUMPY_CROSSJIT_BROADCAST_SCALAR = 1,
+    NUMPY_CROSSJIT_BROADCAST_INNER = 2,
+    NUMPY_CROSSJIT_BROADCAST_OUTER = 3,
+    NUMPY_CROSSJIT_BROADCAST_MULTIPLE = 4,
+} NumpyCrossJitBroadcastRelation;
+
+typedef struct {
+    uint8_t logical_input_slot;
+    uint8_t access_kind;       /* CONTIGUOUS/SCALAR/ZERO_STRIDE/FIXED_STRIDE */
+    uint8_t broadcast_relation;
+    npy_intp inner_stride;     /* bytes; zero for scalar/inner broadcast */
+    npy_intp outer_stride;     /* bytes for affine rows, otherwise zero */
+} NumpyCrossJitOperandDescriptor;
+
+typedef struct {
+    uint8_t access_kind;
+    npy_intp inner_stride;
+    npy_intp outer_stride;
+} NumpyCrossJitOutputDescriptor;
+
+typedef struct {
+    uint8_t version;
+    uint8_t iteration_rank_class;
+    uint8_t outer_shape_class;
+    uint8_t operand_count;
+    uint64_t outer_count;
+    uint64_t inner_extent;
+    NumpyCrossJitOperandDescriptor operands[NUMPY_CROSSJIT_MAX_INPUTS];
+    NumpyCrossJitOutputDescriptor output;
+} NumpyCrossJitIterationDescriptor;
+
 typedef enum {
     NUMPY_CROSSJIT_REJECT_NONE = 0,
     NUMPY_CROSSJIT_REJECT_LIVE_INS,
@@ -193,6 +242,8 @@ typedef struct {
     uint8_t refined_layout_class;
     uint8_t iteration_rank_class;
     uint8_t access_kinds[NUMPY_CROSSJIT_MAX_INPUTS];
+    uint8_t iteration_descriptor_version;
+    uint8_t outer_shape_class;
     uint16_t scalar_mask;
     NumpyCrossJitKernelNode nodes[6];
 } NumpyCrossJitObservedSignature;
@@ -380,6 +431,7 @@ struct PyJitGuardPlan {
     uint16_t int_scalar_mask;     /* scalar positions needing exact int checks */
     uint64_t outer_count;
     uint64_t inner_extent;
+    NumpyCrossJitIterationDescriptor iteration;
     NumpyCrossJitArrayFact domain; /* common output dtype, shape, and layout */
     NumpyCrossJitArrayFact inputs[NUMPY_CROSSJIT_MAX_INPUTS]; /* array contracts */
 };
@@ -412,6 +464,10 @@ numpy_crossjit_observed_signature_equal(
             plan->guards.refined_layout_class &&
         observed->iteration_rank_class ==
             plan->guards.iteration_rank_class &&
+        observed->iteration_descriptor_version ==
+            plan->guards.iteration.version &&
+        observed->outer_shape_class ==
+            plan->guards.iteration.outer_shape_class &&
         observed->scalar_mask == plan->guards.scalar_mask &&
         memcmp(observed->access_kinds, plan->guards.access_kinds,
                (size_t)plan->guards.input_count) == 0 &&
@@ -455,6 +511,10 @@ numpy_crossjit_record_observed_signature(
             plan->guards.iteration_rank_class;
         observed->outer_count = plan->guards.outer_count;
         observed->inner_extent = plan->guards.inner_extent;
+        observed->iteration_descriptor_version =
+            plan->guards.iteration.version;
+        observed->outer_shape_class =
+            plan->guards.iteration.outer_shape_class;
         memcpy(observed->access_kinds, plan->guards.access_kinds,
                (size_t)plan->guards.input_count);
         observed->scalar_mask = plan->guards.scalar_mask;
@@ -822,6 +882,7 @@ numpy_crossjit_classify_profile_layout(const PyJitRegionView *region,
     int all_fully_contiguous = 1;
     int all_inner_contiguous = domain_ndim != 0;
     int all_fixed_affine = domain_ndim == 1;
+    npy_intp domain_itemsize = 0;
     for (uint8_t i = 0; i < guards->input_count; i++) {
         if (guards->scalar_mask & (1u << i)) {
             guards->access_kinds[i] = NUMPY_CROSSJIT_ACCESS_SCALAR;
@@ -832,6 +893,9 @@ numpy_crossjit_classify_profile_layout(const PyJitRegionView *region,
         const PyJitRegionValue *region_input = PyJit_RegionGetInput(region, i);
         PyArrayObject *array = (PyArrayObject *)
             PyJit_ValueGetObservedObject(region_input->value);
+        if (domain_itemsize == 0) {
+            domain_itemsize = PyArray_ITEMSIZE(array);
+        }
         int leading = (int)domain_ndim - input->ndim;
         int broadcast = 0;
         int exact_domain = input->ndim == domain_ndim;
@@ -899,6 +963,66 @@ numpy_crossjit_classify_profile_layout(const PyJitRegionView *region,
         guards->refined_layout_class =
             NUMPY_CROSSJIT_PROFILE_TRULY_GENERAL_STRIDED;
     }
+
+    NumpyCrossJitIterationDescriptor *descriptor = &guards->iteration;
+    memset(descriptor, 0, sizeof(*descriptor));
+    descriptor->version = NUMPY_CROSSJIT_ITERATION_DESCRIPTOR_VERSION;
+    descriptor->iteration_rank_class = domain_ndim <= 1 ?
+        NUMPY_CROSSJIT_ITERATION_FLAT :
+        NUMPY_CROSSJIT_ITERATION_OUTER_INNER;
+    descriptor->outer_shape_class = domain_ndim <= 1 ?
+        NUMPY_CROSSJIT_OUTER_NONE :
+        (domain_ndim == 2 ? NUMPY_CROSSJIT_OUTER_AFFINE_ROWS :
+         NUMPY_CROSSJIT_OUTER_GENERAL);
+    descriptor->operand_count = guards->input_count;
+    descriptor->outer_count = guards->outer_count;
+    descriptor->inner_extent = guards->inner_extent;
+    for (uint8_t i = 0; i < guards->input_count; i++) {
+        NumpyCrossJitOperandDescriptor *operand = &descriptor->operands[i];
+        operand->logical_input_slot = i;
+        if (guards->scalar_mask & (1u << i)) {
+            operand->access_kind = NUMPY_CROSSJIT_ACCESS_SCALAR;
+            operand->broadcast_relation = NUMPY_CROSSJIT_BROADCAST_SCALAR;
+            continue;
+        }
+        const NumpyCrossJitArrayFact *input = &guards->inputs[i];
+        int leading = (int)domain_ndim - input->ndim;
+        int inner_axis = (int)domain_ndim - 1 - leading;
+        int inner_broadcast = domain_ndim != 0 &&
+            (inner_axis < 0 ||
+             (input->dimensions[inner_axis] == 1 &&
+              guards->domain.dimensions[domain_ndim - 1] != 1));
+        int outer_broadcast = 0;
+        int broadcast_axes = inner_broadcast;
+        for (uint8_t axis = 0; axis + 1 < domain_ndim; axis++) {
+            int input_axis = (int)axis - leading;
+            int broadcast = input_axis < 0 ||
+                (input->dimensions[input_axis] == 1 &&
+                 guards->domain.dimensions[axis] != 1);
+            outer_broadcast |= broadcast;
+            broadcast_axes += broadcast;
+        }
+        operand->access_kind = guards->access_kinds[i] <=
+            NUMPY_CROSSJIT_ACCESS_FIXED_STRIDE ?
+            guards->access_kinds[i] : 0;
+        operand->broadcast_relation = broadcast_axes > 1 ?
+            NUMPY_CROSSJIT_BROADCAST_MULTIPLE :
+            (inner_broadcast ? NUMPY_CROSSJIT_BROADCAST_INNER :
+             (outer_broadcast ? NUMPY_CROSSJIT_BROADCAST_OUTER :
+              NUMPY_CROSSJIT_BROADCAST_NONE));
+        operand->inner_stride = inner_broadcast || domain_ndim == 0 ? 0 :
+            input->strides[inner_axis];
+        if (domain_ndim == 2) {
+            int outer_axis = -leading;
+            operand->outer_stride = outer_axis < 0 || outer_broadcast ? 0 :
+                input->strides[outer_axis];
+        }
+    }
+    descriptor->output.access_kind = NUMPY_CROSSJIT_ACCESS_CONTIGUOUS;
+    descriptor->output.inner_stride = domain_itemsize;
+    descriptor->output.outer_stride = domain_ndim <= 1 ? 0 :
+        (npy_intp)(descriptor->inner_extent *
+                   (uint64_t)descriptor->output.inner_stride);
 }
 
 /* Copies and cross-checks the exact array contract for every region input. */
@@ -1812,6 +1936,8 @@ numpy_crossjit_observed_signature_dict(
     ADD_OBSERVED(layout_class);
     ADD_OBSERVED(refined_layout_class);
     ADD_OBSERVED(iteration_rank_class);
+    ADD_OBSERVED(iteration_descriptor_version);
+    ADD_OBSERVED(outer_shape_class);
     ADD_OBSERVED(outer_count);
     ADD_OBSERVED(inner_extent);
     ADD_OBSERVED(scalar_mask);
