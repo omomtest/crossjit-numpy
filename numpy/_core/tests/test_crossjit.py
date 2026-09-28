@@ -85,6 +85,13 @@ def test_provider_optimization_funnel_telemetry(monkeypatch):
     assert observed["max_elements"] == 64
     assert len(observed["element_buckets"]) == 14
     assert sum(observed["element_buckets"]) == observed["execution_count"]
+    assert len(observed["prepare_element_buckets"]) == 14
+    assert sum(observed["prepare_element_buckets"]) == 1
+    assert observed["refined_layout_class"] == 1  # FULL_CONTIGUOUS
+    assert observed["iteration_rank_class"] == 1
+    assert observed["outer_count"] == 1
+    assert observed["inner_extent"] == 64
+    assert observed["access_kinds"] == (1, 1, 1)  # CONTIGUOUS
     assert "benchmark" not in json.dumps(observed).lower()
 
     candidate = stats["last_candidate"]
@@ -295,6 +302,37 @@ def test_provider_rejection_retries_a_shorter_host_region():
     provider_stats = provider._crossjit_stats()
     assert provider_stats["regions_rejected_unsupported_node"] >= 1
     assert provider_stats["regions_provider_accepted"] == 1
+
+
+def test_profile_telemetry_identifies_unsupported_operation(monkeypatch):
+    """Diagnostic coverage retains unsupported atomic operation identity."""
+    internal = _runtime()
+    provider = _provider_runtime()
+    monkeypatch.setenv("NPY_CROSSJIT_DIAGNOSTICS", "1")
+    internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
+
+    def partially_supported(left, right, scale, exponent, count):
+        for _ in range(count):
+            result = ((left + right) * scale) ** exponent
+        return result
+
+    left = np.arange(1.0, 17.0)
+    result = partially_supported(
+        left, left + 1, left + 2, np.full_like(left, 2.0),
+        internal.TIER2_THRESHOLD * 2)
+    np.testing.assert_array_equal(
+        result, ((left + left + 1) * (left + 2)) ** 2.0)
+
+    stats = provider._crossjit_stats()
+    assert stats["unsupported_node_records_dropped"] == 0
+    assert len(stats["unsupported_nodes"]) == 1
+    record = stats["unsupported_nodes"][0]
+    assert record["semantic_id"] == 5  # numpy.power
+    assert record["occurrence_count"] >= 1
+    assert record["dtype_class"] == 2
+    assert record["refined_layout_class"] == 1
+    assert record["region_length"] == 3
 
 
 def test_provider_reports_unsupported_contract():
