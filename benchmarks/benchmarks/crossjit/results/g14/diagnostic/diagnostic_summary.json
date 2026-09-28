@@ -1,0 +1,2170 @@
+{
+  "configuration": {
+    "detailed_telemetry": true,
+    "openblas_num_threads": "6",
+    "preset": "S",
+    "python": "/home/dualz/crossjit-workspace/crossjit/bin/python3.16",
+    "python_jit": "1",
+    "python_jit_crossjit": "1",
+    "repeat": 100,
+    "suite": "/home/dualz/cpython-workspace/crossjit_bench_env/harness/suites/npbench/suite.json"
+  },
+  "correct_count": 53,
+  "elapsed_seconds": 114.445669,
+  "observed_structural_signatures": [
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 1,
+      "max_elements": 3198,
+      "min_elements": 3198,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 0,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 2,
+      "scalar_mask": 4,
+      "workloads": [
+        "jacobi_1d"
+      ]
+    },
+    {
+      "accepted_count": 5,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        199828,
+        0,
+        0,
+        0,
+        0,
+        0,
+        102859,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 302687,
+      "generated_hit_count": 302687,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 1,
+      "max_elements": 3481,
+      "min_elements": 59,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 1,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 5,
+      "scalar_mask": 4,
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "accepted_count": 1,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        50844,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 50844,
+      "generated_hit_count": 50844,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 1,
+      "max_elements": 98,
+      "min_elements": 98,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 0,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 1,
+      "scalar_mask": 1,
+      "workloads": [
+        "adi"
+      ]
+    },
+    {
+      "accepted_count": 10,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        1086872,
+        0,
+        0,
+        0,
+        0,
+        0,
+        551535,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 1638407,
+      "generated_hit_count": 1638407,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 1,
+      "max_elements": 3481,
+      "min_elements": 59,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 0,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 10,
+      "scalar_mask": 2,
+      "workloads": [
+        "cavity_flow",
+        "channel_flow"
+      ]
+    },
+    {
+      "accepted_count": 1,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        50844,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 50844,
+      "generated_hit_count": 50844,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 1,
+      "max_elements": 98,
+      "min_elements": 98,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 1,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 1,
+      "scalar_mask": 1,
+      "workloads": [
+        "adi"
+      ]
+    },
+    {
+      "accepted_count": 3,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1518,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 1518,
+      "generated_hit_count": 1518,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 1,
+      "max_elements": 625,
+      "min_elements": 625,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 3,
+      "scalar_mask": 4,
+      "workloads": [
+        "nbody"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 4,
+      "max_elements": 21904,
+      "min_elements": 21904,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 0,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 2,
+      "scalar_mask": 4,
+      "workloads": [
+        "jacobi_2d"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 4,
+      "max_elements": 3481,
+      "min_elements": 3481,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 1,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 2,
+      "scalar_mask": 0,
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 4,
+      "max_elements": 3481,
+      "min_elements": 3481,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 1,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 4,
+      "scalar_mask": 1,
+      "workloads": [
+        "cavity_flow",
+        "channel_flow"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 5,
+      "max_elements": 3600,
+      "min_elements": 59,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 0,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 4,
+      "scalar_mask": 4,
+      "workloads": [
+        "channel_flow",
+        "vadv"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 5,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 0,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 3,
+          "op": 0,
+          "output": 4,
+          "right": 2
+        }
+      ],
+      "prepare_count": 1,
+      "scalar_mask": 0,
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 5,
+      "max_elements": 3600,
+      "min_elements": 59,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 1,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 4,
+      "scalar_mask": 0,
+      "workloads": [
+        "channel_flow",
+        "vadv"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 5,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 1,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 1,
+      "scalar_mask": 4,
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 5,
+      "max_elements": 98,
+      "min_elements": 98,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 0,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 1,
+      "scalar_mask": 1,
+      "workloads": [
+        "adi"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 5,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 1,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 1,
+      "scalar_mask": 0,
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 5,
+      "max_elements": 98,
+      "min_elements": 59,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 1,
+          "output": 4,
+          "right": 3
+        }
+      ],
+      "prepare_count": 13,
+      "scalar_mask": 1,
+      "workloads": [
+        "adi",
+        "channel_flow"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 3,
+      "layout_class": 5,
+      "max_elements": 98,
+      "min_elements": 98,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 3,
+          "right": 1
+        },
+        {
+          "left": 3,
+          "op": 0,
+          "output": 4,
+          "right": 2
+        }
+      ],
+      "prepare_count": 2,
+      "scalar_mask": 5,
+      "workloads": [
+        "adi"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 4,
+      "layout_class": 1,
+      "max_elements": 3481,
+      "min_elements": 59,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 3,
+          "output": 4,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 0,
+          "output": 5,
+          "right": 4
+        },
+        {
+          "left": 3,
+          "op": 2,
+          "output": 6,
+          "right": 5
+        }
+      ],
+      "prepare_count": 6,
+      "scalar_mask": 10,
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 4,
+      "layout_class": 1,
+      "max_elements": 3481,
+      "min_elements": 3481,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 3,
+          "output": 4,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 5,
+          "right": 4
+        },
+        {
+          "left": 3,
+          "op": 1,
+          "output": 6,
+          "right": 5
+        }
+      ],
+      "prepare_count": 2,
+      "scalar_mask": 6,
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 4,
+      "layout_class": 5,
+      "max_elements": 59,
+      "min_elements": 59,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 1,
+          "output": 4,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 5,
+          "right": 4
+        },
+        {
+          "left": 3,
+          "op": 1,
+          "output": 6,
+          "right": 5
+        }
+      ],
+      "prepare_count": 5,
+      "scalar_mask": 0,
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 4,
+      "layout_class": 5,
+      "max_elements": 59,
+      "min_elements": 59,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 1,
+          "output": 4,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 2,
+          "output": 5,
+          "right": 4
+        },
+        {
+          "left": 3,
+          "op": 1,
+          "output": 6,
+          "right": 5
+        }
+      ],
+      "prepare_count": 2,
+      "scalar_mask": 4,
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 4,
+      "layout_class": 5,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 4,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 1,
+          "output": 5,
+          "right": 4
+        },
+        {
+          "left": 3,
+          "op": 3,
+          "output": 6,
+          "right": 5
+        }
+      ],
+      "prepare_count": 1,
+      "scalar_mask": 8,
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 4,
+      "layout_class": 5,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 4,
+          "right": 1
+        },
+        {
+          "left": 2,
+          "op": 1,
+          "output": 5,
+          "right": 4
+        },
+        {
+          "left": 5,
+          "op": 2,
+          "output": 6,
+          "right": 3
+        }
+      ],
+      "prepare_count": 1,
+      "scalar_mask": 0,
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "accepted_count": 0,
+      "dtype_class": 2,
+      "element_buckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "execution_count": 0,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 0,
+      "input_count": 4,
+      "layout_class": 5,
+      "max_elements": 98,
+      "min_elements": 98,
+      "nodes": [
+        {
+          "left": 0,
+          "op": 2,
+          "output": 4,
+          "right": 1
+        },
+        {
+          "left": 4,
+          "op": 0,
+          "output": 5,
+          "right": 2
+        },
+        {
+          "left": 3,
+          "op": 3,
+          "output": 6,
+          "right": 5
+        }
+      ],
+      "prepare_count": 2,
+      "scalar_mask": 5,
+      "workloads": [
+        "adi"
+      ]
+    }
+  ],
+  "provider_totals": {
+    "exec_error": 0,
+    "exec_hit": 2044300,
+    "exec_miss": 0,
+    "fixed_fast_path_hit": 2044300,
+    "fixed_generic_path_hit": 0,
+    "generated_exec_hit": 2044300,
+    "generated_registry_hit": 20,
+    "generated_registry_miss": 56,
+    "generic_fallback_hit": 0,
+    "guard_error": 0,
+    "guard_hit": 4088600,
+    "guard_miss": 0,
+    "internal_allocations": 0,
+    "nodes_recognized": 664,
+    "output_allocations": 2044300,
+    "regions_executed": 2044300,
+    "regions_prepare_called": 81,
+    "regions_provider_accepted": 20,
+    "regions_rejected_other": 0,
+    "regions_rejected_unprofitable": 56,
+    "regions_rejected_unsupported_contract": 0,
+    "regions_rejected_unsupported_node": 5
+  },
+  "purpose": "G14 diagnostic signature discovery; timings are not formal performance results",
+  "records": [
+    {
+      "candidate_rejection_reasons": {
+        "none": 2,
+        "unprofitable": 8
+      },
+      "correct": true,
+      "generated_execution_hits": 101688,
+      "generated_registry_hits": 2,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 6,
+      "original_rejection_fallbacks": 8,
+      "published_regions": 2,
+      "recognized_nodes": 30,
+      "recognized_regions": 10,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.020512,
+      "workload": "adi"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.742236,
+      "workload": "arc_distance"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 3.695747,
+      "workload": "atax"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.91519,
+      "workload": "azimint_hist"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 2,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 15.848777,
+      "workload": "azimint_naive"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 3.629197,
+      "workload": "bicg"
+    },
+    {
+      "candidate_rejection_reasons": {
+        "none": 1,
+        "unprofitable": 1
+      },
+      "correct": true,
+      "generated_execution_hits": 8099,
+      "generated_registry_hits": 1,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 2,
+      "original_rejection_fallbacks": 1,
+      "published_regions": 1,
+      "recognized_nodes": 8,
+      "recognized_regions": 2,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.920468,
+      "workload": "cavity_flow"
+    },
+    {
+      "candidate_rejection_reasons": {
+        "none": 14,
+        "unprofitable": 35
+      },
+      "correct": true,
+      "generated_execution_hits": 1932995,
+      "generated_registry_hits": 14,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 11,
+      "original_rejection_fallbacks": 35,
+      "published_regions": 14,
+      "recognized_nodes": 335,
+      "recognized_regions": 97,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 35.750897,
+      "workload": "channel_flow"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.785066,
+      "workload": "cholesky"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.161871,
+      "workload": "cholesky2"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 2.523768,
+      "workload": "compute"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 2,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.831346,
+      "workload": "contour_integral"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 2,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.839152,
+      "workload": "conv2d_bias"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 1,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.049138,
+      "workload": "correlation"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 1,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.989199,
+      "workload": "covariance"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.559111,
+      "workload": "covariance2"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.548107,
+      "workload": "crc16"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 12,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.879687,
+      "workload": "deriche"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.355126,
+      "workload": "doitgen"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 2,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.648691,
+      "workload": "durbin"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.691847,
+      "workload": "fdtd_2d"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 1,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.69082,
+      "workload": "floyd_warshall"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.652444,
+      "workload": "gemm"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.667181,
+      "workload": "gemver"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.836386,
+      "workload": "gesummv"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.286957,
+      "workload": "go_fast"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 3,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.630405,
+      "workload": "gramschmidt"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.906215,
+      "workload": "hdiff"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.853259,
+      "workload": "heat_3d"
+    },
+    {
+      "candidate_rejection_reasons": {
+        "unprofitable": 2
+      },
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 1,
+      "original_rejection_fallbacks": 2,
+      "published_regions": 0,
+      "recognized_nodes": 6,
+      "recognized_regions": 2,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.353744,
+      "workload": "jacobi_1d"
+    },
+    {
+      "candidate_rejection_reasons": {
+        "unprofitable": 2
+      },
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 1,
+      "original_rejection_fallbacks": 2,
+      "published_regions": 0,
+      "recognized_nodes": 10,
+      "recognized_regions": 2,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.961648,
+      "workload": "jacobi_2d"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.598699,
+      "workload": "k2mm"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.924016,
+      "workload": "k3mm"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 1,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.747952,
+      "workload": "lenet"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 55,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.693148,
+      "workload": "lu"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 57,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.707029,
+      "workload": "ludcmp"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 3,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.636991,
+      "workload": "mandelbrot1"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.740463,
+      "workload": "mandelbrot2"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 4.927385,
+      "workload": "mlp"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 5.372982,
+      "workload": "mvt"
+    },
+    {
+      "candidate_rejection_reasons": {
+        "kernel": 4,
+        "none": 3
+      },
+      "correct": true,
+      "generated_execution_hits": 1518,
+      "generated_registry_hits": 3,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 1,
+      "original_rejection_fallbacks": 4,
+      "published_regions": 3,
+      "recognized_nodes": 41,
+      "recognized_regions": 10,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.531927,
+      "workload": "nbody"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.659042,
+      "workload": "nussinov"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 2,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.936311,
+      "workload": "resnet"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 12,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.744561,
+      "workload": "scattering_self_energies"
+    },
+    {
+      "candidate_rejection_reasons": {
+        "kernel": 1
+      },
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 1,
+      "published_regions": 0,
+      "recognized_nodes": 7,
+      "recognized_regions": 1,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.915932,
+      "workload": "seidel_2d"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 1.68268,
+      "workload": "softmax"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.699948,
+      "workload": "stockham_fft"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 6,
+      "recognized_regions": 1,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.700394,
+      "workload": "symm"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 4,
+      "recognized_regions": 2,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.794351,
+      "workload": "syr2k"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 2,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.740573,
+      "workload": "syrk"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 28,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.823969,
+      "workload": "trisolv"
+    },
+    {
+      "candidate_rejection_reasons": {},
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 0,
+      "original_rejection_fallbacks": 0,
+      "published_regions": 0,
+      "recognized_nodes": 0,
+      "recognized_regions": 0,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.715639,
+      "workload": "trmm"
+    },
+    {
+      "candidate_rejection_reasons": {
+        "unprofitable": 8
+      },
+      "correct": true,
+      "generated_execution_hits": 0,
+      "generated_registry_hits": 0,
+      "generic_fixed_hits": 0,
+      "observed_signature_count": 7,
+      "original_rejection_fallbacks": 8,
+      "published_regions": 0,
+      "recognized_nodes": 31,
+      "recognized_regions": 9,
+      "returncode": 0,
+      "runtime_exec_fallbacks": 0,
+      "runtime_guard_fallbacks": 0,
+      "validated_rows": 100,
+      "wall_seconds": 0.913535,
+      "workload": "vadv"
+    }
+  ],
+  "schema_version": 1,
+  "workload_count": 53
+}
