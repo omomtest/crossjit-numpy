@@ -1,0 +1,572 @@
+{
+  "compile_command": [
+    "gcc",
+    "-std=c11",
+    "-O3",
+    "-fno-strict-aliasing",
+    "-shared",
+    "-fPIC",
+    "-o",
+    "/home/dualz/crossjit-workspace/numpy/benchmarks/benchmarks/crossjit/results/profiled/pf2_replay/pf2_replay_kernels.so",
+    "/home/dualz/crossjit-workspace/numpy/benchmarks/benchmarks/crossjit/results/profiled/pf2_replay/pf2_replay_kernels.c"
+  ],
+  "configuration": {
+    "element_grid": [
+      16,
+      128,
+      1024,
+      8192,
+      65536
+    ],
+    "formal_npbench_evaluation": false,
+    "host_legality_validation": false,
+    "samples": 5,
+    "source_reconstruction": false
+  },
+  "generated_metadata": {
+    "backend": "c",
+    "backend_version": "1",
+    "header": "pf2_replay_kernels.h",
+    "kernels": [
+      {
+        "backend": "c",
+        "backend_version": "1",
+        "candidate_hash": "088cd2015d64026eb039fe5c7c04bdb46260f5f922203e59e6bb383eccc66bb8",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "header": "crossjit_elem_fp64_contig_088cd2015d64026e.h",
+        "input_count": 4,
+        "ir_hash": "70081954367e4c95fe1a3522feaeccfa8812bc8c680c0c9b8cc8a515c7db50d5",
+        "layout_class": "contiguous_same_shape",
+        "operation_signature": [
+          "numpy.true_divide",
+          "numpy.add",
+          "numpy.multiply"
+        ],
+        "source": "crossjit_elem_fp64_contig_088cd2015d64026e.c",
+        "symbol": "crossjit_elem_fp64_contig_088cd2015d64026e"
+      },
+      {
+        "backend": "c",
+        "backend_version": "1",
+        "candidate_hash": "3236896b62eabf58721aef4ccc1fe508c6ea7d606239dc526a5cb07112ba81e2",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "header": "crossjit_elem_fp64_contig_3236896b62eabf58.h",
+        "input_count": 3,
+        "ir_hash": "db33c1472b96fd0d27909d7027a8cc026042c08e2c8a1be3934dc49bbfc9e2b2",
+        "layout_class": "contiguous_same_shape",
+        "operation_signature": [
+          "numpy.multiply",
+          "numpy.add"
+        ],
+        "source": "crossjit_elem_fp64_contig_3236896b62eabf58.c",
+        "symbol": "crossjit_elem_fp64_contig_3236896b62eabf58"
+      },
+      {
+        "backend": "c",
+        "backend_version": "1",
+        "candidate_hash": "41284a9a11a5a028600ffd41f744d29a7978e167d9c6ed75bcef7a33c2d5ed94",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "header": "crossjit_elem_fp64_contig_41284a9a11a5a028.h",
+        "input_count": 4,
+        "ir_hash": "f4762d49ea8715381301013d60d5499ac2fc2078356504a7174b71d5ef1f33b2",
+        "layout_class": "contiguous_same_shape",
+        "operation_signature": [
+          "numpy.true_divide",
+          "numpy.multiply",
+          "numpy.subtract"
+        ],
+        "source": "crossjit_elem_fp64_contig_41284a9a11a5a028.c",
+        "symbol": "crossjit_elem_fp64_contig_41284a9a11a5a028"
+      },
+      {
+        "backend": "c",
+        "backend_version": "1",
+        "candidate_hash": "4203d7ed1e3861f12560dc788fb7d0755b70bf6ba3b06723673802a4b666a51f",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "header": "crossjit_elem_fp64_contig_4203d7ed1e3861f1.h",
+        "input_count": 3,
+        "ir_hash": "79081be500b8852d2696822346dfb1b08f3085098d6125f9a65b50e8e2ef37b6",
+        "layout_class": "contiguous_same_shape",
+        "operation_signature": [
+          "numpy.multiply",
+          "numpy.multiply"
+        ],
+        "source": "crossjit_elem_fp64_contig_4203d7ed1e3861f1.c",
+        "symbol": "crossjit_elem_fp64_contig_4203d7ed1e3861f1"
+      },
+      {
+        "backend": "c",
+        "backend_version": "1",
+        "candidate_hash": "56838e3cc11845bb8b8bd63d2952d8b82f8959cc2367de0c41a24d07ac399593",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "header": "crossjit_elem_fp64_contig_56838e3cc11845bb.h",
+        "input_count": 3,
+        "ir_hash": "e1d2f5fc8670edccf71607d39a44be3a3d6288b8eef10037a26899599bc41ba1",
+        "layout_class": "contiguous_same_shape",
+        "operation_signature": [
+          "numpy.multiply",
+          "numpy.add"
+        ],
+        "source": "crossjit_elem_fp64_contig_56838e3cc11845bb.c",
+        "symbol": "crossjit_elem_fp64_contig_56838e3cc11845bb"
+      },
+      {
+        "backend": "c",
+        "backend_version": "1",
+        "candidate_hash": "62f13e00cbe94df7ee07d3386a767dbab1eaf8af79b64168b7c6d27d31cf7e33",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "header": "crossjit_elem_fp64_contig_62f13e00cbe94df7.h",
+        "input_count": 3,
+        "ir_hash": "9c4be8c5b2a88ba11ee7ebe4946c56feca0573afb4ef2a5a80855878a3d074be",
+        "layout_class": "contiguous_same_shape",
+        "operation_signature": [
+          "numpy.multiply",
+          "numpy.subtract"
+        ],
+        "source": "crossjit_elem_fp64_contig_62f13e00cbe94df7.c",
+        "symbol": "crossjit_elem_fp64_contig_62f13e00cbe94df7"
+      },
+      {
+        "backend": "c",
+        "backend_version": "1",
+        "candidate_hash": "ba1e01e61b7deb3e7f4647574fb06ebf7de601cd6ca9af0e679245461e813cd6",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "header": "crossjit_elem_fp64_contig_ba1e01e61b7deb3e.h",
+        "input_count": 3,
+        "ir_hash": "65b5b253394e826b4fbc02c1e93e988c00cb0d9b4ef7632fee3624fbfb07c23f",
+        "layout_class": "contiguous_same_shape",
+        "operation_signature": [
+          "numpy.subtract",
+          "numpy.multiply"
+        ],
+        "source": "crossjit_elem_fp64_contig_ba1e01e61b7deb3e.c",
+        "symbol": "crossjit_elem_fp64_contig_ba1e01e61b7deb3e"
+      },
+      {
+        "backend": "c",
+        "backend_version": "1",
+        "candidate_hash": "ef2773fa5accaee49851993669218bd2b06af40b465195fd2d2f3a40e41a5ae2",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "header": "crossjit_elem_fp64_contig_ef2773fa5accaee4.h",
+        "input_count": 3,
+        "ir_hash": "a1526aad8c05b9f1f922ad20087982f7416c7952502f538cd6b304937f1ce925",
+        "layout_class": "contiguous_same_shape",
+        "operation_signature": [
+          "numpy.add",
+          "numpy.multiply"
+        ],
+        "source": "crossjit_elem_fp64_contig_ef2773fa5accaee4.c",
+        "symbol": "crossjit_elem_fp64_contig_ef2773fa5accaee4"
+      }
+    ],
+    "schema_version": 1
+  },
+  "method": "canonical_elementwise_ir_synthetic_replay",
+  "old_reconstruction_failure_hashes": [
+    "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367",
+    "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb",
+    "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94"
+  ],
+  "outcomes": [
+    {
+      "classification": null,
+      "correct": true,
+      "old_source_reconstruction_failure": false,
+      "replay_hash": "2fb956ae6a28988e8ebca8f0844fdc0acaa49f522d7698ff4ab889902adbc647",
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b",
+      "status": "TUNABLE"
+    },
+    {
+      "classification": null,
+      "correct": true,
+      "old_source_reconstruction_failure": false,
+      "replay_hash": "e3ad0e38788dad85dbde5bb23324ffbecb0dd4c8dbe624f9d8609a0661b908fa",
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4",
+      "status": "TUNABLE"
+    },
+    {
+      "classification": null,
+      "correct": true,
+      "old_source_reconstruction_failure": false,
+      "replay_hash": "f556013043a84a0c82a300bac9b0b332efdea53a80570e574081ee02202ed1b4",
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278",
+      "status": "TUNABLE"
+    },
+    {
+      "classification": null,
+      "correct": true,
+      "old_source_reconstruction_failure": false,
+      "replay_hash": "c0f2e44269504cd999b4bfb8d356b208898b017d7e2e39b3b760e15735937128",
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448",
+      "status": "TUNABLE"
+    },
+    {
+      "classification": null,
+      "correct": true,
+      "old_source_reconstruction_failure": true,
+      "replay_hash": "ef8258f4c57f8efcc90f68d26f6db8c0f8c42fcab441db2cc6415c26c07147e3",
+      "signature_hash": "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367",
+      "status": "TUNABLE"
+    },
+    {
+      "classification": null,
+      "correct": true,
+      "old_source_reconstruction_failure": true,
+      "replay_hash": "e336d487fc240999924ef28957690d9c544c79aa91e920f16e0b15ef48276213",
+      "signature_hash": "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb",
+      "status": "TUNABLE"
+    },
+    {
+      "classification": null,
+      "correct": true,
+      "old_source_reconstruction_failure": false,
+      "replay_hash": "f7ba5dda67e88872201274ecd3bb5226c35d96a81654e5b40ccb2e6d55a210ad",
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb",
+      "status": "TUNABLE"
+    },
+    {
+      "classification": null,
+      "correct": true,
+      "old_source_reconstruction_failure": true,
+      "replay_hash": "6bd1354e7eedd9d0fdad3c437ee3ad6862c22fa528072fe8d1c9cca455d1f7d1",
+      "signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94",
+      "status": "TUNABLE"
+    }
+  ],
+  "rows": [
+    {
+      "baseline_median_ns": 2021.9325,
+      "correct": true,
+      "element_count": 16,
+      "generated_median_ns": 4808.633,
+      "generic_fixed_median_ns": 5635.2295,
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_median_ns": 1997.676,
+      "correct": true,
+      "element_count": 128,
+      "generated_median_ns": 4777.8145,
+      "generic_fixed_median_ns": 5935.617,
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_median_ns": 2467.720286885246,
+      "correct": true,
+      "element_count": 1024,
+      "generated_median_ns": 4997.888319672131,
+      "generic_fixed_median_ns": 8691.977459016394,
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_median_ns": 5802.549180327869,
+      "correct": true,
+      "element_count": 8192,
+      "generated_median_ns": 5850.647540983607,
+      "generic_fixed_median_ns": 29412.0,
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_median_ns": 160078.4,
+      "correct": true,
+      "element_count": 65536,
+      "generated_median_ns": 15920.266666666666,
+      "generic_fixed_median_ns": 189116.0,
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_median_ns": 1948.8045,
+      "correct": true,
+      "element_count": 16,
+      "generated_median_ns": 4705.573,
+      "generic_fixed_median_ns": 5590.9245,
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_median_ns": 1985.662,
+      "correct": true,
+      "element_count": 128,
+      "generated_median_ns": 4738.8575,
+      "generic_fixed_median_ns": 5943.722,
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_median_ns": 2414.7879098360654,
+      "correct": true,
+      "element_count": 1024,
+      "generated_median_ns": 4948.085040983607,
+      "generic_fixed_median_ns": 9124.429303278688,
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_median_ns": 5358.680327868852,
+      "correct": true,
+      "element_count": 8192,
+      "generated_median_ns": 5993.877049180328,
+      "generic_fixed_median_ns": 33075.065573770495,
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_median_ns": 160490.2,
+      "correct": true,
+      "element_count": 65536,
+      "generated_median_ns": 16495.066666666666,
+      "generic_fixed_median_ns": 211943.0,
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_median_ns": 1950.183,
+      "correct": true,
+      "element_count": 16,
+      "generated_median_ns": 4708.9075,
+      "generic_fixed_median_ns": 5547.4955,
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_median_ns": 1945.604,
+      "correct": true,
+      "element_count": 128,
+      "generated_median_ns": 4777.88,
+      "generic_fixed_median_ns": 5898.922,
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_median_ns": 2437.6444672131147,
+      "correct": true,
+      "element_count": 1024,
+      "generated_median_ns": 4992.337090163935,
+      "generic_fixed_median_ns": 8270.26024590164,
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_median_ns": 5419.336065573771,
+      "correct": true,
+      "element_count": 8192,
+      "generated_median_ns": 5888.737704918033,
+      "generic_fixed_median_ns": 26324.655737704918,
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_median_ns": 161506.26666666666,
+      "correct": true,
+      "element_count": 65536,
+      "generated_median_ns": 17228.333333333332,
+      "generic_fixed_median_ns": 166190.13333333333,
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_median_ns": 1941.11,
+      "correct": true,
+      "element_count": 16,
+      "generated_median_ns": 4767.4405,
+      "generic_fixed_median_ns": 5637.485,
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_median_ns": 1974.3375,
+      "correct": true,
+      "element_count": 128,
+      "generated_median_ns": 4802.9535,
+      "generic_fixed_median_ns": 5934.731,
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_median_ns": 2416.2684426229507,
+      "correct": true,
+      "element_count": 1024,
+      "generated_median_ns": 4986.713114754099,
+      "generic_fixed_median_ns": 8505.51024590164,
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_median_ns": 5416.770491803279,
+      "correct": true,
+      "element_count": 8192,
+      "generated_median_ns": 5895.754098360656,
+      "generic_fixed_median_ns": 28040.647540983606,
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_median_ns": 161438.33333333334,
+      "correct": true,
+      "element_count": 65536,
+      "generated_median_ns": 17164.133333333335,
+      "generic_fixed_median_ns": 162879.33333333334,
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_median_ns": 2505.817,
+      "correct": true,
+      "element_count": 16,
+      "generated_median_ns": 5524.3925,
+      "generic_fixed_median_ns": 6399.33,
+      "signature_hash": "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367"
+    },
+    {
+      "baseline_median_ns": 2569.434,
+      "correct": true,
+      "element_count": 128,
+      "generated_median_ns": 5569.4035,
+      "generic_fixed_median_ns": 6845.6195,
+      "signature_hash": "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367"
+    },
+    {
+      "baseline_median_ns": 3532.2284836065573,
+      "correct": true,
+      "element_count": 1024,
+      "generated_median_ns": 5977.035860655737,
+      "generic_fixed_median_ns": 10469.668032786885,
+      "signature_hash": "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367"
+    },
+    {
+      "baseline_median_ns": 9155.418032786885,
+      "correct": true,
+      "element_count": 8192,
+      "generated_median_ns": 8616.22131147541,
+      "generic_fixed_median_ns": 38540.762295081964,
+      "signature_hash": "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367"
+    },
+    {
+      "baseline_median_ns": 264817.13333333336,
+      "correct": true,
+      "element_count": 65536,
+      "generated_median_ns": 31348.4,
+      "generic_fixed_median_ns": 247950.26666666666,
+      "signature_hash": "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367"
+    },
+    {
+      "baseline_median_ns": 1951.054,
+      "correct": true,
+      "element_count": 16,
+      "generated_median_ns": 4737.0555,
+      "generic_fixed_median_ns": 5606.7255,
+      "signature_hash": "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb"
+    },
+    {
+      "baseline_median_ns": 1982.8645,
+      "correct": true,
+      "element_count": 128,
+      "generated_median_ns": 4772.1125,
+      "generic_fixed_median_ns": 6015.4415,
+      "signature_hash": "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb"
+    },
+    {
+      "baseline_median_ns": 2405.184426229508,
+      "correct": true,
+      "element_count": 1024,
+      "generated_median_ns": 4979.786885245901,
+      "generic_fixed_median_ns": 9100.992827868853,
+      "signature_hash": "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb"
+    },
+    {
+      "baseline_median_ns": 5378.549180327869,
+      "correct": true,
+      "element_count": 8192,
+      "generated_median_ns": 5825.606557377049,
+      "generic_fixed_median_ns": 32989.07377049181,
+      "signature_hash": "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb"
+    },
+    {
+      "baseline_median_ns": 162465.73333333334,
+      "correct": true,
+      "element_count": 65536,
+      "generated_median_ns": 16956.866666666665,
+      "generic_fixed_median_ns": 212354.0,
+      "signature_hash": "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb"
+    },
+    {
+      "baseline_median_ns": 1999.4185,
+      "correct": true,
+      "element_count": 16,
+      "generated_median_ns": 4736.957,
+      "generic_fixed_median_ns": 5625.542,
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_median_ns": 2007.3975,
+      "correct": true,
+      "element_count": 128,
+      "generated_median_ns": 4772.8295,
+      "generic_fixed_median_ns": 6062.236,
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_median_ns": 2422.8504098360654,
+      "correct": true,
+      "element_count": 1024,
+      "generated_median_ns": 5006.963114754099,
+      "generic_fixed_median_ns": 9694.264344262296,
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_median_ns": 5410.459016393443,
+      "correct": true,
+      "element_count": 8192,
+      "generated_median_ns": 6365.950819672131,
+      "generic_fixed_median_ns": 37663.12295081967,
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_median_ns": 158691.26666666666,
+      "correct": true,
+      "element_count": 65536,
+      "generated_median_ns": 17515.866666666665,
+      "generic_fixed_median_ns": 248959.13333333333,
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_median_ns": 2493.59,
+      "correct": true,
+      "element_count": 16,
+      "generated_median_ns": 5515.5255,
+      "generic_fixed_median_ns": 6391.3425,
+      "signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94"
+    },
+    {
+      "baseline_median_ns": 2556.283,
+      "correct": true,
+      "element_count": 128,
+      "generated_median_ns": 5571.759,
+      "generic_fixed_median_ns": 6902.0475,
+      "signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94"
+    },
+    {
+      "baseline_median_ns": 3481.3524590163934,
+      "correct": true,
+      "element_count": 1024,
+      "generated_median_ns": 5949.803278688524,
+      "generic_fixed_median_ns": 10840.735655737704,
+      "signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94"
+    },
+    {
+      "baseline_median_ns": 8103.983606557377,
+      "correct": true,
+      "element_count": 8192,
+      "generated_median_ns": 8665.475409836066,
+      "generic_fixed_median_ns": 41654.639344262294,
+      "signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94"
+    },
+    {
+      "baseline_median_ns": 264270.3333333333,
+      "correct": true,
+      "element_count": 65536,
+      "generated_median_ns": 33351.6,
+      "generic_fixed_median_ns": 237819.46666666667,
+      "signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94"
+    }
+  ],
+  "schema_version": 1,
+  "summary": {
+    "failed": 0,
+    "old_failures_recovered": 3,
+    "tunable": 8
+  }
+}
