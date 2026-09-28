@@ -13,6 +13,7 @@ from crossjit_generator.ir import (
     SpecializationAttribute,
     build_elementwise_ir,
 )
+from crossjit_generator.signature import OptimizationSignature
 
 try:
     from .crossjit_recipes import RECIPES
@@ -87,4 +88,47 @@ def lower_manifest(manifest: Mapping[str, Any]):
     return build_elementwise_ir(region, RECIPES, specialization)
 
 
-__all__ = ["lower_manifest"]
+def lower_signature(signature: OptimizationSignature):
+    """Reconstruct the supported Provider IR from structural telemetry."""
+
+    if (not isinstance(signature, OptimizationSignature) or
+            signature.provider != "numpy" or
+            signature.domain != "elementwise"):
+        raise ValueError("unsupported OptimizationSignature")
+    values = [f"input_{index}" for index in range(signature.input_count)]
+    operations = []
+    for index, operation in enumerate(signature.operations):
+        recipe = RECIPES.get(operation.operation_id)
+        if recipe is None or recipe.stable_hash() != operation.recipe_hash:
+            raise ValueError(
+                f"missing or stale NumPy recipe: {operation.operation_id}")
+        result = f"value_{index}"
+        operations.append(HostOperation(
+            node_id=f"node_{index}",
+            operation_id=operation.operation_id,
+            operands=tuple(values[slot] for slot in operation.operands),
+            result=result,
+        ))
+        values.append(result)
+    final = operations[-1].result
+    region = HostProvenRegion(
+        provider="numpy",
+        semantic_proof_digest=f"observed:{signature.stable_hash()}",
+        inputs=tuple(values[:signature.input_count]),
+        operations=tuple(operations),
+        outputs=(final,),
+        virtual_values=tuple(item.result for item in operations[:-1]),
+        materialized_values=(final,),
+    )
+    specialization = ProviderSpecialization(
+        contract_digest=f"signature:{signature.stable_hash()}",
+        dtype_class=signature.dtype_class,
+        layout_class=signature.layout_class,
+        error_mode=signature.error_mode,
+        attributes=(SpecializationAttribute(
+            "scalar_mask", signature.scalar_mask),),
+    )
+    return build_elementwise_ir(region, RECIPES, specialization)
+
+
+__all__ = ["lower_manifest", "lower_signature"]

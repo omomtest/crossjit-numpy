@@ -4,24 +4,28 @@ import subprocess
 import sys
 
 
+def _command(root, manifest, outputs, *extra):
+    return [
+        sys.executable,
+        str(root / "numpy/_core/code_generators/generate_crossjit_kernels.py"),
+        "--generator-root", str(root.parent / "crossjit-generator"),
+        "--manifest", str(manifest),
+        "--output-c", str(outputs[0]),
+        "--output-h", str(outputs[1]),
+        "--output-json", str(outputs[2]),
+        *map(str, extra),
+    ]
+
+
 def test_build_time_generation_is_reproducible(tmp_path):
     root = Path(__file__).parents[2]
-    generator_root = root.parent / "crossjit-generator"
-    script = root / "numpy/_core/code_generators/generate_crossjit_kernels.py"
     manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
     outputs = (
         tmp_path / "generated_crossjit_kernels.c",
         tmp_path / "generated_crossjit_kernels.h",
         tmp_path / "generated_crossjit_kernels.json",
     )
-    command = [
-        sys.executable, str(script),
-        "--generator-root", str(generator_root),
-        "--manifest", str(manifest),
-        "--output-c", str(outputs[0]),
-        "--output-h", str(outputs[1]),
-        "--output-json", str(outputs[2]),
-    ]
+    command = _command(root, manifest, outputs)
     subprocess.run(command, check=True)
     first = tuple(path.read_bytes() for path in outputs)
     subprocess.run(command, check=True)
@@ -30,6 +34,20 @@ def test_build_time_generation_is_reproducible(tmp_path):
     metadata = json.loads(outputs[2].read_text())
     assert metadata["provider"] == "numpy"
     assert len(metadata["kernels"]) == 6
+    assert {kernel["generation_mode"] for kernel in metadata["kernels"]} == {
+        "AUTO"}
+    assert {kernel["generation_source"] for kernel in metadata["kernels"]} == {
+        "validation"}
+    assert metadata["generation_universe"] == {
+        "actual_generated_candidate_count": 6,
+        "disabled_signature_count": 0,
+        "forced_signature_count": 0,
+        "observed_signature_count": 0,
+        "unsupported_observed_signature_count": 0,
+        "validation_seed_count": 6,
+    }
+    assert all(len(kernel["optimization_signature_hash"]) == 64
+               for kernel in metadata["kernels"])
     assert {kernel["signature_id"] for kernel in metadata["kernels"]} == {
         "linear_2_add_multiply",
         "linear_3_add_multiply_subtract",
@@ -53,3 +71,63 @@ def test_build_time_generation_is_reproducible(tmp_path):
             for character in signature_id
         )
         assert enum_name in header
+
+
+def test_observed_force_disable_union_is_bounded(tmp_path):
+    root = Path(__file__).parents[2]
+    original = json.loads((
+        root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    ).read_text())
+    manifest = tmp_path / "manifest.json"
+    forced = dict(original["signatures"][0])
+    forced["mode"] = "FORCE"
+    forced["source"] = "developer_seed"
+    forced["id"] = "forced_duplicate"
+    disabled = dict(original["signatures"][1])
+    disabled["mode"] = "DISABLE"
+    disabled["source"] = "developer_seed"
+    disabled["id"] = "disabled_duplicate"
+    original["signatures"].extend((forced, disabled))
+    manifest.write_text(json.dumps(original))
+
+    generator_root = root.parent / "crossjit-generator"
+    sys.path.insert(0, str(generator_root))
+    from crossjit_generator.signature import (
+        ELEMENT_BUCKET_UPPER_BOUNDS,
+        ObservedSignatureProfile,
+        ObservedSignatures,
+        OptimizationSignature,
+    )
+
+    # Same topology as a validation seed, but a scalar relation makes this a
+    # distinct observed structural signature without any workload identity.
+    signature_data = json.loads(subprocess.check_output(
+        _command(root, manifest, (
+            tmp_path / "first.c", tmp_path / "first.h", tmp_path / "first.json"))
+    ) or (tmp_path / "first.json").read_bytes())
+    signature_data = signature_data["kernels"][0]["optimization_signature"]
+    signature_data["scalar_mask"] = 1
+    observed_signature = OptimizationSignature.from_data(signature_data)
+    buckets = [0] * len(ELEMENT_BUCKET_UPPER_BOUNDS)
+    buckets[4] = 3
+    observations = ObservedSignatures((ObservedSignatureProfile(
+        observed_signature, 1, 1, 3, 0, 3, 256, 256, tuple(buckets)),))
+    observations_path = tmp_path / "observations.json"
+    observations_path.write_text(observations.serialize())
+
+    outputs = (tmp_path / "out.c", tmp_path / "out.h", tmp_path / "out.json")
+    subprocess.run(_command(
+        root, manifest, outputs, "--observations", observations_path), check=True)
+    metadata = json.loads(outputs[2].read_text())
+    universe = metadata["generation_universe"]
+    assert universe == {
+        "actual_generated_candidate_count": 6,
+        "disabled_signature_count": 1,
+        "forced_signature_count": 1,
+        "observed_signature_count": 1,
+        "unsupported_observed_signature_count": 0,
+        "validation_seed_count": 6,
+    }
+    assert {kernel["generation_mode"] for kernel in metadata["kernels"]} == {
+        "AUTO", "FORCE"}
+    assert len(metadata["kernels"]) == 6

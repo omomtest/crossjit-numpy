@@ -142,6 +142,32 @@ typedef struct {
 } NumpyCrossJitCandidateDiagnostic;
 
 #define NUMPY_CROSSJIT_MAX_DIAGNOSTIC_CANDIDATES 1024
+#define NUMPY_CROSSJIT_MAX_OBSERVED_SIGNATURES 128
+#define NUMPY_CROSSJIT_ELEMENT_BUCKETS 14
+
+typedef enum {
+    NUMPY_CROSSJIT_OBSERVED_PREPARE = 0,
+    NUMPY_CROSSJIT_OBSERVED_EXECUTION = 1,
+    NUMPY_CROSSJIT_OBSERVED_GENERATED = 2,
+    NUMPY_CROSSJIT_OBSERVED_GENERIC = 3,
+} NumpyCrossJitObservedEvent;
+
+typedef struct {
+    uint64_t prepare_count;
+    uint64_t accepted_count;
+    uint64_t execution_count;
+    uint64_t generated_hit_count;
+    uint64_t generic_fallback_count;
+    uint64_t min_elements;
+    uint64_t max_elements;
+    uint64_t element_buckets[NUMPY_CROSSJIT_ELEMENT_BUCKETS];
+    uint8_t input_count;
+    uint8_t node_count;
+    uint8_t dtype_class;
+    uint8_t layout_class;
+    uint16_t scalar_mask;
+    NumpyCrossJitKernelNode nodes[6];
+} NumpyCrossJitObservedSignature;
 
 typedef struct {
     uint64_t nodes_recognized;
@@ -190,6 +216,10 @@ typedef struct {
         candidates[NUMPY_CROSSJIT_MAX_DIAGNOSTIC_CANDIDATES];
     uint64_t candidate_count;
     uint64_t candidate_records_dropped;
+    NumpyCrossJitObservedSignature
+        observed_signatures[NUMPY_CROSSJIT_MAX_OBSERVED_SIGNATURES];
+    uint64_t observed_signature_count;
+    uint64_t observed_signature_records_dropped;
     int diagnostics_enabled;
     int timing_enabled;
 } NumpyCrossJitStats;
@@ -317,6 +347,93 @@ struct PyJitExecPlan {
      * contiguous signature, DAG shape, scalar roles, and operand slot map. */
     NumpyCrossJitFixedPlan fixed;
 };
+
+static int
+numpy_crossjit_observed_signature_equal(
+    const NumpyCrossJitObservedSignature *observed,
+    const struct PyJitExecPlan *plan)
+{
+    return observed->input_count == plan->guards.input_count &&
+        observed->node_count == plan->node_count &&
+        observed->dtype_class ==
+            numpy_crossjit_dtype_class(plan->guards.domain.typenum) &&
+        observed->layout_class == plan->guards.iteration_class &&
+        observed->scalar_mask == plan->guards.scalar_mask &&
+        memcmp(observed->nodes, plan->nodes,
+               (size_t)plan->node_count * sizeof(plan->nodes[0])) == 0;
+}
+
+static void
+numpy_crossjit_record_observed_signature(
+    const struct PyJitExecPlan *plan, NumpyCrossJitObservedEvent event)
+{
+    if (!crossjit_stats.diagnostics_enabled || plan == NULL) {
+        return;
+    }
+    uint64_t elements = numpy_crossjit_domain_elements(&plan->guards.domain);
+    NumpyCrossJitObservedSignature *observed = NULL;
+    for (uint64_t i = 0; i < crossjit_stats.observed_signature_count; i++) {
+        if (numpy_crossjit_observed_signature_equal(
+                &crossjit_stats.observed_signatures[i], plan)) {
+            observed = &crossjit_stats.observed_signatures[i];
+            break;
+        }
+    }
+    if (observed == NULL) {
+        if (crossjit_stats.observed_signature_count >=
+                NUMPY_CROSSJIT_MAX_OBSERVED_SIGNATURES) {
+            crossjit_stats.observed_signature_records_dropped++;
+            return;
+        }
+        observed = &crossjit_stats.observed_signatures[
+            crossjit_stats.observed_signature_count++];
+        memset(observed, 0, sizeof(*observed));
+        observed->input_count = plan->guards.input_count;
+        observed->node_count = plan->node_count;
+        observed->dtype_class =
+            numpy_crossjit_dtype_class(plan->guards.domain.typenum);
+        observed->layout_class = plan->guards.iteration_class;
+        observed->scalar_mask = plan->guards.scalar_mask;
+        observed->min_elements = elements;
+        observed->max_elements = elements;
+        memcpy(observed->nodes, plan->nodes,
+               (size_t)plan->node_count * sizeof(plan->nodes[0]));
+    }
+    if (event == NUMPY_CROSSJIT_OBSERVED_PREPARE ||
+            event == NUMPY_CROSSJIT_OBSERVED_EXECUTION) {
+        if (elements < observed->min_elements) {
+            observed->min_elements = elements;
+        }
+        if (elements > observed->max_elements) {
+            observed->max_elements = elements;
+        }
+    }
+    switch (event) {
+        case NUMPY_CROSSJIT_OBSERVED_PREPARE:
+            observed->prepare_count++;
+            observed->accepted_count++;
+            break;
+        case NUMPY_CROSSJIT_OBSERVED_EXECUTION: {
+            static const uint64_t upper_bounds[NUMPY_CROSSJIT_ELEMENT_BUCKETS] = {
+                16, 32, 64, 128, 256, 512, 1024, 2048,
+                4096, 8192, 16384, 32768, 65536, UINT64_MAX,
+            };
+            uint8_t bucket = 0;
+            while (elements > upper_bounds[bucket]) {
+                bucket++;
+            }
+            observed->execution_count++;
+            observed->element_buckets[bucket]++;
+            break;
+        }
+        case NUMPY_CROSSJIT_OBSERVED_GENERATED:
+            observed->generated_hit_count++;
+            break;
+        case NUMPY_CROSSJIT_OBSERVED_GENERIC:
+            observed->generic_fallback_count++;
+            break;
+    }
+}
 
 /* C_NumPy is created only after HostRegionProof.  It owns every dtype,
  * shape, stride, broadcast, scalar, guard-class and kernel decision. */
@@ -839,6 +956,8 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
         crossjit_stats.fixed_generic_plans_built++;
         crossjit_stats.generated_registry_miss++;
     }
+    numpy_crossjit_record_observed_signature(
+        plan, NUMPY_CROSSJIT_OBSERVED_PREPARE);
     if (Py_GETENV("PYTHON_JIT_CROSSJIT_DEBUG") != NULL) {
         fprintf(stderr, "NumPy CrossJIT accepted %u-node kernel:",
                 plan->node_count);
@@ -1174,6 +1293,8 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
         return numpy_crossjit_record_exec(
             PYJIT_RESULT_MISS, started, allocation_ns, kernel_ns);
     }
+    numpy_crossjit_record_observed_signature(
+        plan, NUMPY_CROSSJIT_OBSERVED_EXECUTION);
     const NumpyCrossJitArrayFact *fact = &plan->guards.domain;
     uint64_t allocation_started = numpy_crossjit_clock_ns();
     PyArrayObject *output = (PyArrayObject *)PyArray_SimpleNew(
@@ -1223,6 +1344,8 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
                           (size_t)PyArray_SIZE(output));
         crossjit_stats.fixed_fast_path_hit++;
         crossjit_stats.generated_exec_hit++;
+        numpy_crossjit_record_observed_signature(
+            plan, NUMPY_CROSSJIT_OBSERVED_GENERATED);
     }
     else {
         const void *data[NUMPY_CROSSJIT_MAX_INPUTS];
@@ -1299,6 +1422,8 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
         if (ok) {
             crossjit_stats.fixed_generic_path_hit++;
             crossjit_stats.generic_fallback_hit++;
+            numpy_crossjit_record_observed_signature(
+                plan, NUMPY_CROSSJIT_OBSERVED_GENERIC);
         }
     }
     if (kernel_started != 0) {
@@ -1398,6 +1523,72 @@ numpy_crossjit_candidate_dict(
 }
 
 static PyObject *
+numpy_crossjit_observed_signature_dict(
+    const NumpyCrossJitObservedSignature *observed)
+{
+    PyObject *result = PyDict_New();
+    PyObject *nodes = PyTuple_New(observed->node_count);
+    if (result == NULL || nodes == NULL) {
+        Py_XDECREF(result);
+        Py_XDECREF(nodes);
+        return NULL;
+    }
+#define ADD_OBSERVED(name) do {                                            \
+        if (numpy_crossjit_dict_u64(result, #name,                         \
+                                    observed->name) < 0) {                 \
+            Py_DECREF(result);                                             \
+            Py_DECREF(nodes);                                              \
+            return NULL;                                                   \
+        }                                                                  \
+    } while (0)
+    ADD_OBSERVED(prepare_count);
+    ADD_OBSERVED(accepted_count);
+    ADD_OBSERVED(execution_count);
+    ADD_OBSERVED(generated_hit_count);
+    ADD_OBSERVED(generic_fallback_count);
+    ADD_OBSERVED(min_elements);
+    ADD_OBSERVED(max_elements);
+    ADD_OBSERVED(input_count);
+    ADD_OBSERVED(node_count);
+    ADD_OBSERVED(dtype_class);
+    ADD_OBSERVED(layout_class);
+    ADD_OBSERVED(scalar_mask);
+#undef ADD_OBSERVED
+    PyObject *buckets = numpy_crossjit_u64_tuple(
+        observed->element_buckets, NUMPY_CROSSJIT_ELEMENT_BUCKETS);
+    if (buckets == NULL ||
+            PyDict_SetItemString(result, "element_buckets", buckets) < 0) {
+        Py_XDECREF(buckets);
+        Py_DECREF(result);
+        Py_DECREF(nodes);
+        return NULL;
+    }
+    Py_DECREF(buckets);
+    for (Py_ssize_t i = 0; i < observed->node_count; i++) {
+        const NumpyCrossJitKernelNode *node = &observed->nodes[i];
+        PyObject *item = Py_BuildValue(
+            "{sI,sI,sI,sI}",
+            "op", (unsigned int)node->op,
+            "left", (unsigned int)node->left,
+            "right", (unsigned int)node->right,
+            "output", (unsigned int)node->output);
+        if (item == NULL) {
+            Py_DECREF(result);
+            Py_DECREF(nodes);
+            return NULL;
+        }
+        PyTuple_SET_ITEM(nodes, i, item);
+    }
+    if (PyDict_SetItemString(result, "nodes", nodes) < 0) {
+        Py_DECREF(result);
+        Py_DECREF(nodes);
+        return NULL;
+    }
+    Py_DECREF(nodes);
+    return result;
+}
+
+static PyObject *
 numpy_crossjit_get_stats(PyObject *NPY_UNUSED(module),
                          PyObject *NPY_UNUSED(ignored))
 {
@@ -1408,6 +1599,7 @@ numpy_crossjit_get_stats(PyObject *NPY_UNUSED(module),
     PyObject *layouts = NULL;
     PyObject *dtypes = NULL;
     PyObject *rejections = NULL;
+    PyObject *observed_signatures = NULL;
     if (result == NULL) {
         return NULL;
     }
@@ -1455,6 +1647,7 @@ numpy_crossjit_get_stats(PyObject *NPY_UNUSED(module),
     ADD_COUNTER(allocation_time_ns);
     ADD_COUNTER(kernel_time_ns);
     ADD_COUNTER(candidate_records_dropped);
+    ADD_COUNTER(observed_signature_records_dropped);
 #undef ADD_COUNTER
 
     last = crossjit_stats.diagnostics_enabled ?
@@ -1479,6 +1672,26 @@ numpy_crossjit_get_stats(PyObject *NPY_UNUSED(module),
     }
     Py_CLEAR(last);
     Py_CLEAR(candidates);
+
+    observed_signatures = PyTuple_New(
+        (Py_ssize_t)crossjit_stats.observed_signature_count);
+    if (observed_signatures == NULL) {
+        goto error;
+    }
+    for (Py_ssize_t i = 0;
+         i < (Py_ssize_t)crossjit_stats.observed_signature_count; i++) {
+        PyObject *observed = numpy_crossjit_observed_signature_dict(
+            &crossjit_stats.observed_signatures[i]);
+        if (observed == NULL) {
+            goto error;
+        }
+        PyTuple_SET_ITEM(observed_signatures, i, observed);
+    }
+    if (PyDict_SetItemString(result, "observed_signatures",
+                             observed_signatures) < 0) {
+        goto error;
+    }
+    Py_CLEAR(observed_signatures);
 
     region_lengths = numpy_crossjit_u64_tuple(
         crossjit_stats.region_length_hist,
@@ -1522,6 +1735,7 @@ error:
     Py_XDECREF(layouts);
     Py_XDECREF(dtypes);
     Py_XDECREF(rejections);
+    Py_XDECREF(observed_signatures);
     Py_DECREF(result);
     return NULL;
 }

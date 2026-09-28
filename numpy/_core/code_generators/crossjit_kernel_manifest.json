@@ -4,6 +4,8 @@
   "signatures": [
     {
       "id": "linear_2_add_multiply",
+      "mode": "AUTO",
+      "source": "validation",
       "region": {
         "host_semantic_proof_digest": "validation-linear-2",
         "inputs": ["a", "b", "c"],
@@ -25,6 +27,8 @@
     },
     {
       "id": "linear_3_add_multiply_subtract",
+      "mode": "AUTO",
+      "source": "validation",
       "region": {
         "host_semantic_proof_digest": "validation-linear-3",
         "inputs": ["a", "b", "c", "d"],
@@ -47,6 +51,8 @@
     },
     {
       "id": "linear_4_add_multiply_subtract_divide",
+      "mode": "AUTO",
+      "source": "validation",
       "region": {
         "host_semantic_proof_digest": "validation-linear-4",
         "inputs": ["a", "b", "c", "d", "e"],
@@ -70,6 +76,8 @@
     },
     {
       "id": "linear_5_add_multiply_subtract_divide_add",
+      "mode": "AUTO",
+      "source": "validation",
       "region": {
         "host_semantic_proof_digest": "validation-linear-5",
         "inputs": ["a", "b", "c", "d", "e", "f"],
@@ -94,6 +102,8 @@
     },
     {
       "id": "linear_6_add_multiply_subtract_divide_add_multiply",
+      "mode": "AUTO",
+      "source": "validation",
       "region": {
         "host_semantic_proof_digest": "validation-linear-6",
         "inputs": ["a", "b", "c", "d", "e", "f", "g"],
@@ -119,6 +129,8 @@
     },
     {
       "id": "branched_3_multiply_multiply_add",
+      "mode": "AUTO",
+      "source": "validation",
       "region": {
         "host_semantic_proof_digest": "validation-branched-3",
         "inputs": ["a", "b", "c", "d"],

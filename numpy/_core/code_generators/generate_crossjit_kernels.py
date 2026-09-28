@@ -86,6 +86,7 @@ def main() -> int:
     parser.add_argument("--output-c", type=Path, required=True)
     parser.add_argument("--output-h", type=Path, required=True)
     parser.add_argument("--output-json", type=Path, required=True)
+    parser.add_argument("--observations", type=Path, action="append", default=[])
     args = parser.parse_args()
 
     generator_root = args.generator_root.resolve()
@@ -93,6 +94,14 @@ def main() -> int:
     import crossjit_generator
     from crossjit_generator.backend.c import generate_bundle
     from crossjit_generator.domains.elementwise import ElementwiseOptimizer
+    from crossjit_generator.signature import (
+        GenerationMode,
+        GenerationRequest,
+        GenerationSource,
+        ObservedSignatures,
+        optimization_signature_from_ir,
+        resolve_generation_requests,
+    )
 
     lowering = _load_module(
         "numpy_crossjit_lowering", Path(__file__).with_name("crossjit_lowering.py"))
@@ -101,15 +110,54 @@ def main() -> int:
     if manifest.get("schema_version") != 1 or manifest.get("provider") != "numpy":
         raise ValueError("unsupported NumPy CrossJIT generation manifest")
     optimizer = ElementwiseOptimizer()
-    candidates = []
-    signature_ids = {}
+    requests = []
+    payloads = {}
     for signature in manifest["signatures"]:
+        mode = GenerationMode(signature["mode"])
+        source = GenerationSource(signature["source"])
         ir = lowering.lower_manifest(signature["region"])
         candidate = optimizer.legal_candidates(ir)[0]
-        candidates.append(candidate)
-        signature_ids[candidate.stable_hash()] = signature["id"]
+        optimization_signature = optimization_signature_from_ir(
+            ir, provider_abi_version=3)
+        request = GenerationRequest(
+            optimization_signature, mode, source, signature["id"])
+        requests.append(request)
+        payloads[request.request_id] = candidate
+
+    unsupported_observed = []
+    for observations_path in args.observations:
+        observations = ObservedSignatures.from_data(
+            json.loads(observations_path.read_text()))
+        for profile in observations.observations():
+            signature_hash = profile.signature.stable_hash()
+            request_id = f"observed_{signature_hash[:24]}"
+            try:
+                ir = lowering.lower_signature(profile.signature)
+                candidate = optimizer.legal_candidates(ir)[0]
+            except (ValueError, KeyError) as error:
+                unsupported_observed.append({
+                    "reason": str(error),
+                    "signature_hash": signature_hash,
+                })
+                continue
+            request = GenerationRequest(
+                profile.signature, GenerationMode.AUTO,
+                GenerationSource.OBSERVED, request_id)
+            requests.append(request)
+            payloads[request.request_id] = candidate
+
+    resolution = resolve_generation_requests(requests)
+    enabled = tuple(
+        (request, payloads[request.request_id])
+        for request in resolution.generated
+    )
+    candidates = tuple(candidate for _, candidate in enabled)
+    signature_info = {
+        candidate.stable_hash(): request
+        for request, candidate in enabled
+    }
     bundle = generate_bundle(
-        tuple(candidates), header_name=args.output_h.name)
+        candidates, header_name=args.output_h.name)
 
     metadata = json.loads(bundle.metadata)
     metadata.update({
@@ -123,9 +171,25 @@ def main() -> int:
                 for name in sorted(lowering.RECIPES)
             ).encode("ascii")
         ).hexdigest(),
+        "generation_universe": {
+            "actual_generated_candidate_count": len(candidates),
+            "disabled_signature_count": len(resolution.disabled_hashes),
+            "forced_signature_count": resolution.forced_count,
+            "observed_signature_count": resolution.observed_count,
+            "unsupported_observed_signature_count": len(unsupported_observed),
+            "validation_seed_count": resolution.validation_seed_count,
+        },
+        "unsupported_observed_signatures": sorted(
+            unsupported_observed, key=lambda item: item["signature_hash"]),
     })
     for kernel in metadata["kernels"]:
-        kernel["signature_id"] = signature_ids[kernel["candidate_hash"]]
+        request = signature_info[kernel["candidate_hash"]]
+        kernel["generation_mode"] = request.mode.value
+        kernel["generation_source"] = request.source.value
+        kernel["optimization_signature"] = request.signature.to_data()
+        kernel["optimization_signature_hash"] = (
+            request.signature.stable_hash())
+        kernel["signature_id"] = request.request_id
     header_text, source_text = _add_numpy_registry(
         bundle.header, bundle.source, metadata["kernels"])
     metadata_text = json.dumps(

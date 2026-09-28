@@ -72,6 +72,19 @@ def test_provider_optimization_funnel_telemetry(monkeypatch):
             stats["regions_executed"])
     assert stats["diagnostics_enabled"] is True
     assert len(stats["candidates"]) == 1
+    assert len(stats["observed_signatures"]) == 1
+
+    observed = stats["observed_signatures"][0]
+    assert observed["prepare_count"] == 1
+    assert observed["accepted_count"] == 1
+    assert observed["execution_count"] == stats["exec_hit"]
+    assert observed["generated_hit_count"] == stats["generated_exec_hit"]
+    assert observed["generic_fallback_count"] == 0
+    assert observed["min_elements"] == 64
+    assert observed["max_elements"] == 64
+    assert len(observed["element_buckets"]) == 14
+    assert sum(observed["element_buckets"]) == observed["execution_count"]
+    assert "benchmark" not in json.dumps(observed).lower()
 
     candidate = stats["last_candidate"]
     assert candidate["region_length"] == 2
