@@ -247,7 +247,11 @@ def main() -> int:
                     "artifact_format_version"],
             )
             lookup = decision_db.lookup(record.signature, environment)
-            if lookup is not None and lookup.record is not None:
+            if (lookup is not None and lookup.record is not None and
+                    lookup.state in (
+                        ArtifactDecision.AUTO_SELECTED,
+                        ArtifactDecision.AUTO_REJECTED,
+                        ArtifactDecision.FORCED)):
                 production_records.append(lookup.record)
         for request in requests:
             environment = DecisionEnvironment(

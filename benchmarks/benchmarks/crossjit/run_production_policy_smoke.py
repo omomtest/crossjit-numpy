@@ -48,6 +48,11 @@ def main() -> int:
             result = (left + right) * scale
         return result
 
+    def generated_large(left, right, scale, offset, divisor, count):
+        for _ in range(count):
+            result = (((left + right) * scale) - offset) / divisor
+        return result
+
     def generic_profitable(left, scalar, right, count):
         for _ in range(count):
             result = (left + scalar) * right
@@ -66,6 +71,12 @@ def main() -> int:
     unmeasured_stats = _run(
         unmeasured, (tiny, tiny + 1, tiny + 2),
         (tiny + tiny + 1) * (tiny + 2), internal, provider, np)
+    large = np.arange(65536.0) + 1.0
+    generated_large_stats = _run(
+        generated_large,
+        (large, large + 1, large + 2, large + 3, large + 4),
+        (((large + large + 1) * (large + 2)) - (large + 3)) / (large + 4),
+        internal, provider, np)
     medium = np.arange(256.0)
     generic_stats = _run(
         generic_profitable, (medium, 0.25, medium + 1),
@@ -75,6 +86,7 @@ def main() -> int:
         0.25 * medium + medium + 1, internal, provider, np)
 
     assert generated_stats["provider"]["generated_exec_hit"] > 0
+    assert generated_large_stats["provider"]["generated_exec_hit"] > 0
     assert unmeasured_stats["provider"]["regions_rejected_unprofitable"] == 1
     assert generic_stats["provider"]["generic_fallback_hit"] > 0
     assert regressive_stats["provider"]["regions_rejected_unprofitable"] == 1
@@ -85,9 +97,10 @@ def main() -> int:
         "formal_npbench_evaluation": False,
         "forced_admission": False,
         "decision_db_sha256": (
-            "e91373c3ab1b035ed558542e58d64df91a58e838a405e5d12f1e6beeb14ae33c"),
+            "292c9e1e24134c6c46eb4783bc01224ddf75e0a0303ce9dc9540dd4ec416b1b4"),
         "cases": {
             "selected_generated_profitable_n32": generated_stats,
+            "remeasured_generated_linear_l4_n65536": generated_large_stats,
             "selected_generated_unmeasured_n8": unmeasured_stats,
             "registry_miss_generic_profitable_n256": generic_stats,
             "registry_miss_generic_regressive_n256": regressive_stats,

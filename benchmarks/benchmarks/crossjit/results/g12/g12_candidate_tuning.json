@@ -171,9 +171,13 @@
         [
           16385,
           32768
+        ],
+        [
+          32769,
+          65536
         ]
       ],
-      "reason": "at least one stable generated-profitable element range",
+      "reason": "stable generated-profitable ranges, including G13 confidence remeasurement of the high-variance boundary",
       "signature_hash": "edd3cd980b7effcadff53e79bb5906ebc0e433720b2cb5685e8ea4bf2a7c606b"
     },
     {
@@ -473,7 +477,7 @@
     "samples_per_process": 7,
     "speedup_threshold": 1.05
   },
-  "decision_db_bytes": 80302,
+  "decision_db_bytes": 80425,
   "method": "generic_signature_microbenchmark",
   "rows": [
     {
@@ -3701,5 +3705,15 @@
       }
     }
   ],
-  "schema_version": 1
+  "schema_version": 1,
+  "supplemental_confidence_remeasurement": {
+    "artifact": "../g13/g12_linear4_n65536_confidence_remeasure.json",
+    "case_identifier": "linear_4",
+    "decision": "GENERATED for bounded range 32769..65536",
+    "element_count": 65536,
+    "generated_cv": 0.018185781894219363,
+    "generated_speedup": 2.2235145750492746,
+    "independent_processes": 5,
+    "samples_per_process": 7
+  }
 }

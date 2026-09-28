@@ -4,7 +4,7 @@
       "artifact_decision": "AUTO_SELECTED",
       "artifact_hash": "411a936a680b48a174e16d534c8d508c9a0f99a66a93806edd09b8a9a41eccec",
       "confidence": 0.8737442819618145,
-      "decision_db_bytes": 80302,
+      "decision_db_bytes": 80425,
       "environment": {
         "artifact_format_version": 1,
         "backend_version": "1",
@@ -300,7 +300,7 @@
       "artifact_decision": "AUTO_SELECTED",
       "artifact_hash": "f9207fc71894f3d1d04f3b5634578de3987cccf33905c6c185106c4cb9161676",
       "confidence": 0.14841872518021415,
-      "decision_db_bytes": 80302,
+      "decision_db_bytes": 80425,
       "environment": {
         "artifact_format_version": 1,
         "backend_version": "1",
@@ -560,7 +560,7 @@
       "artifact_decision": "AUTO_SELECTED",
       "artifact_hash": "b0adc4bb8d87bef570eeee91d5db583662358313cb470fa4caa269099e57fe8a",
       "confidence": 0.6141290162122868,
-      "decision_db_bytes": 80302,
+      "decision_db_bytes": 80425,
       "environment": {
         "artifact_format_version": 1,
         "backend_version": "1",
@@ -847,7 +847,7 @@
       "artifact_decision": "AUTO_SELECTED",
       "artifact_hash": "d2e22049f6a6fc7224b3a50e96ed46141917957c0cb9cedfb8b5af91c50bf396",
       "confidence": 0.27039639411014926,
-      "decision_db_bytes": 80302,
+      "decision_db_bytes": 80425,
       "environment": {
         "artifact_format_version": 1,
         "backend_version": "1",
@@ -1116,7 +1116,7 @@
       "artifact_decision": "AUTO_REJECTED",
       "artifact_hash": null,
       "confidence": 0.6126686890167119,
-      "decision_db_bytes": 80302,
+      "decision_db_bytes": 80425,
       "environment": {
         "artifact_format_version": 1,
         "backend_version": "1",
@@ -1375,8 +1375,8 @@
     {
       "artifact_decision": "AUTO_SELECTED",
       "artifact_hash": "106b926c3235fd5a624aa1bcf9577e3acb0869b94bcbc92967c744bbd502a25b",
-      "confidence": 0.0,
-      "decision_db_bytes": 80302,
+      "confidence": 0.5245177150385807,
+      "decision_db_bytes": 80425,
       "environment": {
         "artifact_format_version": 1,
         "backend_version": "1",
@@ -1581,17 +1581,17 @@
             "reason": "stable generated speedup above threshold"
           },
           {
-            "baseline_median_ns": 86588.96666666666,
-            "confidence": 0.0,
-            "decision": "ORIGINAL",
-            "generated_median_ns": 39152.0,
-            "generated_speedup": 2.21161030513554,
-            "generic_median_ns": 154323.96666666667,
-            "generic_speedup": 0.5610856728021721,
-            "max_cv": 0.18367497403292637,
+            "baseline_median_ns": 88332.6,
+            "confidence": 0.5245177150385807,
+            "decision": "GENERATED",
+            "generated_median_ns": 39726.566666666666,
+            "generated_speedup": 2.2235145750492746,
+            "generic_median_ns": 155909.3,
+            "generic_speedup": 0.5665640215176388,
+            "max_cv": 0.0713223427442129,
             "max_elements": 65536,
-            "min_elements": 65536,
-            "reason": "no measured-profitable Provider path"
+            "min_elements": 32769,
+            "reason": "stable generated speedup above threshold; G13 confidence remeasurement used 5 independent processes x 7 samples"
           }
         ]
       },
@@ -1601,7 +1601,7 @@
         "method": "generic_signature_microbenchmark",
         "samples_per_process": 7
       },
-      "reason": "at least one stable generated-profitable element range",
+      "reason": "stable generated-profitable ranges, including remeasured high-variance boundary",
       "signature": {
         "domain": "elementwise",
         "dtype_class": "float64",
@@ -1654,7 +1654,7 @@
       "artifact_decision": "AUTO_SELECTED",
       "artifact_hash": "f38779fb5ae76533c79dcbe6e5dfc8240700180d30ab1f5a627cb8c1ddaa9f7f",
       "confidence": 0.2192321260213923,
-      "decision_db_bytes": 80302,
+      "decision_db_bytes": 80425,
       "environment": {
         "artifact_format_version": 1,
         "backend_version": "1",
@@ -1923,7 +1923,7 @@
       "artifact_decision": "AUTO_REJECTED",
       "artifact_hash": null,
       "confidence": 0.0,
-      "decision_db_bytes": 80302,
+      "decision_db_bytes": 80425,
       "environment": {
         "artifact_format_version": 1,
         "backend_version": "1",

@@ -4,6 +4,11 @@ Date: 2026-09-28
 
 Formal NPBench evaluation has not started.
 
+The recovery confidence audit remeasured the sole high-variance G12 boundary
+cell, linear L4 at N=65536, with five independent processes and seven samples
+per process.  The stable 2.224x generated result extends that bounded runtime
+range through N=65536.  No NPBench measurement informed this change.
+
 ## Runtime pipeline
 
 ```text
@@ -32,6 +37,9 @@ and diagnostic generated-disable overrides remain test/microbenchmark-only.
 selected generated signature, N=32:
     generated execution (4002 recorded hits)
 
+remeasured generated linear L4 signature, N=65536:
+    generated execution (4002 recorded hits)
+
 selected generated signature, unmeasured N=8:
     Provider UNPROFITABLE, original NumPy, zero Provider execution
 
@@ -46,7 +54,7 @@ Evidence:
 
 ```text
 results/g13/g13_production_policy_smoke.json
-SHA-256 55ad3dc2ff6656e377b19c4dcfbe455242a9c3d649760dc7a9f661c6ba935dda
+SHA-256 24b5683113b203b8ef82f6fdb630dd6f11e06f801023e52b1009ad4be1c27a38
 ```
 
 The production smoke explicitly verifies that all forced-admission variables
@@ -57,8 +65,9 @@ are absent.  It is a policy diagnostic, not formal suite evaluation.
 The build generator reconstructs the exact DecisionDB environment before
 materializing AUTO entries.  A compiler-version mismatch produces zero
 kernels and zero production policies; no stale record is selected.  DISABLE
-continues to override FORCE/AUTO, and a disabled/rejected artifact cannot
-authorize generated execution.
+continues to override FORCE/AUTO.  Disabled records authorize neither
+generated nor generic execution; an AUTO_REJECTED record can authorize only a
+separately measured generic range.
 
 ## Final generated artifact impact
 
@@ -72,20 +81,20 @@ generated object .text:             1002 bytes
 compiled production policy table:   2880 bytes
 generated registry table:            144 bytes
 policy lookup symbol:                 693 bytes
-DecisionDB JSON:                    80302 bytes
+DecisionDB JSON:                    80425 bytes
 ```
 
 Final build-artifact hashes:
 
 ```text
 generated C:
-    e9fb7c527a1c9cb62c3eb96a8770be222a45c3a170b77b6efac174d8caa881cc
+    5648f27d8b167c196378fe7563150ac7c5b72b3394c1691bff7bbbd0ba41d313
 generated H:
     0db4593fe185c2f3e3b03de218314c7ff997d9055cb8a95afdfdf37a80ce5d08
 generated metadata:
-    1e84bd3e30c370ee9d39e780b9f35f1b0fa8c6ff181d89c92cf0d04478ce82ba
+    a91088411c5e70322ac37211e6965085b11a04b45d97479830fb4a59025c8d57
 DecisionDB:
-    e91373c3ab1b035ed558542e58d64df91a58e838a405e5d12f1e6beeb14ae33c
+    292c9e1e24134c6c46eb4783bc01224ddf75e0a0303ce9dc9540dd4ec416b1b4
 ```
 
 CPython remains unchanged at

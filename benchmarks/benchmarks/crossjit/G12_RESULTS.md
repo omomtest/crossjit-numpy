@@ -45,10 +45,14 @@ linear L6:  2.308x
 branched L3: 1.856x
 ```
 
-The six artifacts have generated-profitable coverage from N=16 through
-N=65536, except linear L4: its N=65536 measurement exceeded the conservative
-CV bound, so N=32769 through N=65536 is unmeasured/unselected and rejects to
-original NumPy.  No envelope extrapolates above N=65536 or below N=16.
+The initial three-process run conservatively rejected linear L4 at N=65536
+because its generated CV exceeded the bound.  The pre-G14 confidence audit
+remeasured only that ambiguous boundary using five independent processes and
+seven samples per process.  It measured 2.224x generated speedup with 1.82%
+generated CV.  Because the adjacent N=32768 and N=65536 boundary measurements
+now agree, the final bounded L4 range N=32769..65536 is GENERATED.  The other
+decisions were clearly separated and were not rerun.  No envelope extrapolates
+above N=65536 or below N=16.
 
 The array-scalar generic fallback was measured profitable across N=16..65536.
 The known scalar-array fallback regression is retained: only N=16..128 is
@@ -63,7 +67,7 @@ generated C source:              5366 bytes
 generated object file:           3944 bytes
 generated object .text:          1002 bytes
 mean object .text/kernel:          167 bytes
-frozen DecisionDB:               80302 bytes
+final DecisionDB:                80425 bytes
 ```
 
 Frozen files:
@@ -71,13 +75,14 @@ Frozen files:
 ```text
 results/g12/g12_candidate_tuning.json
 results/g12/g12_decision_db.json
+results/g13/g12_linear4_n65536_confidence_remeasure.json
 ```
 
 Frozen hashes:
 
 ```text
 DecisionDB:
-    e91373c3ab1b035ed558542e58d64df91a58e838a405e5d12f1e6beeb14ae33c
+    292c9e1e24134c6c46eb4783bc01224ddf75e0a0303ce9dc9540dd4ec416b1b4
 generated C:
     2db708e93ad9be443293ac64e5ae3ad199b831d619f49cfd813968a4eccabca6
 generated H:

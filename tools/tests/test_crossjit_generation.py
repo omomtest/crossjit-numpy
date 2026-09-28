@@ -150,7 +150,25 @@ def test_decisiondb_selection_and_stale_environment_fail_closed(tmp_path):
     assert len(selected["kernels"]) == 6
     assert len(selected["production_policies"]) == 8
     assert selected["decision_db_sha256"] == (
-        "e91373c3ab1b035ed558542e58d64df91a58e838a405e5d12f1e6beeb14ae33c")
+        "292c9e1e24134c6c46eb4783bc01224ddf75e0a0303ce9dc9540dd4ec416b1b4")
+
+    disabled_data = json.loads(decision_db.read_text())
+    disabled_record = disabled_data["records"][0]
+    disabled_record["artifact_decision"] = "DISABLED"
+    disabled_db = tmp_path / "disabled_decision_db.json"
+    disabled_db.write_text(json.dumps(disabled_data))
+    disabled_outputs = (tmp_path / "disabled.c", tmp_path / "disabled.h",
+                        tmp_path / "disabled.json")
+    subprocess.run(_command(
+        root, manifest, disabled_outputs,
+        "--decision-db", disabled_db,
+        "--decision-environment", environment), check=True)
+    disabled = json.loads(disabled_outputs[2].read_text())
+    assert len(disabled["production_policies"]) == 7
+    assert disabled_record["signature_hash"] not in {
+        policy["signature_hash"]
+        for policy in disabled["production_policies"]
+    }
 
     stale_data = json.loads(environment.read_text())
     stale_data["compiler_version"] = "stale-compiler"
