@@ -181,6 +181,8 @@ def _measure_cell(case, n, args, serial):
     host = internal.crossjit_stats()
     exec_hit = _counter_delta(after, before, "exec_hit")
     executed = _counter_delta(after, before, "regions_executed")
+    fixed_fast = _counter_delta(after, before, "fixed_fast_path_hit")
+    fixed_generic = _counter_delta(after, before, "fixed_generic_path_hit")
     valid_execution = (
         args.mode == "baseline" or
         (exec_hit > 0 and executed > 0 and
@@ -213,6 +215,8 @@ def _measure_cell(case, n, args, serial):
             "exec_miss": _counter_delta(after, before, "exec_miss"),
             "exec_error": _counter_delta(after, before, "exec_error"),
             "regions_executed": executed,
+            "fixed_fast_path_hit": fixed_fast,
+            "fixed_generic_path_hit": fixed_generic,
             "provider_accepted": after["regions_provider_accepted"],
             "published": host["published_regions"],
         },
@@ -376,6 +380,16 @@ def _controller(args):
                 row["execution_evidence"]["exec_hit"] > 0
                 for row in crossjit)
         )
+        fast_hits = [row["execution_evidence"]["fixed_fast_path_hit"]
+                     for row in crossjit]
+        generic_hits = [row["execution_evidence"]["fixed_generic_path_hit"]
+                        for row in crossjit]
+        if all(value > 0 for value in fast_hits) and not any(generic_hits):
+            backend_path = "fixed_fast"
+        elif all(value > 0 for value in generic_hits) and not any(fast_hits):
+            backend_path = "fixed_generic"
+        else:
+            backend_path = "mixed"
         case = CASE_BY_ID[case_id]
         rows.append({
             "case_identifier": case_id,
@@ -405,6 +419,9 @@ def _controller(args):
                 row["execution_evidence"]["regions_executed"]
                 for row in crossjit
             ],
+            "fixed_fast_path_hits": fast_hits,
+            "fixed_generic_path_hits": generic_hits,
+            "backend_path": backend_path,
             "forced_admission": True,
             "valid_crossjit_execution": valid,
         })
@@ -460,7 +477,7 @@ def _controller(args):
     costs = _aggregate_cost(cost_raw)
 
     document = {
-        "schema_version": 1,
+        "schema_version": 2,
         "configuration": {
             "python": args.python,
             "dtype": args.dtype,
