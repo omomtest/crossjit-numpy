@@ -1,0 +1,178 @@
+{
+  "independent_processes": 5,
+  "rows": [
+    {
+      "correct": true,
+      "element_count": 16,
+      "execution_specialization_hash": "52c5ff1a8250e7f05a60f113878e438604952067bb3890fe00ed7d01254dac05",
+      "generated_over_oracle_cv": 0.0029926190408999646,
+      "generated_over_oracle_median": 1.0060831832930195,
+      "inner_extent": 8,
+      "outer_count": 2,
+      "process_ratios": [
+        1.0050737705526331,
+        1.0102351830864245,
+        1.0018595253559508,
+        1.0060831832930195,
+        1.0065599104585636
+      ],
+      "profiled_source": "validation_seed"
+    },
+    {
+      "correct": true,
+      "element_count": 256,
+      "execution_specialization_hash": "52c5ff1a8250e7f05a60f113878e438604952067bb3890fe00ed7d01254dac05",
+      "generated_over_oracle_cv": 0.004950540494989247,
+      "generated_over_oracle_median": 0.9937123027723878,
+      "inner_extent": 64,
+      "outer_count": 4,
+      "process_ratios": [
+        1.0027300081249084,
+        0.9949622032085148,
+        0.9937123027723878,
+        0.9897746647165185,
+        0.9920134259793023
+      ],
+      "profiled_source": "validation_seed"
+    },
+    {
+      "correct": true,
+      "element_count": 4096,
+      "execution_specialization_hash": "52c5ff1a8250e7f05a60f113878e438604952067bb3890fe00ed7d01254dac05",
+      "generated_over_oracle_cv": 0.002475522941727853,
+      "generated_over_oracle_median": 1.0001560172023851,
+      "inner_extent": 256,
+      "outer_count": 16,
+      "process_ratios": [
+        0.9973976812901235,
+        1.0017628327487167,
+        1.0031895880321795,
+        0.9978857723166827,
+        1.0001560172023851
+      ],
+      "profiled_source": "validation_seed"
+    },
+    {
+      "correct": true,
+      "element_count": 3481,
+      "execution_specialization_hash": "52c5ff1a8250e7f05a60f113878e438604952067bb3890fe00ed7d01254dac05",
+      "generated_over_oracle_cv": 0.003659416498131068,
+      "generated_over_oracle_median": 1.0043308417325583,
+      "inner_extent": 59,
+      "outer_count": 59,
+      "process_ratios": [
+        0.9983764381289607,
+        1.0043308417325583,
+        1.0053742768371319,
+        1.0010300575087114,
+        1.0076798779934277
+      ],
+      "profiled_source": "validation_seed"
+    },
+    {
+      "correct": true,
+      "element_count": 65536,
+      "execution_specialization_hash": "52c5ff1a8250e7f05a60f113878e438604952067bb3890fe00ed7d01254dac05",
+      "generated_over_oracle_cv": 0.00706592852721945,
+      "generated_over_oracle_median": 0.9950943506855204,
+      "inner_extent": 1024,
+      "outer_count": 64,
+      "process_ratios": [
+        0.9885155296699241,
+        0.9961643125981305,
+        0.9950943506855204,
+        0.9818042189305309,
+        0.9993316147942887
+      ],
+      "profiled_source": "validation_seed"
+    },
+    {
+      "correct": true,
+      "element_count": 16,
+      "execution_specialization_hash": "b433e05a2c7b0202efe5e9e00da69fba20287373d433b6841efa07e79ec421ce",
+      "generated_over_oracle_cv": 0.0025965945555136392,
+      "generated_over_oracle_median": 0.9985069171585739,
+      "inner_extent": 8,
+      "outer_count": 2,
+      "process_ratios": [
+        0.9987923997977344,
+        0.9985069171585739,
+        1.0027592443341222,
+        0.9967326425684214,
+        0.9961378922526155
+      ],
+      "profiled_source": "observed"
+    },
+    {
+      "correct": true,
+      "element_count": 256,
+      "execution_specialization_hash": "b433e05a2c7b0202efe5e9e00da69fba20287373d433b6841efa07e79ec421ce",
+      "generated_over_oracle_cv": 0.002019839288392694,
+      "generated_over_oracle_median": 0.9890945144784395,
+      "inner_extent": 64,
+      "outer_count": 4,
+      "process_ratios": [
+        0.9890945144784395,
+        0.9882930133675025,
+        0.9877299061442094,
+        0.9924920855135985,
+        0.9911042241893466
+      ],
+      "profiled_source": "observed"
+    },
+    {
+      "correct": true,
+      "element_count": 4096,
+      "execution_specialization_hash": "b433e05a2c7b0202efe5e9e00da69fba20287373d433b6841efa07e79ec421ce",
+      "generated_over_oracle_cv": 0.001021006689750663,
+      "generated_over_oracle_median": 0.9970398864574805,
+      "inner_extent": 256,
+      "outer_count": 16,
+      "process_ratios": [
+        0.9970398864574805,
+        0.9967348005692596,
+        0.997515873449798,
+        0.9986169582381003,
+        0.9958554751792983
+      ],
+      "profiled_source": "observed"
+    },
+    {
+      "correct": true,
+      "element_count": 3481,
+      "execution_specialization_hash": "b433e05a2c7b0202efe5e9e00da69fba20287373d433b6841efa07e79ec421ce",
+      "generated_over_oracle_cv": 0.003266264998844499,
+      "generated_over_oracle_median": 1.001283988427165,
+      "inner_extent": 59,
+      "outer_count": 59,
+      "process_ratios": [
+        1.001283988427165,
+        1.0006016940341596,
+        1.0023577665212955,
+        1.0050129866027002,
+        0.9960406473975917
+      ],
+      "profiled_source": "observed"
+    },
+    {
+      "correct": true,
+      "element_count": 65536,
+      "execution_specialization_hash": "b433e05a2c7b0202efe5e9e00da69fba20287373d433b6841efa07e79ec421ce",
+      "generated_over_oracle_cv": 0.01145669892258781,
+      "generated_over_oracle_median": 0.9865573663411606,
+      "inner_extent": 1024,
+      "outer_count": 64,
+      "process_ratios": [
+        1.004294477437107,
+        0.9865573663411606,
+        0.9939303586685498,
+        0.9769364718559459,
+        0.9786490543380367
+      ],
+      "profiled_source": "observed"
+    }
+  ],
+  "samples_per_process": 7,
+  "schema_version": 1,
+  "vectorization_diagnostics": "build-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:12:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:27:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:44:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:61:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:74:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:87:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:103:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:119:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:133:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:148:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:162:26: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:180:30: optimized: loop vectorized using 16 byte vectors\nbuild-crossjit-v3/numpy/_core/generated_crossjit_kernels.c:199:30: optimized: loop vectorized using 16 byte vectors\nbenchmarks/benchmarks/crossjit/pf4_inner_oracle.c:16:38: optimized: loop vectorized using 16 byte vectors\nbenchmarks/benchmarks/crossjit/pf4_inner_oracle.c:36:38: optimized: loop vectorized using 16 byte vectors\n"
+}

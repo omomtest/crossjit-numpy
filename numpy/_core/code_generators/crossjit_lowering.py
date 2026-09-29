@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from copy import deepcopy
 from typing import Any, Mapping
 
 from crossjit_generator.ir import (
@@ -157,12 +158,23 @@ def lower_profile_record(record: Mapping[str, Any]):
     }
     if record.get("profile_variant_hash") != _digest(variant_descriptor):
         raise ValueError("profile execution-specialization hash mismatch")
-    ir = lower_signature(signature)
     access_names = tuple(record["operand_access_classes"])
     if len(access_names) != signature.input_count:
         raise ValueError("profile access count does not match signature")
+    ir = lower_signature(signature)
+    descriptor = iteration_descriptor(
+        signature.input_count, access_names, record["iteration_rank_class"])
+    return ir, descriptor
+
+
+def iteration_descriptor(
+        input_count: int, access_names: tuple[str, ...], rank_code: int,
+) -> IterationDescriptor:
+    """Build the versioned Provider iteration projection from layout facts."""
+
+    if len(access_names) != input_count:
+        raise ValueError("profile access count does not match input count")
     access_kinds = tuple(OperandAccessKind(name) for name in access_names)
-    rank_code = record["iteration_rank_class"]
     if rank_code not in (1, 2):
         raise ValueError("unsupported profile iteration rank class")
     rank = (IterationRankClass.FLAT if rank_code == 1
@@ -181,7 +193,7 @@ def lower_profile_record(record: Mapping[str, Any]):
              "BROADCAST_INNER" if access is OperandAccessKind.ZERO_STRIDE else
              "NONE"),
         ))
-    descriptor = IterationDescriptor(
+    return IterationDescriptor(
         1, rank, outer, outer_shape, "runtime_inner_extent",
         tuple(operands),
         OutputDescriptor(
@@ -190,7 +202,24 @@ def lower_profile_record(record: Mapping[str, Any]):
              if rank is IterationRankClass.OUTER_INNER else None),
             "FRESH_PROVIDER_OUTPUT"),
     )
+
+
+def lower_inner_validation_seed(manifest: Mapping[str, Any]):
+    """Reuse a structural validation recipe with an inner-row descriptor."""
+
+    variant = deepcopy(manifest)
+    specialization = variant["specialization"]
+    specialization["layout_class"] = "inner_contiguous"
+    specialization["contract_digest"] = (
+        "numpy-fp64-inner-contiguous-affine-rows-v1")
+    ir = lower_manifest(variant)
+    descriptor = iteration_descriptor(
+        len(variant["inputs"]),
+        ("CONTIGUOUS",) * len(variant["inputs"]), 2)
     return ir, descriptor
 
 
-__all__ = ["lower_manifest", "lower_profile_record", "lower_signature"]
+__all__ = [
+    "iteration_descriptor", "lower_inner_validation_seed", "lower_manifest",
+    "lower_profile_record", "lower_signature",
+]

@@ -1256,13 +1256,13 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
     const char *force_profiled_generated = Py_GETENV(
         "NPY_CROSSJIT_PROFILED_FORCE_GENERATED");
     if (policy == NUMPY_CROSSJIT_POLICY_ORIGINAL &&
-            force_profiled_generated != NULL &&
-            strcmp(force_profiled_generated, "1") == 0 &&
-            plan->guards.domain.typenum == NPY_DOUBLE &&
-            numpy_crossjit_profiled_iteration_registry_lookup(
+            plan->guards.domain.typenum == NPY_DOUBLE) {
+        int force_profiled = force_profiled_generated != NULL &&
+            strcmp(force_profiled_generated, "1") == 0;
+        policy = numpy_crossjit_profiled_iteration_registry_lookup(
                 plan->nodes, plan->node_count, plan->guards.input_count,
-                &plan->guards.iteration, plan->output_slot, &plan->fixed)) {
-        policy = NUMPY_CROSSJIT_POLICY_GENERATED;
+                &plan->guards.iteration, plan->output_slot, elements,
+                force_profiled, &plan->fixed);
     }
     const char *disable_generated = Py_GETENV(
         "NPY_CROSSJIT_DIAGNOSTIC_DISABLE_GENERATED");

@@ -110,10 +110,11 @@ NumpyCrossJitPolicyDecision numpy_crossjit_generated_registry_lookup(
     uint8_t input_count, uint16_t scalar_mask, uint8_t output_slot,
     uint64_t element_count, NumpyCrossJitFixedPlan *plan);
 
-int numpy_crossjit_profiled_iteration_registry_lookup(
+NumpyCrossJitPolicyDecision numpy_crossjit_profiled_iteration_registry_lookup(
     const NumpyCrossJitKernelNode *nodes, uint8_t node_count,
     uint8_t input_count, const NumpyCrossJitIterationDescriptor *descriptor,
-    uint8_t output_slot, NumpyCrossJitFixedPlan *plan);
+    uint8_t output_slot, uint64_t element_count, int force_generated,
+    NumpyCrossJitFixedPlan *plan);
 
 /* Executes a validated two-to-six-node DAG over one strided iteration domain.
  * Returns zero without publishing partial output when the program is invalid. */

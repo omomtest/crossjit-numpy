@@ -1,0 +1,503 @@
+{
+  "candidate_universe_hash": "6f70deef1b5bd19cd8fc85900966635a34642644153bf5334258d767ce84ed48",
+  "profile_identity_hash": "6c107b03919f0586a6a82c6f490a6f368717af9361172f56abdc561284d63190",
+  "records": [
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "26bb9778d1288654b71a351490c740c1018ed8b461608d7ac4776612908e1606",
+      "confidence": 0.7146242284148898,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "1",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 1021.6502,
+            "confidence": 0.9609884414002509,
+            "decision": "GENERATED",
+            "generated_median_ns": 321.2827,
+            "generated_speedup": 3.1799104028943983,
+            "generic_median_ns": 418.0147,
+            "generic_speedup": 2.4440532832936257,
+            "max_cv": 0.005851733789962371,
+            "max_elements": 16,
+            "min_elements": 16,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 1025.3617,
+            "confidence": 0.9657346039677644,
+            "decision": "GENERATED",
+            "generated_median_ns": 313.8381,
+            "generated_speedup": 3.2671676893277137,
+            "generic_median_ns": 412.4335,
+            "generic_speedup": 2.486126126999868,
+            "max_cv": 0.005139809404835326,
+            "max_elements": 32,
+            "min_elements": 32,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 1078.3747,
+            "confidence": 0.9820984248136887,
+            "decision": "GENERATED",
+            "generated_median_ns": 320.4153,
+            "generated_speedup": 3.365553080642529,
+            "generic_median_ns": 444.5059,
+            "generic_speedup": 2.426007618796511,
+            "max_cv": 0.002685236277946694,
+            "max_elements": 64,
+            "min_elements": 64,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 1285.995391705069,
+            "confidence": 0.9048982517249399,
+            "decision": "GENERATED",
+            "generated_median_ns": 388.7567844342038,
+            "generated_speedup": 3.3079690006611857,
+            "generic_median_ns": 555.5459549411162,
+            "generic_speedup": 2.31483170792122,
+            "max_cv": 0.014265262241259012,
+            "max_elements": 256,
+            "min_elements": 256,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 2089.7639528929853,
+            "confidence": 0.7572231838843672,
+            "decision": "GENERATED",
+            "generated_median_ns": 552.4024577572965,
+            "generated_speedup": 3.7830460808904367,
+            "generic_median_ns": 890.4229390681004,
+            "generic_speedup": 2.3469340930053892,
+            "max_cv": 0.03641652241734492,
+            "max_elements": 1024,
+            "min_elements": 1024,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 4841.543554006968,
+            "confidence": 0.836107047864585,
+            "decision": "GENERATED",
+            "generated_median_ns": 1147.1254355400697,
+            "generated_speedup": 4.220587743944111,
+            "generic_median_ns": 2215.3710801393727,
+            "generic_speedup": 2.185432317597275,
+            "max_cv": 0.024583942820312243,
+            "max_elements": 3481,
+            "min_elements": 3481,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 4731.508196721312,
+            "confidence": 0.8036634697880367,
+            "decision": "GENERATED",
+            "generated_median_ns": 1349.4405737704917,
+            "generated_speedup": 3.5062738505786406,
+            "generic_median_ns": 2250.469262295082,
+            "generic_speedup": 2.1024540419165767,
+            "max_cv": 0.029450479531794502,
+            "max_elements": 4096,
+            "min_elements": 4096,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 15811.88524590164,
+            "confidence": 0.7146242284148898,
+            "decision": "GENERATED",
+            "generated_median_ns": 4315.040983606557,
+            "generated_speedup": 3.6643650213226704,
+            "generic_median_ns": 7409.737704918033,
+            "generic_speedup": 2.1339331938034576,
+            "max_cv": 0.04280636573776652,
+            "max_elements": 16384,
+            "min_elements": 16384,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 104515.53333333334,
+            "confidence": 0.8314398746757091,
+            "decision": "GENERATED",
+            "generated_median_ns": 23670.666666666668,
+            "generated_speedup": 4.415403030473723,
+            "generic_median_ns": 32135.133333333335,
+            "generic_speedup": 3.252375904254326,
+            "max_cv": 0.025284018798643625,
+            "max_elements": 65536,
+            "min_elements": 65536,
+            "reason": "stable descriptor-specific generated speedup"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 5,
+        "measured_at_utc": "2026-09-29T14:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "at least one measured-profitable specialization cell",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "inner_contiguous",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              2
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "943ddb58171c2969b54c4bb3cc97bb7410e526b5c170c818c8371ea4b6ef7bcf",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "OUTER_INNER",
+          "operands": [
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 0,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 1,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": "runtime_outer_stride"
+            }
+          ],
+          "outer_count": "runtime_outer_count",
+          "outer_shape_class": "AFFINE_ROWS",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": "runtime_output_outer_stride",
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 1
+        },
+        "iteration_descriptor_hash": "3fa2758448ea0818f48c231db68bd8fc6e98697b303715699cae884b0ee76b24",
+        "lowering_form": "outer_inner_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "943ddb58171c2969b54c4bb3cc97bb7410e526b5c170c818c8371ea4b6ef7bcf"
+      },
+      "specialization_hash": "52c5ff1a8250e7f05a60f113878e438604952067bb3890fe00ed7d01254dac05"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "47e306cb193d45f327810c8ab3040fd27a6657cee5d4768f94a775bf4e88bf33",
+      "confidence": 0.0,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "1",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 990.1283,
+            "confidence": 0.9813501085781325,
+            "decision": "GENERATED",
+            "generated_median_ns": 311.8461,
+            "generated_speedup": 3.175054297616677,
+            "generic_median_ns": 401.8232,
+            "generic_speedup": 2.4640894303763448,
+            "max_cv": 0.002797483713280111,
+            "max_elements": 16,
+            "min_elements": 16,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 1031.1827,
+            "confidence": 0.8660302577815557,
+            "decision": "GENERATED",
+            "generated_median_ns": 317.0895,
+            "generated_speedup": 3.2520241130658696,
+            "generic_median_ns": 409.9701,
+            "generic_speedup": 2.5152631862665107,
+            "max_cv": 0.020095461332766632,
+            "max_elements": 32,
+            "min_elements": 32,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 1071.2079,
+            "confidence": 0.9781538396621207,
+            "decision": "GENERATED",
+            "generated_median_ns": 322.6648,
+            "generated_speedup": 3.319878400122976,
+            "generic_median_ns": 430.8284,
+            "generic_speedup": 2.4863911014222837,
+            "max_cv": 0.003276924050681902,
+            "max_elements": 64,
+            "min_elements": 64,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 1274.7592165898618,
+            "confidence": 0.9439842723168631,
+            "decision": "GENERATED",
+            "generated_median_ns": 403.2095494111623,
+            "generated_speedup": 3.1615303220161577,
+            "generic_median_ns": 518.1376088069636,
+            "generic_speedup": 2.46027154740814,
+            "max_cv": 0.008402359152470536,
+            "max_elements": 256,
+            "min_elements": 256,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 1934.21044546851,
+            "confidence": 0.9114445602004491,
+            "decision": "GENERATED",
+            "generated_median_ns": 558.994367639529,
+            "generated_speedup": 3.4601608843325553,
+            "generic_median_ns": 725.6979006656426,
+            "generic_speedup": 2.665310790749657,
+            "max_cv": 0.013283315969932633,
+            "max_elements": 1024,
+            "min_elements": 1024,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 4753.789198606271,
+            "confidence": 0.917120725329112,
+            "decision": "GENERATED",
+            "generated_median_ns": 1160.3519163763067,
+            "generated_speedup": 4.096851249620894,
+            "generic_median_ns": 1626.4442508710802,
+            "generic_speedup": 2.9228110315249163,
+            "max_cv": 0.012431891200633193,
+            "max_elements": 3481,
+            "min_elements": 3481,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 5021.411885245901,
+            "confidence": 0.8469119002087941,
+            "decision": "GENERATED",
+            "generated_median_ns": 1368.09631147541,
+            "generated_speedup": 3.670364318013992,
+            "generic_median_ns": 1621.641393442623,
+            "generic_speedup": 3.0964995747831896,
+            "max_cv": 0.02296321496868087,
+            "max_elements": 4096,
+            "min_elements": 4096,
+            "reason": "stable descriptor-specific generated speedup"
+          },
+          {
+            "baseline_median_ns": 16793.147540983606,
+            "confidence": 0.0,
+            "decision": "ORIGINAL",
+            "generated_median_ns": 4430.008196721312,
+            "generated_speedup": 3.790771211983843,
+            "generic_median_ns": 5107.401639344263,
+            "generic_speedup": 3.2880021441077956,
+            "max_cv": 0.15558413516404562,
+            "max_elements": 16384,
+            "min_elements": 16384,
+            "reason": "unprofitable or noisy descriptor specialization"
+          },
+          {
+            "baseline_median_ns": 73769.1,
+            "confidence": 0.7961432245929377,
+            "decision": "GENERATED",
+            "generated_median_ns": 22117.2,
+            "generated_speedup": 3.3353724702946126,
+            "generic_median_ns": 22876.4,
+            "generic_speedup": 3.2246813309786506,
+            "max_cv": 0.030578516311059338,
+            "max_elements": 65536,
+            "min_elements": 65536,
+            "reason": "stable descriptor-specific generated speedup"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 5,
+        "measured_at_utc": "2026-09-29T14:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "at least one measured-profitable specialization cell",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "inner_contiguous",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "6f833ba31a2de4c89d5d74211c3471b921c7df38e1b7b77b5cb2446fd47400f6",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "OUTER_INNER",
+          "operands": [
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 0,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 1,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": "runtime_outer_stride"
+            }
+          ],
+          "outer_count": "runtime_outer_count",
+          "outer_shape_class": "AFFINE_ROWS",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": "runtime_output_outer_stride",
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 1
+        },
+        "iteration_descriptor_hash": "3fa2758448ea0818f48c231db68bd8fc6e98697b303715699cae884b0ee76b24",
+        "lowering_form": "outer_inner_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "6f833ba31a2de4c89d5d74211c3471b921c7df38e1b7b77b5cb2446fd47400f6"
+      },
+      "specialization_hash": "b433e05a2c7b0202efe5e9e00da69fba20287373d433b6841efa07e79ec421ce"
+    }
+  ],
+  "schema_version": 1
+}

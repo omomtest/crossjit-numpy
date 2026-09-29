@@ -91,9 +91,10 @@ def _add_numpy_registry(
         "    const char *execution_specialization_hash;",
         "    unsigned char input_count, node_count, output_slot;",
         "    unsigned char descriptor_version, iteration_rank_class;",
-        "    unsigned char outer_shape_class;",
+        "    unsigned char outer_shape_class, range_count;",
         "    unsigned char access_kinds[16];",
         "    NumpyCrossJitGeneratedPolicyNode nodes[6];",
+        "    NumpyCrossJitGeneratedPolicyRange ranges[16];",
         "    NumpyCrossJitGeneratedOuterInnerKernelEntry entry;",
         "} NumpyCrossJitGeneratedIterationKernel;",
         f"#define NPY_CROSSJIT_PROFILED_ITERATION_KERNEL_COUNT "
@@ -145,6 +146,14 @@ def _add_numpy_registry(
         }
         access_values = [accesses[item["access_kind"]]
                          for item in kernel["iteration_descriptor"]["operands"]]
+        execution_policy = kernel.get("execution_policy", {})
+        policy_points = execution_policy.get("points", [])
+        policy_ranges = [
+            "{" + f"{point['min_elements']}ULL, "
+            f"{point['max_elements']}ULL, "
+            f"{execution_policy['runtime_codes'][index]}" + "}"
+            for index, point in enumerate(policy_points)
+        ]
         iteration_rows.append("\n".join((
             "    {",
             f'        "{kernel["execution_specialization_hash"]}",',
@@ -153,9 +162,11 @@ def _add_numpy_registry(
             f"{signature['input_count'] + len(signature['operations']) - 1},",
             f"        {kernel['iteration_descriptor']['schema_version']}, "
             f"{2 if kernel['iteration_descriptor']['iteration_rank_class'] == 'OUTER_INNER' else 1}, "
-            f"{1 if kernel['iteration_descriptor']['outer_shape_class'] == 'AFFINE_ROWS' else 0},",
+            f"{1 if kernel['iteration_descriptor']['outer_shape_class'] == 'AFFINE_ROWS' else 0}, "
+            f"{len(policy_ranges)},",
             "        {" + ", ".join(map(str, access_values)) + "},",
             "        {" + ", ".join(nodes) + "},",
+            "        {" + ", ".join(policy_ranges) + "},",
             f"        {kernel['symbol']},",
             "    },",
         )))
@@ -217,6 +228,9 @@ def main() -> int:
     parser.add_argument("--decision-environment", type=Path)
     parser.add_argument("--profiled-coverage", type=Path)
     parser.add_argument("--profiled-layout-class", action="append", default=[])
+    parser.add_argument(
+        "--profiled-inner-validation-seed", action="append", default=[])
+    parser.add_argument("--execution-decision-db", type=Path)
     args = parser.parse_args()
 
     generator_root = args.generator_root.resolve()
@@ -234,7 +248,8 @@ def main() -> int:
         resolve_generation_requests,
     )
     from crossjit_generator.decision import (
-        ArtifactDecision, DecisionDB, DecisionEnvironment)
+        ArtifactDecision, DecisionDB, DecisionEnvironment,
+        ExecutionDecisionDB)
 
     lowering = _load_module(
         "numpy_crossjit_lowering", Path(__file__).with_name("crossjit_lowering.py"))
@@ -374,7 +389,29 @@ def main() -> int:
             profiled_info[candidate.stable_hash()] = {
                 "profile_variant_hash": record["profile_variant_hash"],
                 "profiled_layout_class": record["layout_class"],
+                "profiled_source": "observed",
             }
+    manifest_by_id = {
+        item["id"]: item for item in manifest["signatures"]
+    }
+    for seed_id in args.profiled_inner_validation_seed:
+        if seed_id not in manifest_by_id:
+            raise ValueError(f"unknown inner-contiguous validation seed: {seed_id}")
+        seed = manifest_by_id[seed_id]
+        ir, descriptor = lowering.lower_inner_validation_seed(seed["region"])
+        candidate = optimizer.legal_candidates(
+            ir, iteration_descriptor=descriptor)[0]
+        signature = optimization_signature_from_ir(
+            ir, provider_abi_version=3)
+        request_id = f"profiled_validation_{seed_id}"
+        request = GenerationRequest(
+            signature, GenerationMode.FORCE,
+            GenerationSource.DEVELOPER_SEED, request_id)
+        enabled.append((request, candidate))
+        profiled_info[candidate.stable_hash()] = {
+            "profiled_layout_class": "INNER_CONTIGUOUS",
+            "profiled_source": "validation_seed",
+        }
     enabled = tuple(enabled)
     candidates = tuple(candidate for _, candidate in enabled)
     signature_info = {
@@ -432,12 +469,63 @@ def main() -> int:
             execution_specialization.stable_hash())
         kernel["signature_id"] = request.request_id
         kernel.update(profiled_info.get(kernel["candidate_hash"], {}))
+    runtime_codes = {"ORIGINAL": 0, "GENERATED": 1, "GENERIC_FALLBACK": 2}
+    execution_db_hash = None
+    if args.execution_decision_db is not None:
+        if decision_environment_data is None:
+            raise ValueError(
+                "execution DecisionDB requires the decision environment")
+        execution_db_text = args.execution_decision_db.read_text()
+        execution_db = ExecutionDecisionDB.from_data(
+            json.loads(execution_db_text))
+        execution_db_hash = hashlib.sha256(
+            execution_db_text.encode("utf-8")).hexdigest()
+        kernels_by_specialization = {
+            kernel["execution_specialization_hash"]: kernel
+            for kernel in metadata["kernels"]
+        }
+        for record in execution_db.records():
+            environment = DecisionEnvironment(
+                provider=record.signature.provider,
+                provider_abi_version=record.signature.provider_abi_version,
+                recipe_hashes=tuple(
+                    operation.recipe_hash
+                    for operation in record.signature.operations),
+                generator_version=crossjit_generator.__version__,
+                optimizer_version=ElementwiseOptimizer.VERSION,
+                backend_version=CBackend.VERSION,
+                target_triple=decision_environment_data["target_triple"],
+                target_features=tuple(
+                    decision_environment_data["target_features"]),
+                compiler_id=decision_environment_data["compiler_id"],
+                compiler_version=decision_environment_data["compiler_version"],
+                compiler_flags=tuple(
+                    decision_environment_data["compiler_flags"]),
+                artifact_format_version=decision_environment_data[
+                    "artifact_format_version"],
+            )
+            lookup = execution_db.lookup(record.specialization, environment)
+            kernel = kernels_by_specialization.get(
+                record.specialization.stable_hash())
+            if (kernel is None or lookup is None or lookup.record is None or
+                    lookup.state not in (
+                        ArtifactDecision.AUTO_SELECTED,
+                        ArtifactDecision.AUTO_REJECTED,
+                        ArtifactDecision.FORCED)):
+                continue
+            kernel["execution_policy"] = {
+                "artifact_decision": lookup.state.value,
+                "points": [point.to_data()
+                           for point in lookup.record.profitability.points],
+                "runtime_codes": [
+                    runtime_codes[point.decision.value]
+                    for point in lookup.record.profitability.points],
+            }
     symbols = {
         kernel["optimization_signature_hash"]: kernel["symbol"]
         for kernel in metadata["kernels"]
         if kernel.get("entry_abi") == "flat_v1"
     }
-    runtime_codes = {"ORIGINAL": 0, "GENERATED": 1, "GENERIC_FALLBACK": 2}
     policies = []
     for record in production_records:
         policies.append({
@@ -451,6 +539,7 @@ def main() -> int:
             "symbol": symbols.get(record.signature.stable_hash()),
         })
     metadata["production_policies"] = policies
+    metadata["execution_decision_db_sha256"] = execution_db_hash
     header_text, source_text = _add_numpy_registry(
         bundle.header, bundle.source, metadata["kernels"], policies)
     metadata_text = json.dumps(

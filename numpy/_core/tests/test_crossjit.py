@@ -520,6 +520,11 @@ def test_profiled_inner_contiguous_kernel_is_descriptor_selected(monkeypatch):
     stats = provider._crossjit_stats()
     assert stats["generated_registry_hit"] == 1
     assert stats["generated_exec_hit"] == stats["exec_hit"]
+    assert stats["output_allocations"] == stats["exec_hit"]
+    assert stats["internal_allocations"] == 0
+    host_stats = internal.crossjit_stats()
+    assert host_stats["virtual_values"] == 1
+    assert host_stats["materialized_values"] == 1
     observed = stats["observed_signatures"][0]
     assert observed["refined_layout_class"] == 2  # INNER_CONTIGUOUS
     assert observed["iteration_rank_class"] == 2  # OUTER_INNER
@@ -532,6 +537,141 @@ def test_profiled_inner_contiguous_kernel_is_descriptor_selected(monkeypatch):
     np.testing.assert_array_equal(
         changed, contiguous[2] * (contiguous[0] - contiguous[1]))
     assert provider._crossjit_stats()["guard_miss"] >= 1
+
+
+def test_profiled_inner_production_policy_is_specialization_specific():
+    """PF4 production admission is keyed by the execution descriptor."""
+    program = r"""
+import json
+import numpy as np
+import _testinternalcapi as internal
+from numpy._core import _multiarray_umath as umath
+
+def observed(left, right, scale, count):
+    for _ in range(count):
+        result = scale * (left - right)
+    return result
+
+def validation(left, right, scale, count):
+    for _ in range(count):
+        result = (left + right) * scale
+    return result
+
+def unmeasured(left, right, scale, count):
+    for _ in range(count):
+        result = scale * (left - right)
+    return result
+
+def run(function, values, expected):
+    internal.crossjit_reset_stats()
+    umath._crossjit_reset_stats()
+    result = function(*values, internal.TIER2_THRESHOLD * 2)
+    np.testing.assert_array_equal(result, expected)
+    return {
+        "host": internal.crossjit_stats(),
+        "provider": umath._crossjit_stats(),
+    }
+
+backing = np.arange(3 * 59 * 60.0).reshape(3, 59, 60)
+left, right, scale = (item[:, :59] for item in backing)
+observed_stats = run(observed, (left, right, scale), scale * (left - right))
+validation_stats = run(
+    validation, (left, right, scale), (left + right) * scale)
+
+other = np.arange(3 * 58 * 60.0).reshape(3, 58, 60)
+other_left, other_right, other_scale = (item[:, :59] for item in other)
+unmeasured_stats = run(
+    unmeasured,
+    (other_left, other_right, other_scale),
+    other_scale * (other_left - other_right),
+)
+print(json.dumps({
+    "observed": observed_stats,
+    "validation": validation_stats,
+    "unmeasured": unmeasured_stats,
+}))
+"""
+    env = os.environ.copy()
+    for name in (
+        "NPY_CROSSJIT_MIN_WORK",
+        "NPY_CROSSJIT_DIAGNOSTIC_FORCE_FALLBACK",
+        "NPY_CROSSJIT_PROFILED_FORCE_GENERATED",
+    ):
+        env.pop(name, None)
+    env["NPY_CROSSJIT_DIAGNOSTICS"] = "1"
+    completed = subprocess.run(
+        [sys.executable, "-c", program],
+        check=True,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    results = json.loads(completed.stdout)
+
+    for name in ("observed", "validation"):
+        host = results[name]["host"]
+        provider = results[name]["provider"]
+        assert host["rewritten_regions"] == 1
+        assert host["virtual_values"] == 1
+        assert host["materialized_values"] == 1
+        assert provider["generated_registry_hit"] == 1
+        assert provider["generated_exec_hit"] == provider["exec_hit"]
+        assert provider["output_allocations"] == provider["exec_hit"]
+        assert provider["internal_allocations"] == 0
+
+    unmeasured_stats = results["unmeasured"]
+    assert unmeasured_stats["host"]["rewritten_regions"] == 0
+    assert (
+        unmeasured_stats["provider"]["regions_rejected_unprofitable"] == 1
+    )
+    assert unmeasured_stats["provider"]["regions_executed"] == 0
+
+
+def test_profiled_inner_special_values_and_fpe_soft_miss(monkeypatch):
+    """The generated outer/inner kernel preserves FP and replay semantics."""
+    internal = _runtime()
+    provider = _provider_runtime()
+    monkeypatch.setenv("NPY_CROSSJIT_PROFILED_FORCE_GENERATED", "1")
+
+    def fused(left, right, scale, count):
+        for _ in range(count):
+            result = scale * (left - right)
+        return result
+
+    backing = np.ones((3, 59, 60), dtype=np.float64)
+    left, right, scale = (item[:, :59] for item in backing)
+    left.flat[:6] = [np.nan, np.inf, -np.inf, -0.0, 0.0, 3.0]
+    right.flat[:6] = [1.0, np.inf, -2.0, 0.0, -0.0, np.nan]
+    scale.flat[:6] = [2.0, 1.0, -1.0, -1.0, 1.0, 0.0]
+
+    internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
+    with np.errstate(all="ignore"):
+        result = fused(left, right, scale, internal.TIER2_THRESHOLD * 2)
+        expected = scale * (left - right)
+    np.testing.assert_array_equal(result, expected)
+    np.testing.assert_array_equal(np.signbit(result), np.signbit(expected))
+    stats = provider._crossjit_stats()
+    assert stats["generated_registry_hit"] == 1
+    # Invalid arithmetic is detected after the generated attempt; the Host
+    # then replays ordinary NumPy so it retains warning/FPE authority.
+    assert stats["exec_miss"] >= 1
+    assert internal.crossjit_stats()["exec_misses"] >= 1
+
+    safe = np.arange(3 * 59 * 60.0).reshape(3, 59, 60)
+    safe_left, safe_right, safe_scale = (item[:, :59] for item in safe)
+    fused(safe_left, safe_right, safe_scale, internal.TIER2_THRESHOLD * 2)
+    with np.errstate(all="warn"), warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        fpe_result = fused(
+            safe_left,
+            safe_left,
+            np.full_like(safe_scale, np.inf),
+            2,
+        )
+    assert np.isnan(fpe_result).all()
+    assert caught
+    assert provider._crossjit_stats()["exec_miss"] >= 1
 
 
 def test_broadcast_dag_uses_guarded_zero_strides():

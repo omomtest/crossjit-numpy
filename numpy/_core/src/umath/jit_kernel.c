@@ -98,16 +98,17 @@ numpy_crossjit_generated_registry_lookup(
     return NUMPY_CROSSJIT_POLICY_ORIGINAL;
 }
 
-int
+NumpyCrossJitPolicyDecision
 numpy_crossjit_profiled_iteration_registry_lookup(
     const NumpyCrossJitKernelNode *nodes, uint8_t node_count,
     uint8_t input_count, const NumpyCrossJitIterationDescriptor *descriptor,
-    uint8_t output_slot, NumpyCrossJitFixedPlan *plan)
+    uint8_t output_slot, uint64_t element_count, int force_generated,
+    NumpyCrossJitFixedPlan *plan)
 {
     if (plan == NULL || descriptor == NULL ||
             input_count > NUMPY_CROSSJIT_MAX_FAST_INPUTS || node_count > 6 ||
             descriptor->operand_count != input_count) {
-        return 0;
+        return NUMPY_CROSSJIT_POLICY_ORIGINAL;
     }
     memset(plan, 0, sizeof(*plan));
     for (size_t index = 0;
@@ -145,14 +146,32 @@ numpy_crossjit_profiled_iteration_registry_lookup(
         if (!descriptor_match) {
             continue;
         }
-        plan->outer_inner_entry = candidate->entry;
-        plan->input_count = input_count;
-        for (uint8_t slot = 0; slot < input_count; slot++) {
-            plan->input_slots[slot] = slot;
+        NumpyCrossJitPolicyDecision decision =
+            NUMPY_CROSSJIT_POLICY_ORIGINAL;
+        if (force_generated) {
+            decision = NUMPY_CROSSJIT_POLICY_GENERATED;
         }
-        return 1;
+        else {
+            for (uint8_t range = 0; range < candidate->range_count; range++) {
+                const NumpyCrossJitGeneratedPolicyRange *point =
+                    &candidate->ranges[range];
+                if (element_count >= point->min_elements &&
+                        element_count <= point->max_elements) {
+                    decision = (NumpyCrossJitPolicyDecision)point->decision;
+                    break;
+                }
+            }
+        }
+        if (decision == NUMPY_CROSSJIT_POLICY_GENERATED) {
+            plan->outer_inner_entry = candidate->entry;
+            plan->input_count = input_count;
+            for (uint8_t slot = 0; slot < input_count; slot++) {
+                plan->input_slots[slot] = slot;
+            }
+        }
+        return decision;
     }
-    return 0;
+    return NUMPY_CROSSJIT_POLICY_ORIGINAL;
 }
 
 /*

@@ -147,7 +147,9 @@ def test_profiled_inner_contiguous_generation_keeps_identity_layers_separate(
     subprocess.run(_command(
         root, manifest, outputs,
         "--profiled-coverage", coverage,
-        "--profiled-layout-class", "INNER_CONTIGUOUS"), check=True)
+        "--profiled-layout-class", "INNER_CONTIGUOUS",
+        "--profiled-inner-validation-seed", "linear_2_add_multiply"),
+        check=True)
 
     report = json.loads(coverage.read_text())
     profile = next(item for item in report["signatures"]
@@ -155,8 +157,9 @@ def test_profiled_inner_contiguous_generation_keeps_identity_layers_separate(
     metadata = json.loads(outputs[2].read_text())
     profiled = [kernel for kernel in metadata["kernels"]
                 if kernel.get("profiled_layout_class") == "INNER_CONTIGUOUS"]
-    assert len(profiled) == 1
-    kernel = profiled[0]
+    assert len(profiled) == 2
+    kernel = next(item for item in profiled
+                  if item["profiled_source"] == "observed")
     assert kernel["optimization_signature"] == profile["signature"]
     assert (kernel["optimization_signature_hash"] ==
             profile["canonical_signature_hash"])
@@ -172,12 +175,19 @@ def test_profiled_inner_contiguous_generation_keeps_identity_layers_separate(
     assert (kernel["iteration_descriptor"]["iteration_rank_class"] ==
             "OUTER_INNER")
     assert metadata["generation_universe"][
-        "profiled_execution_specialization_count"] == 1
+        "profiled_execution_specialization_count"] == 2
     assert metadata["generation_universe"][
-        "actual_generated_candidate_count"] == 7
-    assert ("NPY_CROSSJIT_PROFILED_ITERATION_KERNEL_COUNT 1" in
+        "actual_generated_candidate_count"] == 8
+    assert ("NPY_CROSSJIT_PROFILED_ITERATION_KERNEL_COUNT 2" in
             outputs[1].read_text())
     assert kernel["execution_specialization_hash"] in outputs[0].read_text()
+    seed = next(item for item in profiled
+                if item["profiled_source"] == "validation_seed")
+    assert seed["optimization_signature_hash"] != (
+        kernel["optimization_signature_hash"])
+    assert [operation["operation_id"] for operation in
+            seed["optimization_signature"]["operations"]] == [
+                "numpy.add", "numpy.multiply"]
 
 
 def test_decisiondb_selection_and_stale_environment_fail_closed(tmp_path):
