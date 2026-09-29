@@ -185,10 +185,13 @@ def iteration_descriptor(
     for slot, access in enumerate(access_kinds):
         zero = access in (OperandAccessKind.SCALAR,
                           OperandAccessKind.ZERO_STRIDE)
+        outer_stride = None
+        if rank is IterationRankClass.OUTER_INNER:
+            outer_stride = (0 if access is OperandAccessKind.SCALAR else
+                            "runtime_outer_stride")
         operands.append(OperandDescriptor(
             slot, access, 0 if zero else "element_size",
-            (0 if zero else "runtime_outer_stride")
-            if rank is IterationRankClass.OUTER_INNER else None,
+            outer_stride,
             ("SCALAR" if access is OperandAccessKind.SCALAR else
              "BROADCAST_INNER" if access is OperandAccessKind.ZERO_STRIDE else
              "NONE"),
@@ -219,7 +222,17 @@ def lower_inner_validation_seed(manifest: Mapping[str, Any]):
     return ir, descriptor
 
 
+def lower_zero_stride_validation_seed(manifest: Mapping[str, Any]):
+    """Apply an inner-broadcast execution descriptor to a structural seed."""
+
+    ir = lower_manifest(deepcopy(manifest))
+    access_names = ("ZERO_STRIDE",) + (
+        ("CONTIGUOUS",) * (len(manifest["inputs"]) - 1))
+    return ir, iteration_descriptor(len(manifest["inputs"]), access_names, 2)
+
+
 __all__ = [
     "iteration_descriptor", "lower_inner_validation_seed", "lower_manifest",
     "lower_profile_record", "lower_signature",
+    "lower_zero_stride_validation_seed",
 ]

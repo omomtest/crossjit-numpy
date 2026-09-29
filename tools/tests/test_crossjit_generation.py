@@ -190,6 +190,46 @@ def test_profiled_inner_contiguous_generation_keeps_identity_layers_separate(
                 "numpy.add", "numpy.multiply"]
 
 
+def test_profiled_scalar_and_zero_stride_use_operand_descriptors(tmp_path):
+    root = Path(__file__).parents[2]
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    coverage = (root /
+        "benchmarks/benchmarks/crossjit/results/profiled/pf1_coverage/"
+        "coverage_report.json")
+    outputs = (tmp_path / "profiled.c", tmp_path / "profiled.h",
+               tmp_path / "profiled.json")
+    subprocess.run(_command(
+        root, manifest, outputs,
+        "--profiled-coverage", coverage,
+        "--profiled-layout-class", "SCALAR_OPERAND",
+        "--profiled-zero-stride-validation-seed",
+        "linear_2_add_multiply"), check=True)
+    metadata = json.loads(outputs[2].read_text())
+    scalar = [kernel for kernel in metadata["kernels"]
+              if kernel.get("profiled_layout_class") == "SCALAR_OPERAND"]
+    assert len(scalar) == 14
+    assert sum(kernel["entry_abi"] == "outer_inner_v1"
+               for kernel in scalar) == 7
+    assert all(any(operand["access_kind"] == "SCALAR"
+                   for operand in kernel["iteration_descriptor"]["operands"])
+               for kernel in scalar)
+    zero = [kernel for kernel in metadata["kernels"]
+            if kernel.get("profiled_layout_class") ==
+            "ZERO_STRIDE_BROADCAST"]
+    assert len(zero) == 1
+    descriptor = zero[0]["iteration_descriptor"]
+    assert descriptor["iteration_rank_class"] == "OUTER_INNER"
+    assert descriptor["operands"][0] == {
+        "access_kind": "ZERO_STRIDE",
+        "broadcast_relation": "BROADCAST_INNER",
+        "inner_stride": 0,
+        "logical_input_slot": 0,
+        "outer_stride": "runtime_outer_stride",
+    }
+    source = outputs[0].read_text()
+    assert "input_0[0]" in source
+
+
 def test_decisiondb_selection_and_stale_environment_fail_closed(tmp_path):
     root = Path(__file__).parents[2]
     manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"

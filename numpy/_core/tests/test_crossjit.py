@@ -674,6 +674,97 @@ def test_profiled_inner_special_values_and_fpe_soft_miss(monkeypatch):
     assert provider._crossjit_stats()["exec_miss"] >= 1
 
 
+def test_profiled_scalar_and_zero_stride_production_policy():
+    """PF5 admits only exact measured scalar/broadcast descriptors."""
+    program = r"""
+import json
+import numpy as np
+import _testinternalcapi as internal
+from numpy._core import _multiarray_umath as umath
+
+def scalar_inner(left, scalar, right, count):
+    for _ in range(count):
+        result = right + left * scalar
+    return result
+
+def zero_inner(column, left, right, count):
+    for _ in range(count):
+        result = (column + left) * right
+    return result
+
+def zero_outer(row, left, right, count):
+    for _ in range(count):
+        result = (row + left) * right
+    return result
+
+def scalar_unmeasured(left, scalar, right, count):
+    for _ in range(count):
+        result = right + left * scalar
+    return result
+
+def run(function, values, expected):
+    internal.crossjit_reset_stats()
+    umath._crossjit_reset_stats()
+    before = tuple(map(__import__("sys").getrefcount, values))
+    result = function(*values, internal.TIER2_THRESHOLD * 2)
+    after = tuple(map(__import__("sys").getrefcount, values))
+    np.testing.assert_allclose(result, expected)
+    assert before == after
+    return internal.crossjit_stats(), umath._crossjit_stats()
+
+backing = np.arange(2 * 59 * 60.0).reshape(2, 59, 60)
+left, right = (item[:, :59] for item in backing)
+scalar = run(scalar_inner, (left, 0.25, right), right + left * 0.25)
+column = np.arange(59.0).reshape(59, 1)
+zero = run(zero_inner, (column, left, right), (column + left) * right)
+row = np.arange(59.0).reshape(1, 59)
+mismatch = run(zero_outer, (row, left, right), (row + left) * right)
+
+other = np.arange(2 * 58 * 60.0).reshape(2, 58, 60)
+other_left, other_right = (item[:, :59] for item in other)
+unmeasured = run(
+    scalar_unmeasured,
+    (other_left, 0.25, other_right),
+    other_right + other_left * 0.25,
+)
+print(json.dumps({
+    "scalar": scalar,
+    "zero": zero,
+    "mismatch": mismatch,
+    "unmeasured": unmeasured,
+}))
+"""
+    env = os.environ.copy()
+    for name in (
+        "NPY_CROSSJIT_MIN_WORK",
+        "NPY_CROSSJIT_DIAGNOSTIC_FORCE_FALLBACK",
+        "NPY_CROSSJIT_PROFILED_FORCE_GENERATED",
+    ):
+        env.pop(name, None)
+    env["NPY_CROSSJIT_DIAGNOSTICS"] = "1"
+    completed = subprocess.run(
+        [sys.executable, "-c", program], check=True,
+        capture_output=True, text=True, env=env)
+    results = json.loads(completed.stdout)
+
+    for name, access in (("scalar", [1, 2, 1]), ("zero", [3, 1, 1])):
+        host, provider = results[name]
+        assert host["rewritten_regions"] == 1
+        assert host["virtual_values"] == 1
+        assert host["materialized_values"] == 1
+        assert provider["generated_registry_hit"] == 1
+        assert provider["generated_exec_hit"] == provider["exec_hit"]
+        assert provider["output_allocations"] == provider["exec_hit"]
+        assert provider["internal_allocations"] == 0
+        assert provider["observed_signatures"][0]["access_kinds"] == access
+
+    for name in ("mismatch", "unmeasured"):
+        host, provider = results[name]
+        assert host["rewritten_regions"] == 0
+        assert provider["regions_rejected_unprofitable"] == 1
+        assert provider["regions_executed"] == 0
+
+
 def test_broadcast_dag_uses_guarded_zero_strides():
     """Provider lowering owns broadcast-domain guards and zero-stride axes."""
     internal = _runtime()

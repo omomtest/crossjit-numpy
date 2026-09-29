@@ -101,8 +101,11 @@ def _inputs(case, outer, inner):
         if access == "SCALAR":
             result.append(0.25 + len(result) * 0.125)
         elif access == "ZERO_STRIDE":
-            scalar = np.asarray(0.5 + len(result) * 0.125)
-            result.append(np.broadcast_to(scalar, (outer, inner)))
+            per_row = (
+                0.5 + len(result) * 0.125 +
+                np.arange(outer, dtype=np.float64) / max(outer, 1)
+            ).reshape(outer, 1)
+            result.append(per_row)
         elif access == "CONTIGUOUS":
             result.append(_array(outer, inner, array_index * 0.125))
             array_index += 1

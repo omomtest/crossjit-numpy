@@ -92,7 +92,7 @@ def _add_numpy_registry(
         "    unsigned char input_count, node_count, output_slot;",
         "    unsigned char descriptor_version, iteration_rank_class;",
         "    unsigned char outer_shape_class, range_count;",
-        "    unsigned char access_kinds[16];",
+        "    unsigned char access_kinds[16], broadcast_relations[16];",
         "    NumpyCrossJitGeneratedPolicyNode nodes[6];",
         "    NumpyCrossJitGeneratedPolicyRange ranges[16];",
         "    NumpyCrossJitGeneratedOuterInnerKernelEntry entry;",
@@ -146,6 +146,14 @@ def _add_numpy_registry(
         }
         access_values = [accesses[item["access_kind"]]
                          for item in kernel["iteration_descriptor"]["operands"]]
+        broadcast_codes = {
+            "NONE": 0, "SCALAR": 1, "BROADCAST_INNER": 2,
+            "BROADCAST_OUTER": 3, "BROADCAST_MULTIPLE": 4,
+        }
+        broadcast_values = [
+            broadcast_codes[item["broadcast_relation"]]
+            for item in kernel["iteration_descriptor"]["operands"]
+        ]
         execution_policy = kernel.get("execution_policy", {})
         policy_points = execution_policy.get("points", [])
         policy_ranges = [
@@ -165,6 +173,7 @@ def _add_numpy_registry(
             f"{1 if kernel['iteration_descriptor']['outer_shape_class'] == 'AFFINE_ROWS' else 0}, "
             f"{len(policy_ranges)},",
             "        {" + ", ".join(map(str, access_values)) + "},",
+            "        {" + ", ".join(map(str, broadcast_values)) + "},",
             "        {" + ", ".join(nodes) + "},",
             "        {" + ", ".join(policy_ranges) + "},",
             f"        {kernel['symbol']},",
@@ -230,7 +239,11 @@ def main() -> int:
     parser.add_argument("--profiled-layout-class", action="append", default=[])
     parser.add_argument(
         "--profiled-inner-validation-seed", action="append", default=[])
-    parser.add_argument("--execution-decision-db", type=Path)
+    parser.add_argument(
+        "--profiled-zero-stride-validation-seed",
+        action="append", default=[])
+    parser.add_argument(
+        "--execution-decision-db", type=Path, action="append", default=[])
     args = parser.parse_args()
 
     generator_root = args.generator_root.resolve()
@@ -412,6 +425,25 @@ def main() -> int:
             "profiled_layout_class": "INNER_CONTIGUOUS",
             "profiled_source": "validation_seed",
         }
+    for seed_id in args.profiled_zero_stride_validation_seed:
+        if seed_id not in manifest_by_id:
+            raise ValueError(f"unknown zero-stride validation seed: {seed_id}")
+        seed = manifest_by_id[seed_id]
+        ir, descriptor = lowering.lower_zero_stride_validation_seed(
+            seed["region"])
+        candidate = optimizer.legal_candidates(
+            ir, iteration_descriptor=descriptor)[0]
+        signature = optimization_signature_from_ir(
+            ir, provider_abi_version=3)
+        request_id = f"profiled_zero_stride_validation_{seed_id}"
+        request = GenerationRequest(
+            signature, GenerationMode.FORCE,
+            GenerationSource.DEVELOPER_SEED, request_id)
+        enabled.append((request, candidate))
+        profiled_info[candidate.stable_hash()] = {
+            "profiled_layout_class": "ZERO_STRIDE_BROADCAST",
+            "profiled_source": "validation_seed",
+        }
     enabled = tuple(enabled)
     candidates = tuple(candidate for _, candidate in enabled)
     signature_info = {
@@ -470,57 +502,65 @@ def main() -> int:
         kernel["signature_id"] = request.request_id
         kernel.update(profiled_info.get(kernel["candidate_hash"], {}))
     runtime_codes = {"ORIGINAL": 0, "GENERATED": 1, "GENERIC_FALLBACK": 2}
-    execution_db_hash = None
-    if args.execution_decision_db is not None:
+    execution_db_hashes = []
+    if args.execution_decision_db:
         if decision_environment_data is None:
             raise ValueError(
                 "execution DecisionDB requires the decision environment")
-        execution_db_text = args.execution_decision_db.read_text()
-        execution_db = ExecutionDecisionDB.from_data(
-            json.loads(execution_db_text))
-        execution_db_hash = hashlib.sha256(
-            execution_db_text.encode("utf-8")).hexdigest()
         kernels_by_specialization = {
             kernel["execution_specialization_hash"]: kernel
             for kernel in metadata["kernels"]
         }
-        for record in execution_db.records():
-            environment = DecisionEnvironment(
-                provider=record.signature.provider,
-                provider_abi_version=record.signature.provider_abi_version,
-                recipe_hashes=tuple(
-                    operation.recipe_hash
-                    for operation in record.signature.operations),
-                generator_version=crossjit_generator.__version__,
-                optimizer_version=ElementwiseOptimizer.VERSION,
-                backend_version=CBackend.VERSION,
-                target_triple=decision_environment_data["target_triple"],
-                target_features=tuple(
-                    decision_environment_data["target_features"]),
-                compiler_id=decision_environment_data["compiler_id"],
-                compiler_version=decision_environment_data["compiler_version"],
-                compiler_flags=tuple(
-                    decision_environment_data["compiler_flags"]),
-                artifact_format_version=decision_environment_data[
-                    "artifact_format_version"],
-            )
-            lookup = execution_db.lookup(record.specialization, environment)
-            kernel = kernels_by_specialization.get(
-                record.specialization.stable_hash())
-            if (kernel is None or lookup is None or lookup.record is None or
-                    lookup.state not in (
-                        ArtifactDecision.AUTO_SELECTED,
-                        ArtifactDecision.AUTO_REJECTED,
-                        ArtifactDecision.FORCED)):
-                continue
-            kernel["execution_policy"] = {
-                "artifact_decision": lookup.state.value,
-                "points": [point.to_data()
-                           for point in lookup.record.profitability.points],
-                "runtime_codes": [
-                    runtime_codes[point.decision.value]
-                    for point in lookup.record.profitability.points],
-            }
+        attached_specializations = set()
+        for execution_db_path in args.execution_decision_db:
+            execution_db_text = execution_db_path.read_text()
+            execution_db = ExecutionDecisionDB.from_data(
+                json.loads(execution_db_text))
+            execution_db_hashes.append(hashlib.sha256(
+                execution_db_text.encode("utf-8")).hexdigest())
+            for record in execution_db.records():
+                specialization_hash = record.specialization.stable_hash()
+                if specialization_hash in attached_specializations:
+                    raise ValueError(
+                        "duplicate execution specialization across DecisionDBs")
+                attached_specializations.add(specialization_hash)
+                environment = DecisionEnvironment(
+                    provider=record.signature.provider,
+                    provider_abi_version=record.signature.provider_abi_version,
+                    recipe_hashes=tuple(
+                        operation.recipe_hash
+                        for operation in record.signature.operations),
+                    generator_version=crossjit_generator.__version__,
+                    optimizer_version=ElementwiseOptimizer.VERSION,
+                    backend_version=CBackend.VERSION,
+                    target_triple=decision_environment_data["target_triple"],
+                    target_features=tuple(
+                        decision_environment_data["target_features"]),
+                    compiler_id=decision_environment_data["compiler_id"],
+                    compiler_version=decision_environment_data[
+                        "compiler_version"],
+                    compiler_flags=tuple(
+                        decision_environment_data["compiler_flags"]),
+                    artifact_format_version=decision_environment_data[
+                        "artifact_format_version"],
+                )
+                lookup = execution_db.lookup(
+                    record.specialization, environment)
+                kernel = kernels_by_specialization.get(specialization_hash)
+                if (kernel is None or lookup is None or
+                        lookup.record is None or lookup.state not in (
+                            ArtifactDecision.AUTO_SELECTED,
+                            ArtifactDecision.AUTO_REJECTED,
+                            ArtifactDecision.FORCED)):
+                    continue
+                kernel["execution_policy"] = {
+                    "artifact_decision": lookup.state.value,
+                    "points": [point.to_data()
+                               for point in lookup.record.profitability.points],
+                    "runtime_codes": [
+                        runtime_codes[point.decision.value]
+                        for point in lookup.record.profitability.points],
+                }
     symbols = {
         kernel["optimization_signature_hash"]: kernel["symbol"]
         for kernel in metadata["kernels"]
@@ -539,7 +579,7 @@ def main() -> int:
             "symbol": symbols.get(record.signature.stable_hash()),
         })
     metadata["production_policies"] = policies
-    metadata["execution_decision_db_sha256"] = execution_db_hash
+    metadata["execution_decision_db_sha256"] = execution_db_hashes
     header_text, source_text = _add_numpy_registry(
         bundle.header, bundle.source, metadata["kernels"], policies)
     metadata_text = json.dumps(

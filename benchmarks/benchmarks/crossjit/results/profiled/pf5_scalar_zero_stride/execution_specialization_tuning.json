@@ -1,0 +1,2228 @@
+{
+  "configuration": {
+    "benchmark_identity_used_for_selection": false,
+    "formal_npbench_evaluation": false,
+    "independent_processes": 5,
+    "max_cv": 0.15,
+    "samples_per_process": 7,
+    "speedup_threshold": 1.05
+  },
+  "method": "generic_signature_microbenchmark",
+  "rows": [
+    {
+      "baseline_cv": 0.004762266901381403,
+      "baseline_median_ns": 1017.8121,
+      "correct": true,
+      "element_count": 16,
+      "execution_specialization_hash": "0a2f077d6fa637d04ee7cc7262214125468cc5afb11d15d0cbbb79aaf0e7c6ec",
+      "generated_cv": 0.006473917589414311,
+      "generated_median_ns": 317.2835,
+      "generated_speedup": 3.207894832224178,
+      "generated_vs_generic": 1.2996528341372937,
+      "generic_cv": 0.0027050280653961637,
+      "generic_median_ns": 412.3584,
+      "generic_speedup": 2.468270562694976,
+      "inner_extent": 8,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          1010.9795,
+          1017.8121,
+          1019.3677,
+          1017.0385,
+          1024.4733
+        ],
+        "generated": [
+          316.9155,
+          319.8965,
+          315.2759,
+          317.2835,
+          320.0727
+        ],
+        "generic": [
+          413.7184,
+          413.2925,
+          412.1608,
+          410.8462,
+          412.3584
+        ]
+      },
+      "profiled_source": "validation_seed",
+      "structural_signature_hash": "44db01877e52defeb0470a9b72bdfacf241fc27585de6809ee0666d9a41e2ce9"
+    },
+    {
+      "baseline_cv": 0.02070097606342325,
+      "baseline_median_ns": 1008.0104,
+      "correct": true,
+      "element_count": 32,
+      "execution_specialization_hash": "0a2f077d6fa637d04ee7cc7262214125468cc5afb11d15d0cbbb79aaf0e7c6ec",
+      "generated_cv": 0.007456558734671877,
+      "generated_median_ns": 314.9321,
+      "generated_speedup": 3.200722949486572,
+      "generated_vs_generic": 1.298965396032986,
+      "generic_cv": 0.005602352509188196,
+      "generic_median_ns": 409.0859,
+      "generic_speedup": 2.4640555932140416,
+      "inner_extent": 16,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          1002.9513,
+          1053.4551,
+          1005.3336,
+          1008.0104,
+          1011.5406
+        ],
+        "generated": [
+          317.2871,
+          314.9321,
+          312.7437,
+          316.543,
+          311.8619
+        ],
+        "generic": [
+          412.3856,
+          409.8092,
+          406.8418,
+          409.0859,
+          406.9454
+        ]
+      },
+      "profiled_source": "validation_seed",
+      "structural_signature_hash": "44db01877e52defeb0470a9b72bdfacf241fc27585de6809ee0666d9a41e2ce9"
+    },
+    {
+      "baseline_cv": 0.004847942225310975,
+      "baseline_median_ns": 1090.0504,
+      "correct": true,
+      "element_count": 64,
+      "execution_specialization_hash": "0a2f077d6fa637d04ee7cc7262214125468cc5afb11d15d0cbbb79aaf0e7c6ec",
+      "generated_cv": 0.009332496347793906,
+      "generated_median_ns": 322.559,
+      "generated_speedup": 3.379382996599072,
+      "generated_vs_generic": 1.3637036945179022,
+      "generic_cv": 0.0034674075500255044,
+      "generic_median_ns": 439.8749,
+      "generic_speedup": 2.4780918392933993,
+      "inner_extent": 16,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          1082.416,
+          1087.0019,
+          1090.0504,
+          1093.7979,
+          1095.5665
+        ],
+        "generated": [
+          323.8599,
+          323.1811,
+          322.559,
+          316.3545,
+          321.3785
+        ],
+        "generic": [
+          440.2126,
+          439.8749,
+          441.0401,
+          437.5294,
+          437.9015
+        ]
+      },
+      "profiled_source": "validation_seed",
+      "structural_signature_hash": "44db01877e52defeb0470a9b72bdfacf241fc27585de6809ee0666d9a41e2ce9"
+    },
+    {
+      "baseline_cv": 0.003688878554769815,
+      "baseline_median_ns": 1297.1717869943677,
+      "correct": true,
+      "element_count": 256,
+      "execution_specialization_hash": "0a2f077d6fa637d04ee7cc7262214125468cc5afb11d15d0cbbb79aaf0e7c6ec",
+      "generated_cv": 0.004012188089917008,
+      "generated_median_ns": 375.7245263696877,
+      "generated_speedup": 3.452454380681121,
+      "generated_vs_generic": 1.458192398370106,
+      "generic_cv": 0.005371098260870707,
+      "generic_median_ns": 547.878648233487,
+      "generic_speedup": 2.367626099642339,
+      "inner_extent": 64,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          1295.3352534562212,
+          1295.386968766001,
+          1301.6298003072197,
+          1297.1717869943677,
+          1306.437532002048
+        ],
+        "generated": [
+          375.1298003072197,
+          375.7245263696877,
+          373.91551459293396,
+          376.3868407578085,
+          377.979006656426
+        ],
+        "generic": [
+          551.0124167946749,
+          547.4412442396314,
+          543.7452636968766,
+          550.699948796723,
+          547.878648233487
+        ]
+      },
+      "profiled_source": "validation_seed",
+      "structural_signature_hash": "44db01877e52defeb0470a9b72bdfacf241fc27585de6809ee0666d9a41e2ce9"
+    },
+    {
+      "baseline_cv": 0.023913521329208643,
+      "baseline_median_ns": 2072.4900153609833,
+      "correct": true,
+      "element_count": 1024,
+      "execution_specialization_hash": "0a2f077d6fa637d04ee7cc7262214125468cc5afb11d15d0cbbb79aaf0e7c6ec",
+      "generated_cv": 0.008872723183268186,
+      "generated_median_ns": 490.23809523809524,
+      "generated_speedup": 4.227517272713031,
+      "generated_vs_generic": 1.7088919874456228,
+      "generic_cv": 0.005811145217819709,
+      "generic_median_ns": 837.7639528929851,
+      "generic_speedup": 2.4738352709068163,
+      "inner_extent": 128,
+      "outer_count": 8,
+      "process_medians_ns": {
+        "baseline": [
+          2126.9447004608296,
+          1994.605734767025,
+          2072.4900153609833,
+          2055.5929339477725,
+          2095.6154633896567
+        ],
+        "generated": [
+          490.23809523809524,
+          495.9498207885305,
+          493.36712749615975,
+          484.3399897593446,
+          489.968253968254
+        ],
+        "generic": [
+          834.4029697900665,
+          838.6728110599079,
+          837.5939580133129,
+          847.3973374295955,
+          837.7639528929851
+        ]
+      },
+      "profiled_source": "validation_seed",
+      "structural_signature_hash": "44db01877e52defeb0470a9b72bdfacf241fc27585de6809ee0666d9a41e2ce9"
+    },
+    {
+      "baseline_cv": 0.11409751765504185,
+      "baseline_median_ns": 6180.545081967213,
+      "correct": true,
+      "element_count": 4096,
+      "execution_specialization_hash": "0a2f077d6fa637d04ee7cc7262214125468cc5afb11d15d0cbbb79aaf0e7c6ec",
+      "generated_cv": 0.0081953268412913,
+      "generated_median_ns": 1069.1905737704917,
+      "generated_speedup": 5.780583212749035,
+      "generated_vs_generic": 1.8966067099173,
+      "generic_cv": 0.03716759399618682,
+      "generic_median_ns": 2027.8340163934427,
+      "generic_speedup": 3.0478555108565932,
+      "inner_extent": 256,
+      "outer_count": 16,
+      "process_medians_ns": {
+        "baseline": [
+          6180.545081967213,
+          5024.584016393443,
+          5009.661885245901,
+          6204.073770491803,
+          6247.139344262295
+        ],
+        "generated": [
+          1057.4590163934427,
+          1062.6803278688524,
+          1069.1905737704917,
+          1071.6065573770493,
+          1080.372950819672
+        ],
+        "generic": [
+          2026.780737704918,
+          2024.90368852459,
+          2163.7008196721313,
+          2171.7909836065573,
+          2027.8340163934427
+        ]
+      },
+      "profiled_source": "validation_seed",
+      "structural_signature_hash": "44db01877e52defeb0470a9b72bdfacf241fc27585de6809ee0666d9a41e2ce9"
+    },
+    {
+      "baseline_cv": 0.12696760469082313,
+      "baseline_median_ns": 23923.467213114753,
+      "correct": true,
+      "element_count": 16384,
+      "execution_specialization_hash": "0a2f077d6fa637d04ee7cc7262214125468cc5afb11d15d0cbbb79aaf0e7c6ec",
+      "generated_cv": 0.015161356222074393,
+      "generated_median_ns": 3267.3196721311474,
+      "generated_speedup": 7.322046696921576,
+      "generated_vs_generic": 2.0737331697661645,
+      "generic_cv": 0.027511865185665632,
+      "generic_median_ns": 6775.549180327869,
+      "generic_speedup": 3.530852861724353,
+      "inner_extent": 512,
+      "outer_count": 32,
+      "process_medians_ns": {
+        "baseline": [
+          23923.467213114753,
+          17508.049180327867,
+          23971.196721311477,
+          23965.72950819672,
+          23895.55737704918
+        ],
+        "generated": [
+          3192.9262295081967,
+          3190.3196721311474,
+          3288.3196721311474,
+          3285.05737704918,
+          3267.3196721311474
+        ],
+        "generic": [
+          6706.106557377049,
+          6719.745901639344,
+          7160.737704918033,
+          6792.3442622950815,
+          6775.549180327869
+        ]
+      },
+      "profiled_source": "validation_seed",
+      "structural_signature_hash": "44db01877e52defeb0470a9b72bdfacf241fc27585de6809ee0666d9a41e2ce9"
+    },
+    {
+      "baseline_cv": 0.09768515954905407,
+      "baseline_median_ns": 6186.792682926829,
+      "correct": true,
+      "element_count": 3481,
+      "execution_specialization_hash": "0a2f077d6fa637d04ee7cc7262214125468cc5afb11d15d0cbbb79aaf0e7c6ec",
+      "generated_cv": 0.0010655781953581548,
+      "generated_median_ns": 905.1864111498257,
+      "generated_speedup": 6.834827176722603,
+      "generated_vs_generic": 2.4197626145884055,
+      "generic_cv": 0.016769796334253784,
+      "generic_median_ns": 2190.336236933798,
+      "generic_speedup": 2.824585823219352,
+      "inner_extent": 59,
+      "outer_count": 59,
+      "process_medians_ns": {
+        "baseline": [
+          6182.3623693379795,
+          4899.160278745645,
+          6186.792682926829,
+          6202.26306620209,
+          6210.871080139373
+        ],
+        "generated": [
+          905.3379790940767,
+          905.1864111498257,
+          906.9233449477352,
+          904.2613240418118,
+          905.1550522648083
+        ],
+        "generic": [
+          2187.8327526132402,
+          2190.336236933798,
+          2260.243902439024,
+          2160.8797909407667,
+          2193.1149825783973
+        ]
+      },
+      "profiled_source": "validation_seed",
+      "structural_signature_hash": "44db01877e52defeb0470a9b72bdfacf241fc27585de6809ee0666d9a41e2ce9"
+    },
+    {
+      "baseline_cv": 0.06591284995488508,
+      "baseline_median_ns": 116886.0,
+      "correct": true,
+      "element_count": 65536,
+      "execution_specialization_hash": "0a2f077d6fa637d04ee7cc7262214125468cc5afb11d15d0cbbb79aaf0e7c6ec",
+      "generated_cv": 0.030734893655905947,
+      "generated_median_ns": 16555.366666666665,
+      "generated_speedup": 7.060308741777591,
+      "generated_vs_generic": 1.7202357342332097,
+      "generic_cv": 0.02394169327792427,
+      "generic_median_ns": 28479.133333333335,
+      "generic_speedup": 4.104268154227539,
+      "inner_extent": 1024,
+      "outer_count": 64,
+      "process_medians_ns": {
+        "baseline": [
+          103508.03333333334,
+          103695.56666666667,
+          117232.1,
+          116886.0,
+          116992.26666666666
+        ],
+        "generated": [
+          16555.366666666665,
+          16598.866666666665,
+          16553.666666666668,
+          17534.733333333334,
+          16148.566666666668
+        ],
+        "generic": [
+          28479.133333333335,
+          28306.4,
+          29915.066666666666,
+          28584.9,
+          28256.5
+        ]
+      },
+      "profiled_source": "validation_seed",
+      "structural_signature_hash": "44db01877e52defeb0470a9b72bdfacf241fc27585de6809ee0666d9a41e2ce9"
+    },
+    {
+      "baseline_cv": 0.006376637444393594,
+      "baseline_median_ns": 870.3491,
+      "correct": true,
+      "element_count": 16,
+      "execution_specialization_hash": "4520d699c1da091c802705492785b5ec9b4348be67adbf8f4c8210c05e60e873",
+      "generated_cv": 0.010207547466768276,
+      "generated_median_ns": 259.8016,
+      "generated_speedup": 3.350052886510322,
+      "generated_vs_generic": 1.3191354479726067,
+      "generic_cv": 0.016216633244833967,
+      "generic_median_ns": 342.7135,
+      "generic_speedup": 2.539582187453952,
+      "inner_extent": 8,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          870.3491,
+          870.5962,
+          869.5584,
+          880.3687,
+          865.2329
+        ],
+        "generated": [
+          261.1358,
+          255.7953,
+          261.0156,
+          259.8016,
+          256.0582
+        ],
+        "generic": [
+          344.5333,
+          342.7135,
+          337.27,
+          341.0294,
+          352.3086
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    },
+    {
+      "baseline_cv": 0.004084128696897929,
+      "baseline_median_ns": 881.2247,
+      "correct": true,
+      "element_count": 32,
+      "execution_specialization_hash": "4520d699c1da091c802705492785b5ec9b4348be67adbf8f4c8210c05e60e873",
+      "generated_cv": 0.004627396395443487,
+      "generated_median_ns": 258.8336,
+      "generated_speedup": 3.404599325589877,
+      "generated_vs_generic": 1.3451773649170742,
+      "generic_cv": 0.0032563284490505964,
+      "generic_median_ns": 348.1771,
+      "generic_speedup": 2.5309668556605245,
+      "inner_extent": 16,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          881.2247,
+          881.252,
+          880.7055,
+          888.2721,
+          878.8763
+        ],
+        "generated": [
+          259.623,
+          258.4642,
+          258.8336,
+          259.6503,
+          256.7225
+        ],
+        "generic": [
+          348.3603,
+          349.0162,
+          346.0107,
+          348.1771,
+          348.0874
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    },
+    {
+      "baseline_cv": 0.0027994153979361055,
+      "baseline_median_ns": 954.3341,
+      "correct": true,
+      "element_count": 64,
+      "execution_specialization_hash": "4520d699c1da091c802705492785b5ec9b4348be67adbf8f4c8210c05e60e873",
+      "generated_cv": 0.00460545844172482,
+      "generated_median_ns": 264.6545,
+      "generated_speedup": 3.605962112867909,
+      "generated_vs_generic": 1.426378920441557,
+      "generic_cv": 0.003702223574469256,
+      "generic_median_ns": 377.4976,
+      "generic_speedup": 2.528053423386003,
+      "inner_extent": 16,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          951.7906,
+          953.5141,
+          954.7613,
+          959.0085,
+          954.3341
+        ],
+        "generated": [
+          265.4515,
+          262.6826,
+          265.7376,
+          264.6545,
+          264.0817
+        ],
+        "generic": [
+          379.5141,
+          377.0992,
+          375.8424,
+          378.5232,
+          377.4976
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    },
+    {
+      "baseline_cv": 0.004833083251632658,
+      "baseline_median_ns": 1105.5240655401947,
+      "correct": true,
+      "element_count": 256,
+      "execution_specialization_hash": "4520d699c1da091c802705492785b5ec9b4348be67adbf8f4c8210c05e60e873",
+      "generated_cv": 0.003140273521205413,
+      "generated_median_ns": 320.7491039426523,
+      "generated_speedup": 3.4466941667212097,
+      "generated_vs_generic": 1.5124592328187183,
+      "generic_cv": 0.003930816736129399,
+      "generic_median_ns": 485.1199436763953,
+      "generic_speedup": 2.2788674841157364,
+      "inner_extent": 64,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          1106.049539170507,
+          1105.5240655401947,
+          1103.902329749104,
+          1115.9388120839733,
+          1102.2880184331798
+        ],
+        "generated": [
+          320.9560931899642,
+          322.705325140809,
+          320.10125448028674,
+          320.4673579109063,
+          320.7491039426523
+        ],
+        "generic": [
+          486.3963133640553,
+          487.81720430107526,
+          483.15834613415257,
+          485.1199436763953,
+          483.74782386072707
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    },
+    {
+      "baseline_cv": 0.018693057124888054,
+      "baseline_median_ns": 1604.363543266769,
+      "correct": true,
+      "element_count": 1024,
+      "execution_specialization_hash": "4520d699c1da091c802705492785b5ec9b4348be67adbf8f4c8210c05e60e873",
+      "generated_cv": 0.0033629534257856083,
+      "generated_median_ns": 420.4280593958013,
+      "generated_speedup": 3.816023948478619,
+      "generated_vs_generic": 1.8371944328068825,
+      "generic_cv": 0.006876730501617374,
+      "generic_median_ns": 772.4080901177675,
+      "generic_speedup": 2.077093137414129,
+      "inner_extent": 128,
+      "outer_count": 8,
+      "process_medians_ns": {
+        "baseline": [
+          1603.6134152585767,
+          1608.0496671786993,
+          1604.363543266769,
+          1672.0604198668714,
+          1602.3445980542754
+        ],
+        "generated": [
+          420.7347670250896,
+          420.4280593958013,
+          421.77777777777777,
+          418.078853046595,
+          419.3410138248848
+        ],
+        "generic": [
+          772.3594470046083,
+          772.4080901177675,
+          782.8115719406042,
+          768.4848950332821,
+          774.2785458269329
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    },
+    {
+      "baseline_cv": 0.003632652494835652,
+      "baseline_median_ns": 3186.844262295082,
+      "correct": true,
+      "element_count": 4096,
+      "execution_specialization_hash": "4520d699c1da091c802705492785b5ec9b4348be67adbf8f4c8210c05e60e873",
+      "generated_cv": 0.0018064036033235125,
+      "generated_median_ns": 1005.2172131147541,
+      "generated_speedup": 3.170304110114036,
+      "generated_vs_generic": 2.044609475971672,
+      "generic_cv": 0.013398817975794529,
+      "generic_median_ns": 2055.276639344262,
+      "generic_speedup": 1.550567062987612,
+      "inner_extent": 256,
+      "outer_count": 16,
+      "process_medians_ns": {
+        "baseline": [
+          3193.1106557377047,
+          3191.2049180327867,
+          3181.120901639344,
+          3164.3565573770493,
+          3186.844262295082
+        ],
+        "generated": [
+          1005.2172131147541,
+          1005.6147540983607,
+          1003.9016393442623,
+          1008.766393442623,
+          1005.1270491803278
+        ],
+        "generic": [
+          2058.1987704918033,
+          2051.5163934426228,
+          2116.2131147540986,
+          2053.1700819672133,
+          2055.276639344262
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    },
+    {
+      "baseline_cv": 0.1149900270782225,
+      "baseline_median_ns": 12084.606557377048,
+      "correct": true,
+      "element_count": 16384,
+      "execution_specialization_hash": "4520d699c1da091c802705492785b5ec9b4348be67adbf8f4c8210c05e60e873",
+      "generated_cv": 0.006823593657137202,
+      "generated_median_ns": 3049.2950819672133,
+      "generated_speedup": 3.9630820345470865,
+      "generated_vs_generic": 2.2124409296424328,
+      "generic_cv": 0.01700236138300482,
+      "generic_median_ns": 6746.38524590164,
+      "generic_speedup": 1.7912713426376479,
+      "inner_extent": 512,
+      "outer_count": 32,
+      "process_medians_ns": {
+        "baseline": [
+          12065.418032786885,
+          12084.606557377048,
+          12196.5,
+          15370.639344262296,
+          12033.877049180328
+        ],
+        "generated": [
+          3051.3360655737706,
+          3049.2950819672133,
+          3040.9262295081967,
+          3093.2295081967213,
+          3048.1393442622953
+        ],
+        "generic": [
+          6768.327868852459,
+          6746.38524590164,
+          7004.377049180328,
+          6738.44262295082,
+          6736.598360655737
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    },
+    {
+      "baseline_cv": 0.03580643136161599,
+      "baseline_median_ns": 3406.2665505226482,
+      "correct": true,
+      "element_count": 3481,
+      "execution_specialization_hash": "4520d699c1da091c802705492785b5ec9b4348be67adbf8f4c8210c05e60e873",
+      "generated_cv": 0.0028642423819221874,
+      "generated_median_ns": 863.2038327526133,
+      "generated_speedup": 3.9460744047679115,
+      "generated_vs_generic": 2.5375949333876915,
+      "generic_cv": 0.0069869613259897,
+      "generic_median_ns": 2190.4616724738676,
+      "generic_speedup": 1.5550450360885213,
+      "inner_extent": 59,
+      "outer_count": 59,
+      "process_medians_ns": {
+        "baseline": [
+          3406.2665505226482,
+          3396.289198606272,
+          3407.456445993031,
+          3676.7996515679442,
+          3391.9895470383276
+        ],
+        "generated": [
+          862.219512195122,
+          867.3815331010453,
+          863.2038327526133,
+          860.726480836237,
+          863.5853658536586
+        ],
+        "generic": [
+          2199.5522648083625,
+          2183.165505226481,
+          2190.4616724738676,
+          2197.1341463414633,
+          2161.534843205575
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    },
+    {
+      "baseline_cv": 0.0028208032945996296,
+      "baseline_median_ns": 52494.9,
+      "correct": true,
+      "element_count": 65536,
+      "execution_specialization_hash": "4520d699c1da091c802705492785b5ec9b4348be67adbf8f4c8210c05e60e873",
+      "generated_cv": 0.014150808536282141,
+      "generated_median_ns": 16062.266666666666,
+      "generated_speedup": 3.2682124565233632,
+      "generated_vs_generic": 1.7457291208380719,
+      "generic_cv": 0.01114632063378085,
+      "generic_median_ns": 28040.366666666665,
+      "generic_speedup": 1.8721188857492355,
+      "inner_extent": 1024,
+      "outer_count": 64,
+      "process_medians_ns": {
+        "baseline": [
+          52717.3,
+          52494.9,
+          52399.53333333333,
+          52723.03333333333,
+          52478.4
+        ],
+        "generated": [
+          16516.9,
+          15967.366666666667,
+          15983.733333333334,
+          16225.066666666668,
+          16062.266666666666
+        ],
+        "generic": [
+          28067.866666666665,
+          28018.566666666666,
+          28725.133333333335,
+          27980.3,
+          28040.366666666665
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    },
+    {
+      "baseline_cv": 0.003790409321462003,
+      "baseline_median_ns": 1182.0237,
+      "correct": true,
+      "element_count": 16,
+      "execution_specialization_hash": "6e827dfbd273021821a236c7720cf50b0077bfada72cf32ce5fc51e3b0b16385",
+      "generated_cv": 0.005545011918123133,
+      "generated_median_ns": 260.8713,
+      "generated_speedup": 4.531060718446222,
+      "generated_vs_generic": 1.355253337565305,
+      "generic_cv": 0.0075264389194274394,
+      "generic_median_ns": 353.5467,
+      "generic_speedup": 3.3433311638886742,
+      "inner_extent": 8,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          1179.7084,
+          1184.7939,
+          1182.0237,
+          1189.5813,
+          1178.2922
+        ],
+        "generated": [
+          260.8713,
+          262.2123,
+          263.0311,
+          260.658,
+          259.2991
+        ],
+        "generic": [
+          353.8953,
+          353.5467,
+          348.8454,
+          352.2148,
+          356.0469
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.00393769911065327,
+      "baseline_median_ns": 1215.3017,
+      "correct": true,
+      "element_count": 32,
+      "execution_specialization_hash": "6e827dfbd273021821a236c7720cf50b0077bfada72cf32ce5fc51e3b0b16385",
+      "generated_cv": 0.0046190863672374224,
+      "generated_median_ns": 263.4199,
+      "generated_speedup": 4.6135531142483925,
+      "generated_vs_generic": 1.4040119975749745,
+      "generic_cv": 0.0018444469511082258,
+      "generic_median_ns": 369.8447,
+      "generic_speedup": 3.285978412019964,
+      "inner_extent": 16,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          1215.3017,
+          1211.9371,
+          1221.1158,
+          1218.9438,
+          1209.5358
+        ],
+        "generated": [
+          263.6223,
+          265.6874,
+          263.4199,
+          263.2471,
+          262.3972
+        ],
+        "generic": [
+          370.5513,
+          371.058,
+          369.3802,
+          369.8447,
+          369.7006
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.004426199615302293,
+      "baseline_median_ns": 1200.2537,
+      "correct": true,
+      "element_count": 64,
+      "execution_specialization_hash": "6e827dfbd273021821a236c7720cf50b0077bfada72cf32ce5fc51e3b0b16385",
+      "generated_cv": 0.004140350884511298,
+      "generated_median_ns": 268.2462,
+      "generated_speedup": 4.474448100289957,
+      "generated_vs_generic": 1.622756258988944,
+      "generic_cv": 0.003943873929476868,
+      "generic_median_ns": 435.2982,
+      "generic_speedup": 2.757313721949689,
+      "inner_extent": 16,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          1193.2364,
+          1200.2537,
+          1198.6015,
+          1208.0593,
+          1200.4796
+        ],
+        "generated": [
+          268.2462,
+          268.7993,
+          269.5469,
+          268.0646,
+          266.5423
+        ],
+        "generic": [
+          436.0328,
+          434.2981,
+          432.1041,
+          435.2982,
+          436.3741
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.005384485512592557,
+      "baseline_median_ns": 1355.7628008192523,
+      "correct": true,
+      "element_count": 256,
+      "execution_specialization_hash": "6e827dfbd273021821a236c7720cf50b0077bfada72cf32ce5fc51e3b0b16385",
+      "generated_cv": 0.001201080677748609,
+      "generated_median_ns": 351.9333077316948,
+      "generated_speedup": 3.852328753869617,
+      "generated_vs_generic": 2.2396563783620795,
+      "generic_cv": 0.005333143967398732,
+      "generic_median_ns": 788.2096774193549,
+      "generic_speedup": 1.7200534827967349,
+      "inner_extent": 64,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          1350.9622375832053,
+          1366.739247311828,
+          1353.7016129032259,
+          1366.181387608807,
+          1355.7628008192523
+        ],
+        "generated": [
+          352.52969790066567,
+          351.35215053763443,
+          351.78123399897595,
+          351.9333077316948,
+          351.95762928827446
+        ],
+        "generic": [
+          788.2096774193549,
+          788.2910906298004,
+          786.0163850486431,
+          785.8798003072196,
+          796.1473374295955
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.003287590917891093,
+      "baseline_median_ns": 1835.9329237071172,
+      "correct": true,
+      "element_count": 1024,
+      "execution_specialization_hash": "6e827dfbd273021821a236c7720cf50b0077bfada72cf32ce5fc51e3b0b16385",
+      "generated_cv": 0.002491529960390188,
+      "generated_median_ns": 489.87916026625703,
+      "generated_speedup": 3.7477261182314,
+      "generated_vs_generic": 4.106710956232349,
+      "generic_cv": 0.010343008033891845,
+      "generic_median_ns": 2011.7921146953406,
+      "generic_speedup": 0.9125858036207409,
+      "inner_extent": 128,
+      "outer_count": 8,
+      "process_medians_ns": {
+        "baseline": [
+          1832.605734767025,
+          1846.647721454173,
+          1831.3067076292882,
+          1835.9329237071172,
+          1837.4019457245263
+        ],
+        "generated": [
+          489.87916026625703,
+          489.95033282130055,
+          487.2754736303123,
+          489.457757296467,
+          490.3481822836662
+        ],
+        "generic": [
+          2011.7921146953406,
+          2023.4500768049156,
+          2007.8776241679468,
+          2003.294418842806,
+          2055.2401433691757
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.004208562813684227,
+      "baseline_median_ns": 3646.4795081967213,
+      "correct": true,
+      "element_count": 4096,
+      "execution_specialization_hash": "6e827dfbd273021821a236c7720cf50b0077bfada72cf32ce5fc51e3b0b16385",
+      "generated_cv": 0.00550273110671531,
+      "generated_median_ns": 1024.2069672131147,
+      "generated_speedup": 3.560295550535901,
+      "generated_vs_generic": 6.6075872376268725,
+      "generic_cv": 0.007518751460177789,
+      "generic_median_ns": 6767.536885245901,
+      "generic_speedup": 0.5388193030977806,
+      "inner_extent": 256,
+      "outer_count": 16,
+      "process_medians_ns": {
+        "baseline": [
+          3646.4795081967213,
+          3646.8217213114754,
+          3629.247950819672,
+          3668.4815573770493,
+          3633.3258196721313
+        ],
+        "generated": [
+          1025.997950819672,
+          1024.2069672131147,
+          1022.9713114754098,
+          1035.204918032787,
+          1020.469262295082
+        ],
+        "generic": [
+          6771.690573770492,
+          6763.3401639344265,
+          6760.043032786885,
+          6767.536885245901,
+          6879.360655737705
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.004886331459096796,
+      "baseline_median_ns": 11371.106557377048,
+      "correct": true,
+      "element_count": 16384,
+      "execution_specialization_hash": "6e827dfbd273021821a236c7720cf50b0077bfada72cf32ce5fc51e3b0b16385",
+      "generated_cv": 0.010686976018050326,
+      "generated_median_ns": 3135.5491803278687,
+      "generated_speedup": 3.6265119452497405,
+      "generated_vs_generic": 8.111278124730418,
+      "generic_cv": 0.009713988877577174,
+      "generic_median_ns": 25433.311475409835,
+      "generic_speedup": 0.4470950064198753,
+      "inner_extent": 512,
+      "outer_count": 32,
+      "process_medians_ns": {
+        "baseline": [
+          11423.106557377048,
+          11412.286885245901,
+          11291.418032786885,
+          11371.106557377048,
+          11329.311475409837
+        ],
+        "generated": [
+          3131.3278688524592,
+          3136.598360655738,
+          3135.5491803278687,
+          3209.6967213114754,
+          3134.7704918032787
+        ],
+        "generic": [
+          25430.918032786885,
+          25417.122950819674,
+          25441.877049180326,
+          25433.311475409835,
+          25985.245901639344
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.004361154479613695,
+      "baseline_median_ns": 3580.0087108013936,
+      "correct": true,
+      "element_count": 3481,
+      "execution_specialization_hash": "6e827dfbd273021821a236c7720cf50b0077bfada72cf32ce5fc51e3b0b16385",
+      "generated_cv": 0.0034615972349488983,
+      "generated_median_ns": 1009.0783972125436,
+      "generated_speedup": 3.5478003698134186,
+      "generated_vs_generic": 6.752428734951511,
+      "generic_cv": 0.006304025615598154,
+      "generic_median_ns": 6813.729965156795,
+      "generic_speedup": 0.5254110052949555,
+      "inner_extent": 59,
+      "outer_count": 59,
+      "process_medians_ns": {
+        "baseline": [
+          3551.696864111498,
+          3592.8135888501743,
+          3577.6951219512193,
+          3580.0087108013936,
+          3585.693379790941
+        ],
+        "generated": [
+          1009.9616724738676,
+          1011.4198606271777,
+          1009.0783972125436,
+          1008.4668989547039,
+          1002.3327526132405
+        ],
+        "generic": [
+          6793.088850174216,
+          6797.836236933798,
+          6813.729965156795,
+          6825.524390243902,
+          6899.344947735191
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.006645634088262386,
+      "baseline_median_ns": 52127.13333333333,
+      "correct": true,
+      "element_count": 65536,
+      "execution_specialization_hash": "6e827dfbd273021821a236c7720cf50b0077bfada72cf32ce5fc51e3b0b16385",
+      "generated_cv": 0.011759869518432898,
+      "generated_median_ns": 16179.333333333334,
+      "generated_speedup": 3.2218344389962503,
+      "generated_vs_generic": 6.17837158514978,
+      "generic_cv": 0.009667978592294865,
+      "generic_median_ns": 99961.93333333333,
+      "generic_speedup": 0.5214698395189101,
+      "inner_extent": 1024,
+      "outer_count": 64,
+      "process_medians_ns": {
+        "baseline": [
+          52561.066666666666,
+          52529.066666666666,
+          52005.2,
+          52127.13333333333,
+          51753.36666666667
+        ],
+        "generated": [
+          16293.566666666668,
+          16181.933333333332,
+          16179.333333333334,
+          15905.1,
+          15863.733333333334
+        ],
+        "generic": [
+          99961.93333333333,
+          99550.86666666667,
+          99996.83333333333,
+          99891.96666666666,
+          101981.76666666666
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.003138127038364813,
+      "baseline_median_ns": 867.8933,
+      "correct": true,
+      "element_count": 16,
+      "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
+      "generated_cv": 0.006869018112984432,
+      "generated_median_ns": 257.6698,
+      "generated_speedup": 3.3682383422504305,
+      "generated_vs_generic": 1.371882153050144,
+      "generic_cv": 0.010640674254655936,
+      "generic_median_ns": 353.4926,
+      "generic_speedup": 2.455195101679639,
+      "inner_extent": 8,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          864.1737,
+          868.811,
+          867.0859,
+          871.6815,
+          867.8933
+        ],
+        "generated": [
+          257.6698,
+          255.158,
+          258.5796,
+          254.7242,
+          258.0355
+        ],
+        "generic": [
+          355.0151,
+          360.3517,
+          350.33,
+          353.4926,
+          352.4778
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.0030139239493375686,
+      "baseline_median_ns": 875.7337,
+      "correct": true,
+      "element_count": 32,
+      "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
+      "generated_cv": 0.004050407841033977,
+      "generated_median_ns": 258.434,
+      "generated_speedup": 3.388616435917874,
+      "generated_vs_generic": 1.434026482583561,
+      "generic_cv": 0.0037826186754368685,
+      "generic_median_ns": 370.6012,
+      "generic_speedup": 2.363008268726599,
+      "inner_extent": 16,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          874.0837,
+          875.7337,
+          874.3706,
+          880.6529,
+          876.3958
+        ],
+        "generated": [
+          258.6651,
+          256.7695,
+          258.434,
+          257.1676,
+          259.2442
+        ],
+        "generic": [
+          371.287,
+          370.7304,
+          367.7352,
+          370.5806,
+          370.6012
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.002933162527826979,
+      "baseline_median_ns": 953.9315,
+      "correct": true,
+      "element_count": 64,
+      "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
+      "generated_cv": 0.0037854365485894773,
+      "generated_median_ns": 262.0484,
+      "generated_speedup": 3.640287443083033,
+      "generated_vs_generic": 1.6616174721921597,
+      "generic_cv": 0.005701181563974946,
+      "generic_median_ns": 435.4242,
+      "generic_speedup": 2.1908095599647424,
+      "inner_extent": 16,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          950.3566,
+          951.1525,
+          957.2339,
+          954.8296,
+          953.9315
+        ],
+        "generated": [
+          260.8962,
+          262.3194,
+          262.0484,
+          261.2644,
+          263.439
+        ],
+        "generic": [
+          438.1825,
+          434.7532,
+          435.1997,
+          435.4242,
+          440.576
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.002734978215726052,
+      "baseline_median_ns": 1086.9882232462878,
+      "correct": true,
+      "element_count": 256,
+      "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
+      "generated_cv": 0.004334876630379083,
+      "generated_median_ns": 322.49961597542244,
+      "generated_speedup": 3.3705101321085813,
+      "generated_vs_generic": 2.4303485756541225,
+      "generic_cv": 0.008211362232248689,
+      "generic_median_ns": 783.7864823348694,
+      "generic_speedup": 1.386842268583393,
+      "inner_extent": 64,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          1086.9882232462878,
+          1087.6614183307731,
+          1086.572964669739,
+          1091.8897849462367,
+          1083.6171274961598
+        ],
+        "generated": [
+          321.78545826932924,
+          324.3358934971838,
+          324.80913978494624,
+          322.49961597542244,
+          321.95494111623145
+        ],
+        "generic": [
+          782.118407578085,
+          792.6382488479263,
+          783.7864823348694,
+          783.0574756784434,
+          796.3572708653354
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.0026637108702412043,
+      "baseline_median_ns": 1605.2713773681517,
+      "correct": true,
+      "element_count": 1024,
+      "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
+      "generated_cv": 0.005491632094008854,
+      "generated_median_ns": 424.1955965181772,
+      "generated_speedup": 3.784271667467355,
+      "generated_vs_generic": 4.7738486385484284,
+      "generic_cv": 0.00798185397310115,
+      "generic_median_ns": 2025.0455709165387,
+      "generic_speedup": 0.7927087668657271,
+      "inner_extent": 128,
+      "outer_count": 8,
+      "process_medians_ns": {
+        "baseline": [
+          1611.7429595494111,
+          1603.1746031746031,
+          1600.2345110087047,
+          1606.5238095238096,
+          1605.2713773681517
+        ],
+        "generated": [
+          425.8341013824885,
+          424.1955965181772,
+          425.6784434203789,
+          420.3712237583205,
+          422.3358934971838
+        ],
+        "generic": [
+          2026.3906810035842,
+          2025.0455709165387,
+          2020.5816692268306,
+          2023.3809523809523,
+          2059.7741935483873
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.0013208852250280426,
+      "baseline_median_ns": 3678.157786885246,
+      "correct": true,
+      "element_count": 4096,
+      "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
+      "generated_cv": 0.0017935604789724208,
+      "generated_median_ns": 1012.3872950819672,
+      "generated_speedup": 3.633152850448846,
+      "generated_vs_generic": 6.794702911678086,
+      "generic_cv": 0.012093238426458342,
+      "generic_median_ns": 6878.870901639344,
+      "generic_speedup": 0.5347037092975073,
+      "inner_extent": 256,
+      "outer_count": 16,
+      "process_medians_ns": {
+        "baseline": [
+          3684.1987704918033,
+          3673.782786885246,
+          3680.8053278688526,
+          3672.4897540983607,
+          3678.157786885246
+        ],
+        "generated": [
+          1015.1639344262295,
+          1012.3872950819672,
+          1011.2868852459017,
+          1012.6372950819672,
+          1010.3360655737705
+        ],
+        "generic": [
+          6882.834016393443,
+          6860.174180327869,
+          6878.870901639344,
+          6867.258196721312,
+          7058.0286885245905
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.005684930910730588,
+      "baseline_median_ns": 11769.204918032787,
+      "correct": true,
+      "element_count": 16384,
+      "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
+      "generated_cv": 0.011005897039725302,
+      "generated_median_ns": 3113.2377049180327,
+      "generated_speedup": 3.7803746560825666,
+      "generated_vs_generic": 8.327743769993287,
+      "generic_cv": 0.010881258727714033,
+      "generic_median_ns": 25926.245901639344,
+      "generic_speedup": 0.45394944423051264,
+      "inner_extent": 512,
+      "outer_count": 32,
+      "process_medians_ns": {
+        "baseline": [
+          11919.22950819672,
+          11762.803278688525,
+          11811.795081967213,
+          11769.204918032787,
+          11761.88524590164
+        ],
+        "generated": [
+          3082.2704918032787,
+          3158.3606557377047,
+          3113.2377049180327,
+          3143.9508196721313,
+          3084.598360655738
+        ],
+        "generic": [
+          25926.245901639344,
+          25892.573770491803,
+          26031.32786885246,
+          25916.983606557376,
+          26564.77868852459
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.0060764598332867835,
+      "baseline_median_ns": 3498.7195121951218,
+      "correct": true,
+      "element_count": 3481,
+      "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
+      "generated_cv": 0.006542711258114581,
+      "generated_median_ns": 863.1376306620209,
+      "generated_speedup": 4.053489719260214,
+      "generated_vs_generic": 8.027359463589004,
+      "generic_cv": 0.0074245178656211,
+      "generic_median_ns": 6928.716027874564,
+      "generic_speedup": 0.5049592880007785,
+      "inner_extent": 59,
+      "outer_count": 59,
+      "process_medians_ns": {
+        "baseline": [
+          3511.0975609756097,
+          3504.1411149825785,
+          3464.0034843205576,
+          3469.939024390244,
+          3498.7195121951218
+        ],
+        "generated": [
+          863.1376306620209,
+          866.9233449477352,
+          861.7909407665505,
+          872.2526132404181,
+          857.219512195122
+        ],
+        "generic": [
+          6928.716027874564,
+          6889.177700348432,
+          6938.613240418118,
+          6895.1184668989545,
+          7017.851916376307
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.05365706637506889,
+      "baseline_median_ns": 47978.8,
+      "correct": true,
+      "element_count": 65536,
+      "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
+      "generated_cv": 0.016814204511172912,
+      "generated_median_ns": 16569.133333333335,
+      "generated_speedup": 2.895673481212053,
+      "generated_vs_generic": 6.190967542056112,
+      "generic_cv": 0.011891823574316531,
+      "generic_median_ns": 102578.96666666666,
+      "generic_speedup": 0.4677255148797561,
+      "inner_extent": 1024,
+      "outer_count": 64,
+      "process_medians_ns": {
+        "baseline": [
+          53721.433333333334,
+          47978.8,
+          47650.833333333336,
+          48058.7,
+          47718.63333333333
+        ],
+        "generated": [
+          16385.0,
+          16569.133333333335,
+          16160.4,
+          16884.6,
+          16686.933333333334
+        ],
+        "generic": [
+          102758.73333333334,
+          102578.96666666666,
+          102417.13333333333,
+          102560.0,
+          105307.43333333333
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.004801980894315335,
+      "baseline_median_ns": 871.7459,
+      "correct": true,
+      "element_count": 16,
+      "execution_specialization_hash": "ca832d868412b967a0ee9eb77ea75cb225a9b29c74ba839c7ca2312fd3522935",
+      "generated_cv": 0.0033352620771312717,
+      "generated_median_ns": 256.881,
+      "generated_speedup": 3.3935787387934493,
+      "generated_vs_generic": 1.313846099945111,
+      "generic_cv": 0.004770753947138435,
+      "generic_median_ns": 337.5021,
+      "generic_speedup": 2.582934743220857,
+      "inner_extent": 8,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          868.8515,
+          871.7459,
+          867.4734,
+          878.3079,
+          872.3811
+        ],
+        "generated": [
+          258.0224,
+          256.2173,
+          258.2227,
+          256.8017,
+          256.881
+        ],
+        "generic": [
+          340.3944,
+          337.5884,
+          337.3897,
+          337.5021,
+          335.9673
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.003953602429269203,
+      "baseline_median_ns": 879.1781,
+      "correct": true,
+      "element_count": 32,
+      "execution_specialization_hash": "ca832d868412b967a0ee9eb77ea75cb225a9b29c74ba839c7ca2312fd3522935",
+      "generated_cv": 0.004266281557255589,
+      "generated_median_ns": 258.5703,
+      "generated_speedup": 3.4001511387812138,
+      "generated_vs_generic": 1.3173307220512178,
+      "generic_cv": 0.004404012059969028,
+      "generic_median_ns": 340.6226,
+      "generic_speedup": 2.5810915071401603,
+      "inner_extent": 16,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          878.5701,
+          879.1781,
+          876.7842,
+          885.7787,
+          881.6713
+        ],
+        "generated": [
+          258.9899,
+          258.9993,
+          258.5703,
+          257.6089,
+          256.4298
+        ],
+        "generic": [
+          341.6777,
+          340.3324,
+          337.7957,
+          341.1434,
+          340.6226
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.004208660614857187,
+      "baseline_median_ns": 949.0419,
+      "correct": true,
+      "element_count": 64,
+      "execution_specialization_hash": "ca832d868412b967a0ee9eb77ea75cb225a9b29c74ba839c7ca2312fd3522935",
+      "generated_cv": 0.004905046773386591,
+      "generated_median_ns": 264.837,
+      "generated_speedup": 3.583494375785861,
+      "generated_vs_generic": 1.3623923394389756,
+      "generic_cv": 0.008204973137489467,
+      "generic_median_ns": 360.8119,
+      "generic_speedup": 2.6302954531155986,
+      "inner_extent": 16,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          944.087,
+          945.7373,
+          953.1454,
+          952.4473,
+          949.0419
+        ],
+        "generated": [
+          262.5484,
+          264.837,
+          264.9898,
+          262.6789,
+          265.0863
+        ],
+        "generic": [
+          362.6708,
+          361.1122,
+          356.1188,
+          360.8119,
+          356.4998
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.004335884539628405,
+      "baseline_median_ns": 1117.31643625192,
+      "correct": true,
+      "element_count": 256,
+      "execution_specialization_hash": "ca832d868412b967a0ee9eb77ea75cb225a9b29c74ba839c7ca2312fd3522935",
+      "generated_cv": 0.0035978994111302244,
+      "generated_median_ns": 331.5257296466974,
+      "generated_speedup": 3.370225404352867,
+      "generated_vs_generic": 1.2763353036956553,
+      "generic_cv": 0.003981308925663294,
+      "generic_median_ns": 423.1379928315412,
+      "generic_speedup": 2.6405486039556454,
+      "inner_extent": 64,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          1109.1376088069637,
+          1112.2110855094727,
+          1120.9429083461341,
+          1118.5771889400921,
+          1117.31643625192
+        ],
+        "generated": [
+          331.5257296466974,
+          330.0140809011777,
+          330.0814132104455,
+          332.8511264720942,
+          331.6395289298515
+        ],
+        "generic": [
+          424.8058115719406,
+          423.1379928315412,
+          420.610599078341,
+          421.99244751664105,
+          424.16359447004606
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.02374447446728825,
+      "baseline_median_ns": 1719.5458269329238,
+      "correct": true,
+      "element_count": 1024,
+      "execution_specialization_hash": "ca832d868412b967a0ee9eb77ea75cb225a9b29c74ba839c7ca2312fd3522935",
+      "generated_cv": 0.002256689051725586,
+      "generated_median_ns": 433.36968766001024,
+      "generated_speedup": 3.9678497963658965,
+      "generated_vs_generic": 1.361860224416952,
+      "generic_cv": 0.008350305626377135,
+      "generic_median_ns": 590.1889400921659,
+      "generic_speedup": 2.91355142416663,
+      "inner_extent": 128,
+      "outer_count": 8,
+      "process_medians_ns": {
+        "baseline": [
+          1811.7281105990783,
+          1719.5458269329238,
+          1713.5862775217613,
+          1729.6390168970813,
+          1718.5939580133129
+        ],
+        "generated": [
+          433.36968766001024,
+          433.073732718894,
+          433.9032258064516,
+          431.51612903225805,
+          433.87864823348696
+        ],
+        "generic": [
+          590.862775217614,
+          597.8330773169483,
+          586.958013312852,
+          590.1889400921659,
+          584.9144905273938
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.0910556289925559,
+      "baseline_median_ns": 3768.27868852459,
+      "correct": true,
+      "element_count": 4096,
+      "execution_specialization_hash": "ca832d868412b967a0ee9eb77ea75cb225a9b29c74ba839c7ca2312fd3522935",
+      "generated_cv": 0.005481792189025142,
+      "generated_median_ns": 1015.3360655737705,
+      "generated_speedup": 3.7113610126664027,
+      "generated_vs_generic": 1.3142906733618038,
+      "generic_cv": 0.005873544884488999,
+      "generic_median_ns": 1334.4467213114754,
+      "generic_speedup": 2.823850985089295,
+      "inner_extent": 256,
+      "outer_count": 16,
+      "process_medians_ns": {
+        "baseline": [
+          4562.985655737705,
+          3750.872950819672,
+          3764.655737704918,
+          3768.27868852459,
+          3773.190573770492
+        ],
+        "generated": [
+          1016.2008196721312,
+          1010.6004098360655,
+          1015.3360655737705,
+          1023.4262295081967,
+          1009.3504098360655
+        ],
+        "generic": [
+          1346.5553278688524,
+          1331.780737704918,
+          1327.202868852459,
+          1334.4467213114754,
+          1342.1967213114754
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.11719215052903023,
+      "baseline_median_ns": 11672.188524590163,
+      "correct": true,
+      "element_count": 16384,
+      "execution_specialization_hash": "ca832d868412b967a0ee9eb77ea75cb225a9b29c74ba839c7ca2312fd3522935",
+      "generated_cv": 0.00837645190104483,
+      "generated_median_ns": 3099.1967213114754,
+      "generated_speedup": 3.766198010060777,
+      "generated_vs_generic": 1.3216301421309595,
+      "generic_cv": 0.00373074582934982,
+      "generic_median_ns": 4095.9918032786886,
+      "generic_speedup": 2.84966110411818,
+      "inner_extent": 512,
+      "outer_count": 32,
+      "process_medians_ns": {
+        "baseline": [
+          14889.073770491803,
+          11678.83606557377,
+          11658.967213114754,
+          11672.188524590163,
+          11644.795081967213
+        ],
+        "generated": [
+          3099.1967213114754,
+          3090.8688524590166,
+          3100.1311475409834,
+          3152.434426229508,
+          3090.3606557377047
+        ],
+        "generic": [
+          4085.909836065574,
+          4071.967213114754,
+          4112.122950819672,
+          4095.9918032786886,
+          4101.1557377049185
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.07317035702614681,
+      "baseline_median_ns": 3628.8327526132402,
+      "correct": true,
+      "element_count": 3481,
+      "execution_specialization_hash": "ca832d868412b967a0ee9eb77ea75cb225a9b29c74ba839c7ca2312fd3522935",
+      "generated_cv": 0.008933830828896145,
+      "generated_median_ns": 855.712543554007,
+      "generated_speedup": 4.240714688535137,
+      "generated_vs_generic": 1.6502476693832595,
+      "generic_cv": 0.0016275023501718445,
+      "generic_median_ns": 1412.137630662021,
+      "generic_speedup": 2.56974438880438,
+      "inner_extent": 59,
+      "outer_count": 59,
+      "process_medians_ns": {
+        "baseline": [
+          4242.95818815331,
+          3628.8327526132402,
+          3624.8675958188155,
+          3648.6062717770033,
+          3616.130662020906
+        ],
+        "generated": [
+          855.712543554007,
+          867.7038327526133,
+          853.3658536585366,
+          846.5174216027874,
+          856.1132404181185
+        ],
+        "generic": [
+          1414.5487804878048,
+          1414.48606271777,
+          1409.8989547038327,
+          1412.137630662021,
+          1409.9442508710802
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.003898824572620479,
+      "baseline_median_ns": 47045.9,
+      "correct": true,
+      "element_count": 65536,
+      "execution_specialization_hash": "ca832d868412b967a0ee9eb77ea75cb225a9b29c74ba839c7ca2312fd3522935",
+      "generated_cv": 0.015629017899558447,
+      "generated_median_ns": 16088.333333333334,
+      "generated_speedup": 2.924224593390656,
+      "generated_vs_generic": 1.14484616181498,
+      "generic_cv": 0.05194196497090554,
+      "generic_median_ns": 18418.666666666668,
+      "generic_speedup": 2.554251122050094,
+      "inner_extent": 1024,
+      "outer_count": 64,
+      "process_medians_ns": {
+        "baseline": [
+          47379.433333333334,
+          47258.833333333336,
+          46966.46666666667,
+          47045.9,
+          46980.066666666666
+        ],
+        "generated": [
+          16366.4,
+          15897.766666666666,
+          15852.966666666667,
+          16387.3,
+          16088.333333333334
+        ],
+        "generic": [
+          18456.833333333332,
+          18418.666666666668,
+          20521.233333333334,
+          18237.566666666666,
+          18283.466666666667
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.012075749144425297,
+      "baseline_median_ns": 1140.9923,
+      "correct": true,
+      "element_count": 16,
+      "execution_specialization_hash": "ed92e3d2043a9e0a58109e44b29a40a1245fb0b433e1be22a9236fdea30e0d5a",
+      "generated_cv": 0.0024744806124857655,
+      "generated_median_ns": 258.8871,
+      "generated_speedup": 4.407296848703547,
+      "generated_vs_generic": 1.3661630880797075,
+      "generic_cv": 0.007397604806510667,
+      "generic_median_ns": 353.682,
+      "generic_speedup": 3.226040058583699,
+      "inner_extent": 8,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          1171.3944,
+          1138.5964,
+          1143.0186,
+          1139.9519,
+          1140.9923
+        ],
+        "generated": [
+          258.2726,
+          258.1993,
+          259.2785,
+          258.8871,
+          259.687
+        ],
+        "generic": [
+          354.9322,
+          354.4642,
+          349.6937,
+          353.682,
+          349.6448
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    },
+    {
+      "baseline_cv": 0.001575294985935615,
+      "baseline_median_ns": 1143.7438,
+      "correct": true,
+      "element_count": 32,
+      "execution_specialization_hash": "ed92e3d2043a9e0a58109e44b29a40a1245fb0b433e1be22a9236fdea30e0d5a",
+      "generated_cv": 0.0030935202897154827,
+      "generated_median_ns": 260.3979,
+      "generated_speedup": 4.392292718182443,
+      "generated_vs_generic": 1.4269830901094056,
+      "generic_cv": 0.0054147783800987575,
+      "generic_median_ns": 371.5834,
+      "generic_speedup": 3.0780271669832397,
+      "inner_extent": 16,
+      "outer_count": 2,
+      "process_medians_ns": {
+        "baseline": [
+          1144.9952,
+          1140.434,
+          1143.7438,
+          1142.6566,
+          1144.4342
+        ],
+        "generated": [
+          261.7529,
+          259.92,
+          260.6193,
+          259.6817,
+          260.3979
+        ],
+        "generic": [
+          373.967,
+          372.2938,
+          368.819,
+          371.5834,
+          369.9448
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    },
+    {
+      "baseline_cv": 0.002422881551576621,
+      "baseline_median_ns": 1153.2598,
+      "correct": true,
+      "element_count": 64,
+      "execution_specialization_hash": "ed92e3d2043a9e0a58109e44b29a40a1245fb0b433e1be22a9236fdea30e0d5a",
+      "generated_cv": 0.005922416285287966,
+      "generated_median_ns": 265.1126,
+      "generated_speedup": 4.350075401923561,
+      "generated_vs_generic": 1.6527811201730886,
+      "generic_cv": 0.003803480912212743,
+      "generic_median_ns": 438.1731,
+      "generic_speedup": 2.6319730718293752,
+      "inner_extent": 16,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          1156.8161,
+          1153.2598,
+          1150.9561,
+          1152.026,
+          1157.1044
+        ],
+        "generated": [
+          265.247,
+          263.0459,
+          265.1126,
+          266.4496,
+          262.776
+        ],
+        "generic": [
+          438.1731,
+          438.5076,
+          435.7123,
+          437.3144,
+          440.2605
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    },
+    {
+      "baseline_cv": 0.0038571524182937347,
+      "baseline_median_ns": 1332.1907322068612,
+      "correct": true,
+      "element_count": 256,
+      "execution_specialization_hash": "ed92e3d2043a9e0a58109e44b29a40a1245fb0b433e1be22a9236fdea30e0d5a",
+      "generated_cv": 0.00519812027656761,
+      "generated_median_ns": 326.0067844342038,
+      "generated_speedup": 4.086389596213235,
+      "generated_vs_generic": 2.3830011799282618,
+      "generic_cv": 0.003318166532140716,
+      "generic_median_ns": 776.8745519713261,
+      "generic_speedup": 1.714808045683071,
+      "inner_extent": 64,
+      "outer_count": 4,
+      "process_medians_ns": {
+        "baseline": [
+          1332.1907322068612,
+          1340.9828469022018,
+          1326.863799283154,
+          1334.594726062468,
+          1331.7402713773681
+        ],
+        "generated": [
+          324.12749615975423,
+          327.7800819252432,
+          323.64976958525347,
+          326.0067844342038,
+          326.35407066052227
+        ],
+        "generic": [
+          776.8745519713261,
+          773.7474398361495,
+          777.6373527905786,
+          776.2240143369175,
+          780.8750640040963
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    },
+    {
+      "baseline_cv": 0.0031996281239655747,
+      "baseline_median_ns": 1814.4935995903738,
+      "correct": true,
+      "element_count": 1024,
+      "execution_specialization_hash": "ed92e3d2043a9e0a58109e44b29a40a1245fb0b433e1be22a9236fdea30e0d5a",
+      "generated_cv": 0.01903194823728025,
+      "generated_median_ns": 433.0184331797235,
+      "generated_speedup": 4.19033801001555,
+      "generated_vs_generic": 4.664955627686432,
+      "generic_cv": 0.073732689700338,
+      "generic_median_ns": 2020.0117767537122,
+      "generic_speedup": 0.898258921295192,
+      "inner_extent": 128,
+      "outer_count": 8,
+      "process_medians_ns": {
+        "baseline": [
+          1815.1715309779827,
+          1817.583717357911,
+          1814.4935995903738,
+          1802.727086533538,
+          1814.1182795698924
+        ],
+        "generated": [
+          430.58730158730157,
+          439.9257552483359,
+          433.0184331797235,
+          446.7885304659498,
+          425.6221198156682
+        ],
+        "generic": [
+          2003.9093701996928,
+          2010.3128520225293,
+          2284.4720942140298,
+          2020.0117767537122,
+          2309.3512544802866
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    },
+    {
+      "baseline_cv": 0.008811209262006016,
+      "baseline_median_ns": 3945.7971311475408,
+      "correct": true,
+      "element_count": 4096,
+      "execution_specialization_hash": "ed92e3d2043a9e0a58109e44b29a40a1245fb0b433e1be22a9236fdea30e0d5a",
+      "generated_cv": 0.0022980396833902116,
+      "generated_median_ns": 1012.9979508196722,
+      "generated_speedup": 3.895167929959562,
+      "generated_vs_generic": 6.690439634019294,
+      "generic_cv": 0.10402589769579167,
+      "generic_median_ns": 6777.401639344263,
+      "generic_speedup": 0.5821990994662831,
+      "inner_extent": 256,
+      "outer_count": 16,
+      "process_medians_ns": {
+        "baseline": [
+          4015.0737704918033,
+          3958.2602459016393,
+          3943.2356557377047,
+          3922.7438524590166,
+          3945.7971311475408
+        ],
+        "generated": [
+          1013.4979508196722,
+          1012.9979508196722,
+          1011.1004098360655,
+          1017.405737704918,
+          1012.8237704918033
+        ],
+        "generic": [
+          6754.206967213115,
+          6777.401639344263,
+          8167.668032786885,
+          6766.047131147541,
+          8145.071721311476
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    },
+    {
+      "baseline_cv": 0.0035649108338915905,
+      "baseline_median_ns": 10857.311475409837,
+      "correct": true,
+      "element_count": 16384,
+      "execution_specialization_hash": "ed92e3d2043a9e0a58109e44b29a40a1245fb0b433e1be22a9236fdea30e0d5a",
+      "generated_cv": 0.009997247924092718,
+      "generated_median_ns": 3089.6721311475408,
+      "generated_speedup": 3.5140658990820826,
+      "generated_vs_generic": 8.248662917175148,
+      "generic_cv": 0.11318510762794455,
+      "generic_median_ns": 25485.66393442623,
+      "generic_speedup": 0.42601642646412274,
+      "inner_extent": 512,
+      "outer_count": 32,
+      "process_medians_ns": {
+        "baseline": [
+          10861.991803278688,
+          10857.311475409837,
+          10822.975409836066,
+          10776.606557377048,
+          10870.057377049181
+        ],
+        "generated": [
+          3088.622950819672,
+          3144.1065573770493,
+          3089.6721311475408,
+          3146.0163934426228,
+          3086.6803278688526
+        ],
+        "generic": [
+          25448.59836065574,
+          25485.66393442623,
+          31143.05737704918,
+          25456.852459016394,
+          31255.5
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    },
+    {
+      "baseline_cv": 0.0027349879956561616,
+      "baseline_median_ns": 3717.135888501742,
+      "correct": true,
+      "element_count": 3481,
+      "execution_specialization_hash": "ed92e3d2043a9e0a58109e44b29a40a1245fb0b433e1be22a9236fdea30e0d5a",
+      "generated_cv": 0.0004001991658323626,
+      "generated_median_ns": 851.6602787456446,
+      "generated_speedup": 4.364575854091107,
+      "generated_vs_generic": 7.969624815639874,
+      "generic_cv": 0.0785585786614448,
+      "generic_median_ns": 6787.412891986062,
+      "generic_speedup": 0.5476513581324316,
+      "inner_extent": 59,
+      "outer_count": 59,
+      "process_medians_ns": {
+        "baseline": [
+          3736.897212543554,
+          3720.1881533101046,
+          3711.4773519163764,
+          3717.135888501742,
+          3713.0783972125437
+        ],
+        "generated": [
+          851.3414634146342,
+          851.8327526132405,
+          851.6602787456446,
+          851.7108013937283,
+          850.9912891986063
+        ],
+        "generic": [
+          6773.728222996516,
+          6787.412891986062,
+          7805.585365853659,
+          6771.047038327526,
+          7811.517421602787
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    },
+    {
+      "baseline_cv": 0.0023245167536286894,
+      "baseline_median_ns": 48287.4,
+      "correct": true,
+      "element_count": 65536,
+      "execution_specialization_hash": "ed92e3d2043a9e0a58109e44b29a40a1245fb0b433e1be22a9236fdea30e0d5a",
+      "generated_cv": 0.009450454480909889,
+      "generated_median_ns": 18473.833333333332,
+      "generated_speedup": 2.6138267639814874,
+      "generated_vs_generic": 5.518172550364029,
+      "generic_cv": 0.007813217019933172,
+      "generic_median_ns": 101941.8,
+      "generic_speedup": 0.47367615639511956,
+      "inner_extent": 1024,
+      "outer_count": 64,
+      "process_medians_ns": {
+        "baseline": [
+          48328.1,
+          48287.4,
+          48100.666666666664,
+          48110.23333333333,
+          48309.5
+        ],
+        "generated": [
+          18549.633333333335,
+          18665.9,
+          18198.333333333332,
+          18408.6,
+          18473.833333333332
+        ],
+        "generic": [
+          102175.36666666667,
+          101941.8,
+          101881.1,
+          101911.43333333333,
+          103746.23333333334
+        ]
+      },
+      "profiled_source": "observed",
+      "structural_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    }
+  ],
+  "schema_version": 1
+}

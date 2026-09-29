@@ -136,12 +136,31 @@ numpy_crossjit_profiled_iteration_registry_lookup(
         for (uint8_t slot = 0; descriptor_match && slot < input_count; slot++) {
             const NumpyCrossJitOperandDescriptor *operand =
                 &descriptor->operands[slot];
-            descriptor_match =
+            int access_match =
                 operand->logical_input_slot == slot &&
                 candidate->access_kinds[slot] == operand->access_kind &&
-                operand->access_kind == NUMPY_CROSSJIT_ACCESS_CONTIGUOUS &&
-                operand->broadcast_relation == NUMPY_CROSSJIT_BROADCAST_NONE &&
-                operand->inner_stride == (npy_intp)sizeof(double);
+                candidate->broadcast_relations[slot] ==
+                    operand->broadcast_relation;
+            if (operand->access_kind == NUMPY_CROSSJIT_ACCESS_CONTIGUOUS) {
+                access_match &=
+                    operand->broadcast_relation ==
+                        NUMPY_CROSSJIT_BROADCAST_NONE &&
+                    operand->inner_stride == (npy_intp)sizeof(double);
+            }
+            else if (operand->access_kind == NUMPY_CROSSJIT_ACCESS_SCALAR) {
+                access_match &=
+                    operand->broadcast_relation ==
+                        NUMPY_CROSSJIT_BROADCAST_SCALAR &&
+                    operand->inner_stride == 0 && operand->outer_stride == 0;
+            }
+            else if (operand->access_kind ==
+                     NUMPY_CROSSJIT_ACCESS_ZERO_STRIDE) {
+                access_match &= operand->inner_stride == 0;
+            }
+            else {
+                access_match = 0;
+            }
+            descriptor_match = access_match;
         }
         if (!descriptor_match) {
             continue;
