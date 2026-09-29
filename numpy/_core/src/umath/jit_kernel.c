@@ -98,6 +98,63 @@ numpy_crossjit_generated_registry_lookup(
     return NUMPY_CROSSJIT_POLICY_ORIGINAL;
 }
 
+int
+numpy_crossjit_profiled_iteration_registry_lookup(
+    const NumpyCrossJitKernelNode *nodes, uint8_t node_count,
+    uint8_t input_count, const NumpyCrossJitIterationDescriptor *descriptor,
+    uint8_t output_slot, NumpyCrossJitFixedPlan *plan)
+{
+    if (plan == NULL || descriptor == NULL ||
+            input_count > NUMPY_CROSSJIT_MAX_FAST_INPUTS || node_count > 6 ||
+            descriptor->operand_count != input_count) {
+        return 0;
+    }
+    memset(plan, 0, sizeof(*plan));
+    for (size_t index = 0;
+         index < NPY_CROSSJIT_PROFILED_ITERATION_KERNEL_COUNT; index++) {
+        const NumpyCrossJitGeneratedIterationKernel *candidate =
+            &numpy_crossjit_profiled_iteration_registry[index];
+        if (candidate->input_count != input_count ||
+                candidate->node_count != node_count ||
+                candidate->output_slot != output_slot ||
+                candidate->descriptor_version != descriptor->version ||
+                candidate->iteration_rank_class !=
+                    descriptor->iteration_rank_class ||
+                candidate->outer_shape_class !=
+                    descriptor->outer_shape_class ||
+                memcmp(candidate->nodes, nodes,
+                       (size_t)node_count * sizeof(nodes[0])) != 0) {
+            continue;
+        }
+        int descriptor_match =
+            descriptor->output.access_kind ==
+                NUMPY_CROSSJIT_ACCESS_CONTIGUOUS &&
+            descriptor->output.inner_stride == (npy_intp)sizeof(double) &&
+            descriptor->output.outer_stride ==
+                (npy_intp)(descriptor->inner_extent * sizeof(double));
+        for (uint8_t slot = 0; descriptor_match && slot < input_count; slot++) {
+            const NumpyCrossJitOperandDescriptor *operand =
+                &descriptor->operands[slot];
+            descriptor_match =
+                operand->logical_input_slot == slot &&
+                candidate->access_kinds[slot] == operand->access_kind &&
+                operand->access_kind == NUMPY_CROSSJIT_ACCESS_CONTIGUOUS &&
+                operand->broadcast_relation == NUMPY_CROSSJIT_BROADCAST_NONE &&
+                operand->inner_stride == (npy_intp)sizeof(double);
+        }
+        if (!descriptor_match) {
+            continue;
+        }
+        plan->outer_inner_entry = candidate->entry;
+        plan->input_count = input_count;
+        for (uint8_t slot = 0; slot < input_count; slot++) {
+            plan->input_slots[slot] = slot;
+        }
+        return 1;
+    }
+    return 0;
+}
+
 /*
  * Executes the two dominant NPBench shapes without interpreting a node
  * switch for every element.  The first node must add two live-ins and the

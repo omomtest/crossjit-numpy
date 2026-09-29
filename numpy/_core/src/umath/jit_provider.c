@@ -110,63 +110,6 @@ typedef enum {
 } NumpyCrossJitProfileLayoutClass;
 
 typedef enum {
-    NUMPY_CROSSJIT_ACCESS_CONTIGUOUS = 1,
-    NUMPY_CROSSJIT_ACCESS_SCALAR = 2,
-    NUMPY_CROSSJIT_ACCESS_ZERO_STRIDE = 3,
-    NUMPY_CROSSJIT_ACCESS_FIXED_STRIDE = 4,
-    NUMPY_CROSSJIT_ACCESS_GENERAL_STRIDED = 5,
-} NumpyCrossJitProfileAccessKind;
-
-/* Versioned Provider projection consumed by generated iteration backends.
- * The historical execution class and canonical signature remain unchanged;
- * this descriptor makes their concrete iteration meaning explicit. */
-#define NUMPY_CROSSJIT_ITERATION_DESCRIPTOR_VERSION 1
-
-typedef enum {
-    NUMPY_CROSSJIT_ITERATION_FLAT = 1,
-    NUMPY_CROSSJIT_ITERATION_OUTER_INNER = 2,
-} NumpyCrossJitIterationRankClass;
-
-typedef enum {
-    NUMPY_CROSSJIT_OUTER_NONE = 0,
-    NUMPY_CROSSJIT_OUTER_AFFINE_ROWS = 1,
-    NUMPY_CROSSJIT_OUTER_GENERAL = 2,
-} NumpyCrossJitOuterShapeClass;
-
-typedef enum {
-    NUMPY_CROSSJIT_BROADCAST_NONE = 0,
-    NUMPY_CROSSJIT_BROADCAST_SCALAR = 1,
-    NUMPY_CROSSJIT_BROADCAST_INNER = 2,
-    NUMPY_CROSSJIT_BROADCAST_OUTER = 3,
-    NUMPY_CROSSJIT_BROADCAST_MULTIPLE = 4,
-} NumpyCrossJitBroadcastRelation;
-
-typedef struct {
-    uint8_t logical_input_slot;
-    uint8_t access_kind;       /* CONTIGUOUS/SCALAR/ZERO_STRIDE/FIXED_STRIDE */
-    uint8_t broadcast_relation;
-    npy_intp inner_stride;     /* bytes; zero for scalar/inner broadcast */
-    npy_intp outer_stride;     /* bytes for affine rows, otherwise zero */
-} NumpyCrossJitOperandDescriptor;
-
-typedef struct {
-    uint8_t access_kind;
-    npy_intp inner_stride;
-    npy_intp outer_stride;
-} NumpyCrossJitOutputDescriptor;
-
-typedef struct {
-    uint8_t version;
-    uint8_t iteration_rank_class;
-    uint8_t outer_shape_class;
-    uint8_t operand_count;
-    uint64_t outer_count;
-    uint64_t inner_extent;
-    NumpyCrossJitOperandDescriptor operands[NUMPY_CROSSJIT_MAX_INPUTS];
-    NumpyCrossJitOutputDescriptor output;
-} NumpyCrossJitIterationDescriptor;
-
-typedef enum {
     NUMPY_CROSSJIT_REJECT_NONE = 0,
     NUMPY_CROSSJIT_REJECT_LIVE_INS,
     NUMPY_CROSSJIT_REJECT_INPUT_KIND,
@@ -1310,6 +1253,17 @@ numpy_crossjit_build_exec(const PyJitRegionView *region,
             plan->guards.scalar_mask, plan->output_slot, elements,
             &plan->fixed);
     }
+    const char *force_profiled_generated = Py_GETENV(
+        "NPY_CROSSJIT_PROFILED_FORCE_GENERATED");
+    if (policy == NUMPY_CROSSJIT_POLICY_ORIGINAL &&
+            force_profiled_generated != NULL &&
+            strcmp(force_profiled_generated, "1") == 0 &&
+            plan->guards.domain.typenum == NPY_DOUBLE &&
+            numpy_crossjit_profiled_iteration_registry_lookup(
+                plan->nodes, plan->node_count, plan->guards.input_count,
+                &plan->guards.iteration, plan->output_slot, &plan->fixed)) {
+        policy = NUMPY_CROSSJIT_POLICY_GENERATED;
+    }
     const char *disable_generated = Py_GETENV(
         "NPY_CROSSJIT_DIAGNOSTIC_DISABLE_GENERATED");
     if (policy == NUMPY_CROSSJIT_POLICY_GENERATED &&
@@ -1697,8 +1651,9 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
     int floating = fact->typenum == NPY_FLOAT || fact->typenum == NPY_DOUBLE;
     uint64_t kernel_started = 0;
     int ok = 1;
-    if (plan->fixed.entry != NULL) {
+    if (plan->fixed.entry != NULL || plan->fixed.outer_inner_entry != NULL) {
         const void *role_inputs[NUMPY_CROSSJIT_MAX_FAST_INPUTS];
+        ptrdiff_t outer_strides[NUMPY_CROSSJIT_MAX_FAST_INPUTS];
         double scalar_values[NUMPY_CROSSJIT_MAX_FAST_INPUTS];
         for (uint8_t role = 0; role < plan->fixed.input_count; role++) {
             uint8_t slot = plan->fixed.input_slots[role];
@@ -1714,16 +1669,28 @@ numpy_crossjit_run_region(PyJitExecPlan *opaque, PyObject *const *inputs,
                 }
                 scalar_values[role] = value;
                 role_inputs[role] = &scalar_values[role];
+                outer_strides[role] = 0;
             }
             else {
                 role_inputs[role] = PyArray_DATA(
                     (PyArrayObject *)inputs[slot]);
+                outer_strides[role] =
+                    plan->guards.iteration.operands[slot].outer_stride;
             }
         }
         npy_clear_floatstatus_barrier(&fp_barrier);
         kernel_started = numpy_crossjit_clock_ns();
-        plan->fixed.entry(role_inputs, (double *)PyArray_DATA(output),
-                          (size_t)PyArray_SIZE(output));
+        if (plan->fixed.entry != NULL) {
+            plan->fixed.entry(role_inputs, (double *)PyArray_DATA(output),
+                              (size_t)PyArray_SIZE(output));
+        }
+        else {
+            plan->fixed.outer_inner_entry(
+                role_inputs, outer_strides,
+                (double *)PyArray_DATA(output),
+                (size_t)plan->guards.iteration.outer_count,
+                (size_t)plan->guards.iteration.inner_extent);
+        }
         crossjit_stats.fixed_fast_path_hit++;
         crossjit_stats.generated_exec_hit++;
         numpy_crossjit_record_observed_signature(

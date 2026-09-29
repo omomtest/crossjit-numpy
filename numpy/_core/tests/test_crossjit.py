@@ -492,6 +492,48 @@ def test_multidimensional_strided_dag_executes():
     assert stats["exec_hits"] >= 1
 
 
+def test_profiled_inner_contiguous_kernel_is_descriptor_selected(monkeypatch):
+    """PF4 uses the generated descriptor registry and guards exact strides."""
+    internal = _runtime()
+    provider = _provider_runtime()
+    monkeypatch.setenv("NPY_CROSSJIT_PROFILED_FORCE_GENERATED", "1")
+    monkeypatch.setenv("NPY_CROSSJIT_DIAGNOSTICS", "1")
+    internal.crossjit_reset_stats()
+    provider._crossjit_reset_stats()
+
+    def fused(left, right, scale, count):
+        for _ in range(count):
+            result = scale * (left - right)
+        return result
+
+    backing = np.arange(3 * 59 * 60.0).reshape(3, 59, 60)
+    left, right, scale = (item[:, :59] for item in backing)
+    assert all(not item.flags.c_contiguous for item in (left, right, scale))
+    before = tuple(map(sys.getrefcount, (left, right, scale)))
+    result = fused(
+        left, right, scale, internal.TIER2_THRESHOLD * 2)
+    after = tuple(map(sys.getrefcount, (left, right, scale)))
+
+    np.testing.assert_array_equal(result, scale * (left - right))
+    assert result.flags.c_contiguous
+    assert after == before
+    stats = provider._crossjit_stats()
+    assert stats["generated_registry_hit"] == 1
+    assert stats["generated_exec_hit"] == stats["exec_hit"]
+    observed = stats["observed_signatures"][0]
+    assert observed["refined_layout_class"] == 2  # INNER_CONTIGUOUS
+    assert observed["iteration_rank_class"] == 2  # OUTER_INNER
+    assert observed["outer_shape_class"] == 1  # AFFINE_ROWS
+    assert observed["access_kinds"] == (1, 1, 1)
+
+    contiguous = tuple(np.ascontiguousarray(item) for item in
+                       (left, right, scale))
+    changed = fused(*contiguous, 2)
+    np.testing.assert_array_equal(
+        changed, contiguous[2] * (contiguous[0] - contiguous[1]))
+    assert provider._crossjit_stats()["guard_miss"] >= 1
+
+
 def test_broadcast_dag_uses_guarded_zero_strides():
     """Provider lowering owns broadcast-domain guards and zero-stride axes."""
     internal = _runtime()

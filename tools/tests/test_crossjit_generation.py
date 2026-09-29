@@ -43,6 +43,7 @@ def test_build_time_generation_is_reproducible(tmp_path):
         "disabled_signature_count": 0,
         "forced_signature_count": 0,
         "observed_signature_count": 0,
+        "profiled_execution_specialization_count": 0,
         "unsupported_observed_signature_count": 0,
         "validation_seed_count": 6,
     }
@@ -125,12 +126,58 @@ def test_observed_force_disable_union_is_bounded(tmp_path):
         "disabled_signature_count": 1,
         "forced_signature_count": 1,
         "observed_signature_count": 1,
+        "profiled_execution_specialization_count": 0,
         "unsupported_observed_signature_count": 0,
         "validation_seed_count": 6,
     }
     assert {kernel["generation_mode"] for kernel in metadata["kernels"]} == {
         "AUTO", "FORCE"}
     assert len(metadata["kernels"]) == 6
+
+
+def test_profiled_inner_contiguous_generation_keeps_identity_layers_separate(
+        tmp_path):
+    root = Path(__file__).parents[2]
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    coverage = (root /
+        "benchmarks/benchmarks/crossjit/results/profiled/pf1_coverage/"
+        "coverage_report.json")
+    outputs = (tmp_path / "profiled.c", tmp_path / "profiled.h",
+               tmp_path / "profiled.json")
+    subprocess.run(_command(
+        root, manifest, outputs,
+        "--profiled-coverage", coverage,
+        "--profiled-layout-class", "INNER_CONTIGUOUS"), check=True)
+
+    report = json.loads(coverage.read_text())
+    profile = next(item for item in report["signatures"]
+                   if item["layout_class"] == "INNER_CONTIGUOUS")
+    metadata = json.loads(outputs[2].read_text())
+    profiled = [kernel for kernel in metadata["kernels"]
+                if kernel.get("profiled_layout_class") == "INNER_CONTIGUOUS"]
+    assert len(profiled) == 1
+    kernel = profiled[0]
+    assert kernel["optimization_signature"] == profile["signature"]
+    assert (kernel["optimization_signature_hash"] ==
+            profile["canonical_signature_hash"])
+    assert (kernel["execution_specialization"]
+            ["structural_signature_hash"] ==
+            profile["canonical_signature_hash"])
+    assert (kernel["execution_specialization_hash"] ==
+            kernel["profitability_specialization_hash"])
+    assert (kernel["execution_specialization_hash"] !=
+            kernel["optimization_signature_hash"])
+    assert kernel["profile_variant_hash"] == profile["profile_variant_hash"]
+    assert kernel["entry_abi"] == "outer_inner_v1"
+    assert (kernel["iteration_descriptor"]["iteration_rank_class"] ==
+            "OUTER_INNER")
+    assert metadata["generation_universe"][
+        "profiled_execution_specialization_count"] == 1
+    assert metadata["generation_universe"][
+        "actual_generated_candidate_count"] == 7
+    assert ("NPY_CROSSJIT_PROFILED_ITERATION_KERNEL_COUNT 1" in
+            outputs[1].read_text())
+    assert kernel["execution_specialization_hash"] in outputs[0].read_text()
 
 
 def test_decisiondb_selection_and_stale_environment_fail_closed(tmp_path):

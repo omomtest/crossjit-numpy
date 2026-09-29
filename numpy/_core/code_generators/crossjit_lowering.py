@@ -14,6 +14,13 @@ from crossjit_generator.ir import (
     build_elementwise_ir,
 )
 from crossjit_generator.signature import OptimizationSignature
+from crossjit_generator.iteration import (
+    IterationDescriptor,
+    IterationRankClass,
+    OperandAccessKind,
+    OperandDescriptor,
+    OutputDescriptor,
+)
 
 try:
     from .crossjit_recipes import RECIPES
@@ -131,4 +138,59 @@ def lower_signature(signature: OptimizationSignature):
     return build_elementwise_ir(region, RECIPES, specialization)
 
 
-__all__ = ["lower_manifest", "lower_signature"]
+def lower_profile_record(record: Mapping[str, Any]):
+    """Lower an offline refined profile variant to IR plus iteration C_P."""
+
+    forbidden = _FORBIDDEN_POLICY_KEYS.intersection(record)
+    if forbidden:
+        raise ValueError(
+            f"workload identity is not a lowering input: {sorted(forbidden)}")
+    signature = OptimizationSignature.from_data(record["signature"])
+    signature_hash = signature.stable_hash()
+    if record.get("canonical_signature_hash") != signature_hash:
+        raise ValueError("profile record changed canonical structural signature")
+    variant_descriptor = {
+        "canonical_signature_hash": signature_hash,
+        "iteration_rank_class": record["iteration_rank_class"],
+        "operand_access_classes": record["operand_access_classes"],
+        "refined_layout_class": record["layout_class"],
+    }
+    if record.get("profile_variant_hash") != _digest(variant_descriptor):
+        raise ValueError("profile execution-specialization hash mismatch")
+    ir = lower_signature(signature)
+    access_names = tuple(record["operand_access_classes"])
+    if len(access_names) != signature.input_count:
+        raise ValueError("profile access count does not match signature")
+    access_kinds = tuple(OperandAccessKind(name) for name in access_names)
+    rank_code = record["iteration_rank_class"]
+    if rank_code not in (1, 2):
+        raise ValueError("unsupported profile iteration rank class")
+    rank = (IterationRankClass.FLAT if rank_code == 1
+            else IterationRankClass.OUTER_INNER)
+    outer = 1 if rank is IterationRankClass.FLAT else "runtime_outer_count"
+    outer_shape = "NONE" if rank is IterationRankClass.FLAT else "AFFINE_ROWS"
+    operands = []
+    for slot, access in enumerate(access_kinds):
+        zero = access in (OperandAccessKind.SCALAR,
+                          OperandAccessKind.ZERO_STRIDE)
+        operands.append(OperandDescriptor(
+            slot, access, 0 if zero else "element_size",
+            (0 if zero else "runtime_outer_stride")
+            if rank is IterationRankClass.OUTER_INNER else None,
+            ("SCALAR" if access is OperandAccessKind.SCALAR else
+             "BROADCAST_INNER" if access is OperandAccessKind.ZERO_STRIDE else
+             "NONE"),
+        ))
+    descriptor = IterationDescriptor(
+        1, rank, outer, outer_shape, "runtime_inner_extent",
+        tuple(operands),
+        OutputDescriptor(
+            OperandAccessKind.CONTIGUOUS, "element_size",
+            ("runtime_output_outer_stride"
+             if rank is IterationRankClass.OUTER_INNER else None),
+            "FRESH_PROVIDER_OUTPUT"),
+    )
+    return ir, descriptor
+
+
+__all__ = ["lower_manifest", "lower_profile_record", "lower_signature"]

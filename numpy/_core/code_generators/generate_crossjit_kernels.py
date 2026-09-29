@@ -44,6 +44,9 @@ def _add_numpy_registry(
     declarations = "\n".join((
         "typedef void (*NumpyCrossJitGeneratedKernelEntry)(",
         "    const void *const *inputs, double *restrict output, size_t size);",
+        "typedef void (*NumpyCrossJitGeneratedOuterInnerKernelEntry)(",
+        "    const void *const *inputs, const ptrdiff_t *outer_strides,",
+        "    double *restrict output, size_t outer_count, size_t inner_extent);",
         "",
         "typedef enum {",
         *enum_rows,
@@ -53,7 +56,11 @@ def _add_numpy_registry(
         "typedef struct {",
         "    const char *signature_id;",
         "    unsigned char input_count;",
-        "    NumpyCrossJitGeneratedKernelEntry entry;",
+        "    unsigned char entry_abi;",
+        "    union {",
+        "        NumpyCrossJitGeneratedKernelEntry flat;",
+        "        NumpyCrossJitGeneratedOuterInnerKernelEntry outer_inner;",
+        "    } entry;",
         "} NumpyCrossJitGeneratedKernel;",
         "",
         "extern const NumpyCrossJitGeneratedKernel",
@@ -80,17 +87,34 @@ def _add_numpy_registry(
         "    numpy_crossjit_production_policies[",
         "        NPY_CROSSJIT_PRODUCTION_POLICY_COUNT];",
         "",
+        "typedef struct {",
+        "    const char *execution_specialization_hash;",
+        "    unsigned char input_count, node_count, output_slot;",
+        "    unsigned char descriptor_version, iteration_rank_class;",
+        "    unsigned char outer_shape_class;",
+        "    unsigned char access_kinds[16];",
+        "    NumpyCrossJitGeneratedPolicyNode nodes[6];",
+        "    NumpyCrossJitGeneratedOuterInnerKernelEntry entry;",
+        "} NumpyCrossJitGeneratedIterationKernel;",
+        f"#define NPY_CROSSJIT_PROFILED_ITERATION_KERNEL_COUNT "
+        f"{sum(kernel.get('entry_abi') == 'outer_inner_v1' for kernel in ordered)}",
+        "extern const NumpyCrossJitGeneratedIterationKernel",
+        "    numpy_crossjit_profiled_iteration_registry[",
+        "        NPY_CROSSJIT_PROFILED_ITERATION_KERNEL_COUNT];",
+        "",
     ))
     marker = "#endif /* GENERATED_CROSSJIT_KERNELS_H */"
     if marker not in header:
         raise ValueError("unexpected generated header guard")
     header = header.replace(marker, declarations + marker)
-    registry_rows = [
-        f'    [{_registry_name(kernel["signature_id"])}] = '
-        f'{{"{kernel["signature_id"]}", {kernel["input_count"]}, '
-        f'{kernel["symbol"]}}},'
-        for kernel in ordered
-    ]
+    registry_rows = []
+    for kernel in ordered:
+        outer_inner = kernel.get("entry_abi") == "outer_inner_v1"
+        member = "outer_inner" if outer_inner else "flat"
+        registry_rows.append(
+            f'    [{_registry_name(kernel["signature_id"])}] = '
+            f'{{"{kernel["signature_id"]}", {kernel["input_count"]}, '
+            f'{2 if outer_inner else 1}, {{.{member} = {kernel["symbol"]}}}}},')
     source += "\n" + "\n".join((
         "const NumpyCrossJitGeneratedKernel",
         "numpy_crossjit_generated_registry[NPY_CROSSJIT_GENERATED_COUNT] = {",
@@ -104,6 +128,45 @@ def _add_numpy_registry(
         "numpy.multiply": 2,
         "numpy.true_divide": 3,
     }
+    iteration_rows = []
+    for kernel in ordered:
+        if kernel.get("entry_abi") != "outer_inner_v1":
+            continue
+        signature = kernel["optimization_signature"]
+        nodes = []
+        for index, operation in enumerate(signature["operations"]):
+            left, right = operation["operands"]
+            nodes.append("{" + ", ".join(map(str, (
+                operation_codes[operation["operation_id"]], left, right,
+                signature["input_count"] + index))) + "}")
+        accesses = {
+            "CONTIGUOUS": 1, "SCALAR": 2, "ZERO_STRIDE": 3,
+            "FIXED_STRIDE": 4,
+        }
+        access_values = [accesses[item["access_kind"]]
+                         for item in kernel["iteration_descriptor"]["operands"]]
+        iteration_rows.append("\n".join((
+            "    {",
+            f'        "{kernel["execution_specialization_hash"]}",',
+            f"        {signature['input_count']}, "
+            f"{len(signature['operations'])}, "
+            f"{signature['input_count'] + len(signature['operations']) - 1},",
+            f"        {kernel['iteration_descriptor']['schema_version']}, "
+            f"{2 if kernel['iteration_descriptor']['iteration_rank_class'] == 'OUTER_INNER' else 1}, "
+            f"{1 if kernel['iteration_descriptor']['outer_shape_class'] == 'AFFINE_ROWS' else 0},",
+            "        {" + ", ".join(map(str, access_values)) + "},",
+            "        {" + ", ".join(nodes) + "},",
+            f"        {kernel['symbol']},",
+            "    },",
+        )))
+    source += "\n" + "\n".join((
+        "const NumpyCrossJitGeneratedIterationKernel",
+        "numpy_crossjit_profiled_iteration_registry[",
+        "        NPY_CROSSJIT_PROFILED_ITERATION_KERNEL_COUNT] = {",
+        *iteration_rows,
+        "};",
+        "",
+    ))
     policy_rows = []
     for policy in sorted(policies, key=lambda item: item["signature_hash"]):
         signature = policy["signature"]
@@ -152,6 +215,8 @@ def main() -> int:
     parser.add_argument("--observations", type=Path, action="append", default=[])
     parser.add_argument("--decision-db", type=Path)
     parser.add_argument("--decision-environment", type=Path)
+    parser.add_argument("--profiled-coverage", type=Path)
+    parser.add_argument("--profiled-layout-class", action="append", default=[])
     args = parser.parse_args()
 
     generator_root = args.generator_root.resolve()
@@ -164,6 +229,7 @@ def main() -> int:
         GenerationRequest,
         GenerationSource,
         ObservedSignatures,
+        OptimizationSignature,
         optimization_signature_from_ir,
         resolve_generation_requests,
     )
@@ -283,14 +349,41 @@ def main() -> int:
             decision_db_text.encode("utf-8")).hexdigest()
     resolution = resolve_generation_requests(
         requests, auto_selected_hashes=selected_hashes)
-    enabled = tuple(
+    enabled = list(
         (request, payloads[request.request_id])
         for request in resolution.generated
     )
+    profiled_info = {}
+    if args.profiled_coverage is not None:
+        coverage = json.loads(args.profiled_coverage.read_text())
+        for record in coverage["signatures"]:
+            if (args.profiled_layout_class and
+                    record["layout_class"] not in args.profiled_layout_class):
+                continue
+            try:
+                ir, descriptor = lowering.lower_profile_record(record)
+                candidate = optimizer.legal_candidates(
+                    ir, iteration_descriptor=descriptor)[0]
+            except (ValueError, KeyError):
+                continue
+            request_id = "profiled_" + record["profile_variant_hash"][:24]
+            request = GenerationRequest(
+                OptimizationSignature.from_data(record["signature"]),
+                GenerationMode.FORCE, GenerationSource.OBSERVED, request_id)
+            enabled.append((request, candidate))
+            profiled_info[candidate.stable_hash()] = {
+                "profile_variant_hash": record["profile_variant_hash"],
+                "profiled_layout_class": record["layout_class"],
+            }
+    enabled = tuple(enabled)
     candidates = tuple(candidate for _, candidate in enabled)
     signature_info = {
         candidate.stable_hash(): request
         for request, candidate in enabled
+    }
+    candidate_info = {
+        candidate.stable_hash(): candidate
+        for _, candidate in enabled
     }
     bundle = generate_bundle(
         candidates, header_name=args.output_h.name)
@@ -314,6 +407,7 @@ def main() -> int:
             "observed_signature_count": resolution.observed_count,
             "unsupported_observed_signature_count": len(unsupported_observed),
             "validation_seed_count": resolution.validation_seed_count,
+            "profiled_execution_specialization_count": len(profiled_info),
         },
         "decision_db_sha256": decision_db_hash,
         "decision_environment": decision_environment_data,
@@ -322,15 +416,26 @@ def main() -> int:
     })
     for kernel in metadata["kernels"]:
         request = signature_info[kernel["candidate_hash"]]
+        candidate = candidate_info[kernel["candidate_hash"]]
+        execution_specialization = candidate.execution_specialization(
+            request.signature.stable_hash())
         kernel["generation_mode"] = request.mode.value
         kernel["generation_source"] = request.source.value
         kernel["optimization_signature"] = request.signature.to_data()
         kernel["optimization_signature_hash"] = (
             request.signature.stable_hash())
+        kernel["execution_specialization"] = (
+            execution_specialization.to_data())
+        kernel["execution_specialization_hash"] = (
+            execution_specialization.stable_hash())
+        kernel["profitability_specialization_hash"] = (
+            execution_specialization.stable_hash())
         kernel["signature_id"] = request.request_id
+        kernel.update(profiled_info.get(kernel["candidate_hash"], {}))
     symbols = {
         kernel["optimization_signature_hash"]: kernel["symbol"]
         for kernel in metadata["kernels"]
+        if kernel.get("entry_abi") == "flat_v1"
     }
     runtime_codes = {"ORIGINAL": 0, "GENERATED": 1, "GENERIC_FALLBACK": 2}
     policies = []
