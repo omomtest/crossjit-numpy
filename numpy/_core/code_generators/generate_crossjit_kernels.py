@@ -244,6 +244,7 @@ def main() -> int:
         action="append", default=[])
     parser.add_argument(
         "--execution-decision-db", type=Path, action="append", default=[])
+    parser.add_argument("--production-selection", type=Path)
     args = parser.parse_args()
 
     generator_root = args.generator_root.resolve()
@@ -444,6 +445,43 @@ def main() -> int:
             "profiled_layout_class": "ZERO_STRIDE_BROADCAST",
             "profiled_source": "validation_seed",
         }
+    production_selection = None
+    production_selection_hash = None
+    if args.production_selection is not None:
+        selection_text = args.production_selection.read_text()
+        production_selection = json.loads(selection_text)
+        if (production_selection.get("schema_version") != 1 or
+                production_selection.get("policy_name") !=
+                "GEN-PROFILED-PF9" or
+                production_selection.get("runtime_profitability_retuned") is
+                not False):
+            raise ValueError("unsupported production selection manifest")
+        artifact_records = [
+            record for record in production_selection["records"]
+            if record["artifact_present_in_pf6"]
+        ]
+        expected_candidate_hashes = {
+            record["candidate_hash"] for record in artifact_records
+        }
+        actual_candidate_hashes = {
+            candidate.stable_hash() for _, candidate in enabled
+        }
+        if expected_candidate_hashes != actual_candidate_hashes:
+            raise ValueError(
+                "production selection does not match frozen candidate universe")
+        selected_candidate_hashes = {
+            record["candidate_hash"] for record in artifact_records
+            if record["production_artifact_decision"] == "SELECT"
+        }
+        if any(record["production_artifact_decision"] not in (
+                "SELECT", "REJECT") for record in artifact_records):
+            raise ValueError("invalid production artifact decision")
+        enabled = [
+            (request, candidate) for request, candidate in enabled
+            if candidate.stable_hash() in selected_candidate_hashes
+        ]
+        production_selection_hash = hashlib.sha256(
+            selection_text.encode("utf-8")).hexdigest()
     enabled = tuple(enabled)
     candidates = tuple(candidate for _, candidate in enabled)
     signature_info = {
@@ -476,13 +514,27 @@ def main() -> int:
             "observed_signature_count": resolution.observed_count,
             "unsupported_observed_signature_count": len(unsupported_observed),
             "validation_seed_count": resolution.validation_seed_count,
-            "profiled_execution_specialization_count": len(profiled_info),
+            "profiled_execution_specialization_count": sum(
+                candidate.stable_hash() in profiled_info
+                for candidate in candidates),
         },
         "decision_db_sha256": decision_db_hash,
         "decision_environment": decision_environment_data,
         "unsupported_observed_signatures": sorted(
             unsupported_observed, key=lambda item: item["signature_hash"]),
     })
+    if production_selection is not None:
+        metadata["production_selection"] = {
+            "candidate_universe_hash": production_selection[
+                "candidate_universe_hash"],
+            "manifest_sha256": production_selection_hash,
+            "policy_name": production_selection["policy_name"],
+            "rejected_artifact_count": production_selection["summary"][
+                "production_rejected_artifact_count"],
+            "runtime_profitability_retuned": False,
+            "selected_artifact_count": production_selection["summary"][
+                "production_selected_artifact_count"],
+        }
     for kernel in metadata["kernels"]:
         request = signature_info[kernel["candidate_hash"]]
         candidate = candidate_info[kernel["candidate_hash"]]

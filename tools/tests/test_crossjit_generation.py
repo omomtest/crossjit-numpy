@@ -280,3 +280,74 @@ def test_decisiondb_selection_and_stale_environment_fail_closed(tmp_path):
     stale = json.loads(stale_outputs[2].read_text())
     assert stale["kernels"] == []
     assert stale["production_policies"] == []
+
+
+def test_pf9_production_selection_filters_only_the_frozen_artifact_set(
+        tmp_path):
+    root = Path(__file__).parents[2]
+    crossjit = root / "benchmarks/benchmarks/crossjit/results"
+    selection = (root /
+        "numpy/_core/code_generators/crossjit_production_selection.json")
+    selection_data = json.loads(selection.read_text())
+    assert selection_data["runtime_profitability_retuned"] is False
+    assert selection_data["summary"] == {
+        "expected_generated_dynamic_coverage": 0.4148387379417577,
+        "expected_generated_execution_count": 2698694,
+        "frozen_candidate_count": 30,
+        "pf6_generated_artifact_count": 28,
+        "production_rejected_artifact_count": 19,
+        "production_selected_artifact_count": 9,
+        "selected_generated_source_function_bytes": 6683,
+        "selected_object_text_function_bytes": 1824,
+        "total_dynamic_execution_opportunities": 6505405,
+    }
+    serialized = selection.read_text().lower()
+    assert '"benchmark"' not in serialized
+    assert '"workload"' not in serialized
+    assert '"source_path"' not in serialized
+
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    outputs = (tmp_path / "production.c", tmp_path / "production.h",
+               tmp_path / "production.json")
+    command = _command(
+        root, manifest, outputs,
+        "--decision-db", crossjit / "g14/g14_decision_db.json",
+        "--decision-environment",
+        root / "numpy/_core/code_generators/crossjit_decision_environment.json",
+        "--observations",
+        crossjit / "profiled/pf6_coverage/pf6_observed_signatures.json",
+        "--profiled-coverage",
+        crossjit / "profiled/pf6_coverage/opportunity/coverage_report.json",
+        "--profiled-layout-class", "INNER_CONTIGUOUS",
+        "--profiled-layout-class", "SCALAR_OPERAND",
+        "--profiled-inner-validation-seed", "linear_2_add_multiply",
+        "--profiled-zero-stride-validation-seed", "linear_2_add_multiply",
+        "--execution-decision-db",
+        crossjit / "profiled/pf4_inner_contiguous/execution_decision_db.json",
+        "--execution-decision-db",
+        crossjit / "profiled/pf5_scalar_zero_stride/execution_decision_db.json",
+        "--production-selection", selection,
+    )
+    subprocess.run(command, check=True)
+    first = tuple(path.read_bytes() for path in outputs)
+    subprocess.run(command, check=True)
+    assert first == tuple(path.read_bytes() for path in outputs)
+
+    metadata = json.loads(outputs[2].read_text())
+    assert len(metadata["kernels"]) == 9
+    assert len(metadata["production_policies"]) == 13
+    assert metadata["generation_universe"][
+        "profiled_execution_specialization_count"] == 5
+    assert metadata["production_selection"] == {
+        "candidate_universe_hash": selection_data["candidate_universe_hash"],
+        "manifest_sha256": (
+            "347b1af549c5027c390ba86e18d94182a6ea0d3aad35ff21e8328f626257e221"),
+        "policy_name": "GEN-PROFILED-PF9",
+        "rejected_artifact_count": 19,
+        "runtime_profitability_retuned": False,
+        "selected_artifact_count": 9,
+    }
+    assert all(kernel.get("profiled_source") != "validation_seed"
+               for kernel in metadata["kernels"])
+    assert all(kernel.get("profiled_layout_class") !=
+               "ZERO_STRIDE_BROADCAST" for kernel in metadata["kernels"])

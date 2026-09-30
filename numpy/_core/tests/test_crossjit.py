@@ -80,7 +80,8 @@ def test_provider_optimization_funnel_telemetry(monkeypatch):
     assert observed["accepted_count"] == 1
     assert observed["execution_count"] == stats["exec_hit"]
     assert observed["generated_hit_count"] == stats["generated_exec_hit"]
-    assert observed["generic_fallback_count"] == 0
+    assert (observed["generic_fallback_count"] ==
+            stats["generic_fallback_hit"])
     assert observed["min_elements"] == 64
     assert observed["max_elements"] == 64
     assert len(observed["element_buckets"]) == 14
@@ -608,16 +609,22 @@ print(json.dumps({
     )
     results = json.loads(completed.stdout)
 
-    for name in ("observed", "validation"):
-        host = results[name]["host"]
-        provider = results[name]["provider"]
-        assert host["rewritten_regions"] == 1
-        assert host["virtual_values"] == 1
-        assert host["materialized_values"] == 1
-        assert provider["generated_registry_hit"] == 1
-        assert provider["generated_exec_hit"] == provider["exec_hit"]
-        assert provider["output_allocations"] == provider["exec_hit"]
-        assert provider["internal_allocations"] == 0
+    host = results["observed"]["host"]
+    provider = results["observed"]["provider"]
+    assert host["rewritten_regions"] == 1
+    assert host["virtual_values"] == 1
+    assert host["materialized_values"] == 1
+    assert provider["generated_registry_hit"] == 1
+    assert provider["generated_exec_hit"] == provider["exec_hit"]
+    assert provider["output_allocations"] == provider["exec_hit"]
+    assert provider["internal_allocations"] == 0
+
+    # PF9 keeps this zero-frequency seed in validation generation but removes
+    # it from the production binary.
+    validation_stats = results["validation"]
+    assert validation_stats["host"]["rewritten_regions"] == 0
+    assert validation_stats["provider"]["regions_rejected_unprofitable"] == 1
+    assert validation_stats["provider"]["regions_executed"] == 0
 
     unmeasured_stats = results["unmeasured"]
     assert unmeasured_stats["host"]["rewritten_regions"] == 0
@@ -747,18 +754,19 @@ print(json.dumps({
         capture_output=True, text=True, env=env)
     results = json.loads(completed.stdout)
 
-    for name, access in (("scalar", [1, 2, 1]), ("zero", [3, 1, 1])):
-        host, provider = results[name]
-        assert host["rewritten_regions"] == 1
-        assert host["virtual_values"] == 1
-        assert host["materialized_values"] == 1
-        assert provider["generated_registry_hit"] == 1
-        assert provider["generated_exec_hit"] == provider["exec_hit"]
-        assert provider["output_allocations"] == provider["exec_hit"]
-        assert provider["internal_allocations"] == 0
-        assert provider["observed_signatures"][0]["access_kinds"] == access
+    host, provider = results["scalar"]
+    assert host["rewritten_regions"] == 1
+    assert host["virtual_values"] == 1
+    assert host["materialized_values"] == 1
+    assert provider["generated_registry_hit"] == 1
+    assert provider["generated_exec_hit"] == provider["exec_hit"]
+    assert provider["output_allocations"] == provider["exec_hit"]
+    assert provider["internal_allocations"] == 0
+    assert provider["observed_signatures"][0]["access_kinds"] == [1, 2, 1]
 
-    for name in ("mismatch", "unmeasured"):
+    # The zero-stride candidate is a zero-frequency PF5 validation artifact,
+    # and PF9 deliberately excludes it from the production artifact set.
+    for name in ("zero", "mismatch", "unmeasured"):
         host, provider = results[name]
         assert host["rewritten_regions"] == 0
         assert provider["regions_rejected_unprofitable"] == 1
@@ -844,8 +852,9 @@ def test_six_node_provider_loop_executes():
                        v[5]) * v[6]),
     ],
 )
-def test_contiguous_float64_straight_line_fast_paths(node_count, expression):
-    """The exact two-to-six-node reference chains use the fixed fast path."""
+def test_contiguous_float64_straight_line_validation_fallbacks(
+        node_count, expression):
+    """Excluded zero-frequency validation chains retain generic correctness."""
     internal = _runtime()
     provider = _provider_runtime()
 
@@ -884,20 +893,20 @@ def test_contiguous_float64_straight_line_fast_paths(node_count, expression):
     np.testing.assert_array_equal(result, expression(values))
     stats = provider._crossjit_stats()
     assert stats["exec_hit"] >= 1
-    assert stats["fixed_fast_path_hit"] == stats["exec_hit"]
-    assert stats["fixed_generic_path_hit"] == 0
-    assert stats["fixed_fast_plans_built"] == 1
-    assert stats["fixed_generic_plans_built"] == 0
-    assert stats["generated_registry_hit"] == 1
-    assert stats["generated_registry_miss"] == 0
-    assert stats["generated_exec_hit"] == stats["exec_hit"]
-    assert stats["generic_fallback_hit"] == 0
+    assert stats["fixed_fast_path_hit"] == 0
+    assert stats["fixed_generic_path_hit"] == stats["exec_hit"]
+    assert stats["fixed_fast_plans_built"] == 0
+    assert stats["fixed_generic_plans_built"] == 1
+    assert stats["generated_registry_hit"] == 0
+    assert stats["generated_registry_miss"] == 1
+    assert stats["generated_exec_hit"] == 0
+    assert stats["generic_fallback_hit"] == stats["exec_hit"]
     assert stats["output_allocations"] == stats["exec_hit"]
     assert stats["internal_allocations"] == 0
 
 
-def test_contiguous_float64_branched_registry_and_scalar_fallbacks():
-    """The generated branched kernel hits; scalar contracts stay generic."""
+def test_contiguous_float64_branched_and_scalar_validation_fallbacks():
+    """Excluded validation artifacts retain generic fallback correctness."""
     internal = _runtime()
     provider = _provider_runtime()
 
@@ -919,7 +928,7 @@ def test_contiguous_float64_branched_registry_and_scalar_fallbacks():
     a = np.arange(193.0) / 193 + 1
     arrays = (a, a + 1, a + 2, a + 3)
     cases = (
-        (branched, arrays, arrays[0] * arrays[1] + arrays[2] * arrays[3], True),
+        (branched, arrays, arrays[0] * arrays[1] + arrays[2] * arrays[3], False),
         (array_scalar, (arrays[0], 0.25, arrays[1]),
          (arrays[0] + 0.25) * arrays[1], False),
         (scalar_array, (0.25, arrays[0], arrays[1]),
@@ -1011,14 +1020,14 @@ import numpy as np
 import _testinternalcapi as internal
 from numpy._core import _multiarray_umath as umath
 
-def fused(left, right, scale, count):
+def fused(left, scalar, right, count):
     for _ in range(count):
-        result = (left + right) * scale
+        result = right + left * scalar
     return result
 
-def fused_tiny(left, right, scale, count):
+def fused_tiny(left, scalar, right, count):
     for _ in range(count):
-        result = (left + right) * scale
+        result = right + left * scalar
     return result
 
 def array_scalar(left, scalar, right, count):
@@ -1042,12 +1051,12 @@ def run(function, values, expected):
     }
 
 left = np.arange(32.0)
-generated = run(fused, (left, left + 1, left + 2),
-                (left + left + 1) * (left + 2))
+generated = run(fused, (left, 0.25, left + 1),
+                (left + 1) + left * 0.25)
 
 tiny = np.arange(8.0)
-unmeasured = run(fused_tiny, (tiny, tiny + 1, tiny + 2),
-                 (tiny + tiny + 1) * (tiny + 2))
+unmeasured = run(fused_tiny, (tiny, 0.25, tiny + 1),
+                 (tiny + 1) + tiny * 0.25)
 
 medium = np.arange(256.0)
 generic_profitable = run(array_scalar, (medium, 0.25, medium + 1),

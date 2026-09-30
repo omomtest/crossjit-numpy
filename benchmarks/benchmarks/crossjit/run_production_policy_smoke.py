@@ -40,19 +40,19 @@ def main() -> int:
     import _testinternalcapi as internal
     from numpy._core import _multiarray_umath as provider
 
-    def generated(left, right, scale, count):
+    def generated(left, scalar, right, count):
         for _ in range(count):
-            result = (left + right) * scale
+            result = right + left * scalar
         return result
 
-    def unmeasured(left, right, scale, count):
+    def unmeasured(left, scalar, right, count):
         for _ in range(count):
-            result = (left + right) * scale
+            result = right + left * scalar
         return result
 
-    def generated_large(left, right, scale, offset, divisor, count):
+    def generated_large(left, scalar, right, count):
         for _ in range(count):
-            result = (((left + right) * scale) - offset) / divisor
+            result = right + left * scalar
         return result
 
     def generic_profitable(left, scalar, right, count):
@@ -67,17 +67,16 @@ def main() -> int:
 
     left = np.arange(32.0)
     generated_stats = _run(
-        generated, (left, left + 1, left + 2),
-        (left + left + 1) * (left + 2), internal, provider, np)
+        generated, (left, 0.25, left + 1),
+        (left + 1) + left * 0.25, internal, provider, np)
     tiny = np.arange(8.0)
     unmeasured_stats = _run(
-        unmeasured, (tiny, tiny + 1, tiny + 2),
-        (tiny + tiny + 1) * (tiny + 2), internal, provider, np)
+        unmeasured, (tiny, 0.25, tiny + 1),
+        (tiny + 1) + tiny * 0.25, internal, provider, np)
     large = np.arange(65536.0) + 1.0
     generated_large_stats = _run(
-        generated_large,
-        (large, large + 1, large + 2, large + 3, large + 4),
-        (((large + large + 1) * (large + 2)) - (large + 3)) / (large + 4),
+        generated_large, (large, 0.25, large + 1),
+        (large + 1) + large * 0.25,
         internal, provider, np)
     medium = np.arange(256.0)
     generic_stats = _run(
@@ -102,7 +101,7 @@ def main() -> int:
             args.decision_db.read_bytes()).hexdigest(),
         "cases": {
             "selected_generated_profitable_n32": generated_stats,
-            "remeasured_generated_linear_l4_n65536": generated_large_stats,
+            "selected_generated_profiled_scalar_n65536": generated_large_stats,
             "selected_generated_unmeasured_n8": unmeasured_stats,
             "registry_miss_generic_profitable_n256": generic_stats,
             "registry_miss_generic_regressive_n256": regressive_stats,
