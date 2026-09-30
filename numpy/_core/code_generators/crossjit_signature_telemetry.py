@@ -53,6 +53,10 @@ _LAYOUTS = {
 
 
 def collect_snapshot(stats: dict) -> ObservedSignatures:
+    # Coverage diagnostics persist Host and Provider counters together.  Accept
+    # that durable wrapper as well as the historical bare Provider snapshot so
+    # the final observation universe can be rebuilt directly from the run.
+    stats = stats.get("provider_counters", stats)
     result = ObservedSignatures()
     for record in stats.get("observed_signatures", ()):
         operations = []

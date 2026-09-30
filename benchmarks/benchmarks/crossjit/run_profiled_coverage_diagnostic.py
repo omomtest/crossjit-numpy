@@ -323,7 +323,10 @@ def _summarize(args, workloads):
             "python": args.python,
             "profile_guided_analysis_only": True,
             "benchmark_identity_in_canonical_signature": False,
-            "forced_generic_profile_execution": True,
+            "execution_mode": args.execution_mode,
+            "forced_generic_profile_execution": (
+                args.execution_mode == "opportunity"),
+            "excluded_workloads": sorted(args.exclude_workload),
             "formal_timing": False,
         },
         "workload_count": len(workloads),
@@ -350,7 +353,11 @@ def _summarize(args, workloads):
 
 def _controller(args):
     suite = json.loads(args.suite.read_text())
-    workloads = [item["name"] for item in suite["experiments"]]
+    excluded = set(args.exclude_workload)
+    workloads = [
+        item["name"] for item in suite["experiments"]
+        if item["name"] not in excluded
+    ]
     raw_dir = args.output_dir / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
     if args.summarize_only:
@@ -364,11 +371,20 @@ def _controller(args):
         "PYTHON_JIT": "1",
         "PYTHON_JIT_CROSSJIT": "1",
         "NPY_CROSSJIT_DIAGNOSTICS": "1",
-        "NPY_CROSSJIT_MIN_WORK": "0",
-        "NPY_CROSSJIT_DIAGNOSTIC_DISABLE_GENERATED": "1",
-        "NPY_CROSSJIT_DIAGNOSTIC_FORCE_FALLBACK": "1",
         "OPENBLAS_NUM_THREADS": str(args.openblas_threads),
     })
+    if args.execution_mode == "opportunity":
+        env.update({
+            "NPY_CROSSJIT_MIN_WORK": "0",
+            "NPY_CROSSJIT_DIAGNOSTIC_DISABLE_GENERATED": "1",
+            "NPY_CROSSJIT_DIAGNOSTIC_FORCE_FALLBACK": "1",
+        })
+    else:
+        for name in (
+                "NPY_CROSSJIT_MIN_WORK",
+                "NPY_CROSSJIT_DIAGNOSTIC_DISABLE_GENERATED",
+                "NPY_CROSSJIT_DIAGNOSTIC_FORCE_FALLBACK"):
+            env.pop(name, None)
     env.pop("NPY_CROSSJIT_TELEMETRY_TIMING", None)
     started = time.monotonic()
     for index, workload in enumerate(workloads, 1):
@@ -409,6 +425,12 @@ def main():
     parser.add_argument("--repeat", type=int, default=100)
     parser.add_argument("--timeout", type=float, default=600.0)
     parser.add_argument("--openblas-threads", type=int, default=6)
+    parser.add_argument(
+        "--execution-mode", choices=("opportunity", "production"),
+        default="opportunity",
+        help=("force the generic executor to count the complete opportunity "
+              "universe, or exercise the frozen production policy"))
+    parser.add_argument("--exclude-workload", action="append", default=[])
     args = parser.parse_args()
     if args.worker:
         return _worker(args)

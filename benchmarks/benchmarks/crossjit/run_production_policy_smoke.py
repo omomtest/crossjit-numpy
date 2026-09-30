@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -23,6 +24,7 @@ def _run(function, values, expected, internal, provider, np):
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--decision-db", type=Path, required=True)
     args = parser.parse_args()
     if os.environ.get("PYTHON_JIT_CROSSJIT") != "1":
         raise RuntimeError("production smoke requires PYTHON_JIT_CROSSJIT=1")
@@ -96,8 +98,8 @@ def main() -> int:
         "schema_version": 1,
         "formal_npbench_evaluation": False,
         "forced_admission": False,
-        "decision_db_sha256": (
-            "292c9e1e24134c6c46eb4783bc01224ddf75e0a0303ce9dc9540dd4ec416b1b4"),
+        "decision_db_sha256": hashlib.sha256(
+            args.decision_db.read_bytes()).hexdigest(),
         "cases": {
             "selected_generated_profitable_n32": generated_stats,
             "remeasured_generated_linear_l4_n65536": generated_large_stats,

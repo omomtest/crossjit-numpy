@@ -1,0 +1,2413 @@
+{
+  "observations": [
+    {
+      "accepted_count": 1,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 50844,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 50844,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 50844,
+      "max_elements": 98,
+      "min_elements": 98,
+      "prepare_count": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "accepted_count": 10,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 1086872,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 551535,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 1638407,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 1638407,
+      "max_elements": 3481,
+      "min_elements": 59,
+      "prepare_count": 10,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 2,
+        "schema_version": 1
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "accepted_count": 4,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 204328,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 570,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 204898,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 204898,
+      "max_elements": 3600,
+      "min_elements": 59,
+      "prepare_count": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "34adbefd6c9ae55f6484879df3b7d18baf312a627346b951fc5ea88b78be9acf"
+    },
+    {
+      "accepted_count": 1,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 285,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 285,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 285,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "prepare_count": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              5,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "3a5f8f7f28004f40bb42f23e39fe03de34c202e0c12dde0dfe36df56b55928d6"
+    },
+    {
+      "accepted_count": 3,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 1518,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 1518,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 1518,
+      "max_elements": 625,
+      "min_elements": 625,
+      "prepare_count": 3,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "accepted_count": 5,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 199828,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 102859,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 302687,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 302687,
+      "max_elements": 3481,
+      "min_elements": 59,
+      "prepare_count": 5,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "accepted_count": 4,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 551535,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 551535,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 551535,
+      "max_elements": 3481,
+      "min_elements": 3481,
+      "prepare_count": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "inner_contiguous",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c"
+    },
+    {
+      "accepted_count": 1,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 395,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 395,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 395,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "prepare_count": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "56766573f32449c31f8f21b69e00e1c6767005588801a92cc2d11812151a8982"
+    },
+    {
+      "accepted_count": 2,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 101688,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 101688,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 101688,
+      "max_elements": 98,
+      "min_elements": 98,
+      "prepare_count": 2,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              2
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 5,
+        "schema_version": 1
+      },
+      "signature_hash": "6268a2573b6fd7fb31f6fade792d8b446e92744a27a97b1c3c425cfeb79dc901"
+    },
+    {
+      "accepted_count": 2,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 204328,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 204328,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 204328,
+      "max_elements": 59,
+      "min_elements": 59,
+      "prepare_count": 2,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "68dd5ad22ddc3dfbb4fb6e1d2b351a0227cf898ce04f3539f1d73e75853a45db"
+    },
+    {
+      "accepted_count": 2,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 102859,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 102859,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 102859,
+      "max_elements": 3481,
+      "min_elements": 3481,
+      "prepare_count": 2,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "inner_contiguous",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "6f833ba31a2de4c89d5d74211c3471b921c7df38e1b7b77b5cb2446fd47400f6"
+    },
+    {
+      "accepted_count": 5,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 199828,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 102859,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 302687,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 302687,
+      "max_elements": 3481,
+      "min_elements": 59,
+      "prepare_count": 5,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 6,
+        "schema_version": 1
+      },
+      "signature_hash": "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367"
+    },
+    {
+      "accepted_count": 5,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 510820,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 510820,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 510820,
+      "max_elements": 59,
+      "min_elements": 59,
+      "prepare_count": 5,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "7e50bbafbb177e86a8115e93513e8729e66443115874e1de7bf749caf1dcc122"
+    },
+    {
+      "accepted_count": 4,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 199828,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 285,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 200113,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 200113,
+      "max_elements": 3600,
+      "min_elements": 59,
+      "prepare_count": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "8756142f80154c6809c4ecd7a60cf391d938ff791bdea4baeb8375802b446171"
+    },
+    {
+      "accepted_count": 1,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 285,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 285,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 285,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "prepare_count": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              2
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "944051c006240e659f34ae6204fd9a16d6321cc0f3c51518f0a08665d3dd737b"
+    },
+    {
+      "accepted_count": 2,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 101688,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 101688,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 101688,
+      "max_elements": 98,
+      "min_elements": 98,
+      "prepare_count": 2,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              4,
+              2
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 5,
+        "schema_version": 1
+      },
+      "signature_hash": "997b090d124bbd5bcb8c0149eaf8c15a893404a15ce78ea5f9e6f81a6db0e05b"
+    },
+    {
+      "accepted_count": 2,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 172356,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 172356,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 172356,
+      "max_elements": 3198,
+      "min_elements": 3198,
+      "prepare_count": 2,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb"
+    },
+    {
+      "accepted_count": 1,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 50844,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 50844,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 50844,
+      "max_elements": 98,
+      "min_elements": 98,
+      "prepare_count": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "accepted_count": 6,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 205718,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 102859,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 308577,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 308577,
+      "max_elements": 3481,
+      "min_elements": 59,
+      "prepare_count": 6,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 10,
+        "schema_version": 1
+      },
+      "signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94"
+    },
+    {
+      "accepted_count": 1,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 50844,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 50844,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 50844,
+      "max_elements": 98,
+      "min_elements": 98,
+      "prepare_count": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "signature_hash": "d100351f5ac6c9a1e2284895337dec8f78de718315e8ac4bfd1eb50f72784938"
+    },
+    {
+      "accepted_count": 1,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 395,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 395,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 395,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "prepare_count": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "de0d67e56fa99dae60b5608d2fa07b37c9d60e5bd6f3d194ad15c33bdd11177e"
+    },
+    {
+      "accepted_count": 1,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 285,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 285,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 285,
+      "max_elements": 3600,
+      "min_elements": 3600,
+      "prepare_count": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 8,
+        "schema_version": 1
+      },
+      "signature_hash": "e7b56bc5c3785c36483820092b3d972b2f6d144ccee0b84b9fe22e80222f1945"
+    },
+    {
+      "accepted_count": 13,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 1491527,
+          "upper_bound": 64
+        },
+        {
+          "count": 152532,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 1644059,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 1644059,
+      "max_elements": 98,
+      "min_elements": 59,
+      "prepare_count": 13,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "signature_hash": "f7f72245912b7e16f927066d59a81f7f6dbe00f9c19872b87af32fd18e093508"
+    },
+    {
+      "accepted_count": 2,
+      "element_buckets": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 3008,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": 18446744073709551615
+        }
+      ],
+      "execution_count": 3008,
+      "generated_hit_count": 0,
+      "generic_fallback_count": 3008,
+      "max_elements": 21904,
+      "min_elements": 21904,
+      "prepare_count": 2,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "inner_contiguous",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388"
+    }
+  ],
+  "schema_version": 1
+}

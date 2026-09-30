@@ -59,3 +59,16 @@ def test_scalar_relation_is_part_of_signature():
     observed = _module().collect_snapshot({
         "observed_signatures": [_record(), _record(scalar_mask=2)]})
     assert len(observed.observations()) == 2
+
+
+def test_coverage_diagnostic_wrapper_is_accepted():
+    observed = _module().collect_snapshot({
+        "schema_version": 1,
+        "workload_id": "offline-report-only",
+        "host_counters": {"recognized_nodes": 2},
+        "provider_counters": {"observed_signatures": [_record()]},
+    })
+    records = observed.observations()
+    assert len(records) == 1
+    assert records[0].execution_count == 10
+    assert "workload" not in observed.serialize()

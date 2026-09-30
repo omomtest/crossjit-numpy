@@ -1,0 +1,6624 @@
+{
+  "break_even_observations": {
+    "array_scalar_2": {
+      "first_observed_profitable_n": 16,
+      "measurement_only": true,
+      "profitable_intervals_on_grid": [
+        [
+          16,
+          65536
+        ]
+      ],
+      "regressing_element_counts": [],
+      "sustained_profitable_n": 16
+    },
+    "branched_3": {
+      "first_observed_profitable_n": 16,
+      "measurement_only": true,
+      "profitable_intervals_on_grid": [
+        [
+          16,
+          65536
+        ]
+      ],
+      "regressing_element_counts": [],
+      "sustained_profitable_n": 16
+    },
+    "linear_2": {
+      "first_observed_profitable_n": 16,
+      "measurement_only": true,
+      "profitable_intervals_on_grid": [
+        [
+          16,
+          65536
+        ]
+      ],
+      "regressing_element_counts": [],
+      "sustained_profitable_n": 16
+    },
+    "linear_3": {
+      "first_observed_profitable_n": 16,
+      "measurement_only": true,
+      "profitable_intervals_on_grid": [
+        [
+          16,
+          65536
+        ]
+      ],
+      "regressing_element_counts": [],
+      "sustained_profitable_n": 16
+    },
+    "linear_4": {
+      "first_observed_profitable_n": 16,
+      "measurement_only": true,
+      "profitable_intervals_on_grid": [
+        [
+          16,
+          65536
+        ]
+      ],
+      "regressing_element_counts": [],
+      "sustained_profitable_n": 16
+    },
+    "linear_5": {
+      "first_observed_profitable_n": 16,
+      "measurement_only": true,
+      "profitable_intervals_on_grid": [
+        [
+          16,
+          65536
+        ]
+      ],
+      "regressing_element_counts": [],
+      "sustained_profitable_n": 16
+    },
+    "linear_6": {
+      "first_observed_profitable_n": 16,
+      "measurement_only": true,
+      "profitable_intervals_on_grid": [
+        [
+          16,
+          65536
+        ]
+      ],
+      "regressing_element_counts": [],
+      "sustained_profitable_n": 16
+    },
+    "scalar_array_2": {
+      "first_observed_profitable_n": 16,
+      "measurement_only": true,
+      "profitable_intervals_on_grid": [
+        [
+          16,
+          128
+        ]
+      ],
+      "regressing_element_counts": [],
+      "sustained_profitable_n": null
+    }
+  },
+  "configuration": {
+    "baseline_crossjit_mode": "0",
+    "cases": "all",
+    "crossjit_mode": "1",
+    "detailed_diagnostics_in_main_timing": false,
+    "dtype": "float64",
+    "forced_admission": true,
+    "independent_processes": 5,
+    "layout": "CONTIGUOUS_SAME_SHAPE",
+    "n_grid": [
+      16,
+      32,
+      64,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536
+    ],
+    "production_profitability_changed": false,
+    "python": "/home/dualz/crossjit-workspace/venv/bin/python3",
+    "samples_per_process": 7
+  },
+  "cost_decomposition": [
+    {
+      "case_identifier": "linear_2",
+      "element_count": 256,
+      "execution_lower_ns": 287.0,
+      "fixed_fused_loop_ns": 61.83695155184081,
+      "guard_lower_ns": 397.0,
+      "host_ext_dispatch_residual_ns": 31.2185341987618,
+      "independent_process_count": 5,
+      "metadata_setup_ns": 123.29351193839258,
+      "method_note": "dispatch residual subtracts the Python control loop, one Provider guard, and Provider region callback from total; fixed_fused_loop includes per-chunk/node dispatch",
+      "output_allocation_ns": 67.73369058287763,
+      "plan_prepare_ns": 3169.0,
+      "provider_guard_ns": 130.1534279725285
+    },
+    {
+      "case_identifier": "linear_4",
+      "element_count": 4096,
+      "execution_lower_ns": 228.0,
+      "fixed_fused_loop_ns": 3409.6776180698153,
+      "guard_lower_ns": 266.0,
+      "host_ext_dispatch_residual_ns": 0.0,
+      "independent_process_count": 5,
+      "metadata_setup_ns": 504.11249573950727,
+      "method_note": "dispatch residual subtracts the Python control loop, one Provider guard, and Provider region callback from total; fixed_fused_loop includes per-chunk/node dispatch",
+      "output_allocation_ns": 129.98415957758874,
+      "plan_prepare_ns": 3415.0,
+      "provider_guard_ns": 216.282822830927
+    },
+    {
+      "case_identifier": "linear_6",
+      "element_count": 65536,
+      "execution_lower_ns": 711.0,
+      "fixed_fused_loop_ns": 989275.5467980296,
+      "guard_lower_ns": 759.0,
+      "host_ext_dispatch_residual_ns": 0.0,
+      "independent_process_count": 5,
+      "metadata_setup_ns": 9462.823050789768,
+      "method_note": "dispatch residual subtracts the Python control loop, one Provider guard, and Provider region callback from total; fixed_fused_loop includes per-chunk/node dispatch",
+      "output_allocation_ns": 1905.039408866995,
+      "plan_prepare_ns": 4638.0,
+      "provider_guard_ns": 343.8736028537455
+    }
+  ],
+  "evidence_note": "Per-process medians and execution counts are retained in each row; per-sample raw records are intentionally not persisted.",
+  "rows": [
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.022920308504682393,
+      "baseline_median_ns": 585.9512,
+      "baseline_process_medians_ns": [
+        608.2217,
+        600.6615,
+        584.5477,
+        574.3686,
+        585.9512
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.01602674563122426,
+      "crossjit_median_ns": 356.2813,
+      "crossjit_process_medians_ns": [
+        365.9412,
+        354.244,
+        354.3273,
+        356.2813,
+        364.702
+      ],
+      "dtype": "float64",
+      "element_count": 16,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.6446308015604523,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.0159744128297141,
+      "baseline_median_ns": 585.2119,
+      "baseline_process_medians_ns": [
+        604.7051,
+        597.732,
+        583.8102,
+        584.7729,
+        585.2119
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.009711435688771653,
+      "crossjit_median_ns": 370.3057,
+      "crossjit_process_medians_ns": [
+        376.3431,
+        369.305,
+        369.2793,
+        370.3057,
+        376.0241
+      ],
+      "dtype": "float64",
+      "element_count": 32,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.580348074577302,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.014167432031291664,
+      "baseline_median_ns": 591.1555,
+      "baseline_process_medians_ns": [
+        608.5699,
+        600.3709,
+        589.7985,
+        589.207,
+        591.1555
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.003471313091048243,
+      "crossjit_median_ns": 384.8477,
+      "crossjit_process_medians_ns": [
+        383.3035,
+        385.8594,
+        383.0363,
+        385.7669,
+        384.8477
+      ],
+      "dtype": "float64",
+      "element_count": 64,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.536076479085103,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.01286057542133959,
+      "baseline_median_ns": 616.9175,
+      "baseline_process_medians_ns": [
+        632.3373,
+        624.5634,
+        616.9175,
+        614.698,
+        613.3188
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.003236133204843857,
+      "crossjit_median_ns": 406.8952,
+      "crossjit_process_medians_ns": [
+        406.8952,
+        406.301,
+        406.5739,
+        409.5639,
+        406.9185
+      ],
+      "dtype": "float64",
+      "element_count": 128,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.5161582146950863,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.007306153855352777,
+      "baseline_median_ns": 665.3424219150025,
+      "baseline_process_medians_ns": [
+        673.8388376856119,
+        667.3113159242191,
+        660.6920122887865,
+        664.1632104454685,
+        665.3424219150025
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.007932934217618244,
+      "crossjit_median_ns": 454.10407066052227,
+      "crossjit_process_medians_ns": [
+        451.7900665642601,
+        454.10407066052227,
+        451.1209677419355,
+        459.56016385048645,
+        457.3152841781874
+      ],
+      "dtype": "float64",
+      "element_count": 256,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 54677,
+      "provider_exec_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed_min": 54677,
+      "region_length": 2,
+      "speedup": 1.465176079455137,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.016400694113647328,
+      "baseline_median_ns": 782.3172043010753,
+      "baseline_process_medians_ns": [
+        800.3325652841781,
+        790.1456733230926,
+        772.8246287762416,
+        768.7163338453661,
+        782.3172043010753
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.0038954108621782856,
+      "crossjit_median_ns": 506.7383512544803,
+      "crossjit_process_medians_ns": [
+        506.6300563236047,
+        506.7383512544803,
+        506.15770609319,
+        510.88300051203277,
+        508.78136200716847
+      ],
+      "dtype": "float64",
+      "element_count": 512,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 27335,
+      "provider_exec_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed_min": 27335,
+      "region_length": 2,
+      "speedup": 1.5438286886405435,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.010994671941700656,
+      "baseline_median_ns": 970.3036354326676,
+      "baseline_process_medians_ns": [
+        982.2043010752689,
+        989.7030209933436,
+        970.3036354326676,
+        969.1848438300051,
+        963.352278545827
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.0032812058627552446,
+      "crossjit_median_ns": 624.9411162314389,
+      "crossjit_process_medians_ns": [
+        621.6620583717358,
+        622.8397337429595,
+        626.9068100358423,
+        624.9411162314389,
+        625.0
+      ],
+      "dtype": "float64",
+      "element_count": 1024,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 13664,
+      "provider_exec_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed_min": 13664,
+      "region_length": 2,
+      "speedup": 1.5526320964187101,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.004944560078356163,
+      "baseline_median_ns": 1456.5420081967213,
+      "baseline_process_medians_ns": [
+        1463.4149590163934,
+        1455.0881147540983,
+        1456.5420081967213,
+        1450.2284836065573,
+        1468.5194672131147
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.014715773692955354,
+      "crossjit_median_ns": 1002.7213114754098,
+      "crossjit_process_medians_ns": [
+        996.6209016393443,
+        1008.469262295082,
+        1034.0256147540983,
+        1001.0758196721312,
+        1002.7213114754098
+      ],
+      "dtype": "float64",
+      "element_count": 2048,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 6825,
+      "provider_exec_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed_min": 6825,
+      "region_length": 2,
+      "speedup": 1.4525890609161953,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.016028012353198187,
+      "baseline_median_ns": 2450.81762295082,
+      "baseline_process_medians_ns": [
+        2481.309426229508,
+        2450.81762295082,
+        2531.9528688524592,
+        2446.0225409836066,
+        2433.0860655737706
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.006822467234509919,
+      "crossjit_median_ns": 1596.5901639344263,
+      "crossjit_process_medians_ns": [
+        1610.688524590164,
+        1591.1516393442623,
+        1596.5901639344263,
+        1616.747950819672,
+        1595.8196721311476
+      ],
+      "dtype": "float64",
+      "element_count": 4096,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 3409,
+      "provider_exec_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed_min": 3409,
+      "region_length": 2,
+      "speedup": 1.535032394857894,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.007576265386283275,
+      "baseline_median_ns": 3416.8852459016393,
+      "baseline_process_medians_ns": [
+        3428.4180327868853,
+        3416.8852459016393,
+        3403.1475409836066,
+        3395.0204918032787,
+        3461.2663934426228
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.028158763187192636,
+      "crossjit_median_ns": 2808.905737704918,
+      "crossjit_process_medians_ns": [
+        2803.3524590163934,
+        2798.8975409836066,
+        2893.0409836065573,
+        2808.905737704918,
+        2983.627049180328
+      ],
+      "dtype": "float64",
+      "element_count": 8192,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 1701,
+      "provider_exec_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed_min": 1701,
+      "region_length": 2,
+      "speedup": 1.2164471025266534,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.022362505772771615,
+      "baseline_median_ns": 6200.270491803279,
+      "baseline_process_medians_ns": [
+        6136.368852459016,
+        6470.475409836065,
+        6200.270491803279,
+        6235.4672131147545,
+        6128.401639344263
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.007036246694152387,
+      "crossjit_median_ns": 5354.975409836065,
+      "crossjit_process_medians_ns": [
+        5354.975409836065,
+        5335.459016393443,
+        5358.491803278688,
+        5347.008196721312,
+        5431.049180327869
+      ],
+      "dtype": "float64",
+      "element_count": 16384,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 847,
+      "provider_exec_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed_min": 847,
+      "region_length": 2,
+      "speedup": 1.157852280780705,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.022805055496702538,
+      "baseline_median_ns": 12117.426229508197,
+      "baseline_process_medians_ns": [
+        11814.754098360656,
+        11959.573770491803,
+        12548.426229508197,
+        12117.426229508197,
+        12178.0
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.011838783475415546,
+      "crossjit_median_ns": 10842.786885245901,
+      "crossjit_process_medians_ns": [
+        10888.590163934427,
+        10842.786885245901,
+        11110.508196721312,
+        10790.295081967213,
+        10814.606557377048
+      ],
+      "dtype": "float64",
+      "element_count": 32768,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 420,
+      "provider_exec_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed_min": 420,
+      "region_length": 2,
+      "speedup": 1.1175564324700262,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.01852137787159581,
+      "baseline_median_ns": 32105.133333333335,
+      "baseline_process_medians_ns": [
+        33387.933333333334,
+        31914.366666666665,
+        32105.133333333335,
+        32365.433333333334,
+        32018.633333333335
+      ],
+      "case_identifier": "array_scalar_2",
+      "crossjit_cv": 0.00578173274904617,
+      "crossjit_median_ns": 23352.033333333333,
+      "crossjit_process_medians_ns": [
+        23187.233333333334,
+        23096.833333333332,
+        23380.266666666666,
+        23352.033333333333,
+        23403.166666666668
+      ],
+      "dtype": "float64",
+      "element_count": 65536,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "array_scalar",
+      "provider_exec_hit_min": 203,
+      "provider_exec_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed_min": 203,
+      "region_length": 2,
+      "speedup": 1.3748324557033578,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.003950278346890591,
+      "baseline_median_ns": 694.6509,
+      "baseline_process_medians_ns": [
+        698.8461,
+        694.6509,
+        691.6414,
+        692.8577,
+        695.1486
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.0016091430581593106,
+      "crossjit_median_ns": 464.114,
+      "crossjit_process_medians_ns": [
+        464.114,
+        464.1062,
+        463.3538,
+        465.1226,
+        465.0773
+      ],
+      "dtype": "float64",
+      "element_count": 16,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 3,
+      "speedup": 1.496724727114459,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.00510193916657393,
+      "baseline_median_ns": 695.6044,
+      "baseline_process_medians_ns": [
+        702.9705,
+        695.6044,
+        693.916,
+        696.4712,
+        695.178
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.0012952073974839074,
+      "crossjit_median_ns": 468.2822,
+      "crossjit_process_medians_ns": [
+        467.6991,
+        467.0694,
+        468.5063,
+        468.2822,
+        468.421
+      ],
+      "dtype": "float64",
+      "element_count": 32,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 3,
+      "speedup": 1.485438481326004,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.00578268224512618,
+      "baseline_median_ns": 700.8981,
+      "baseline_process_medians_ns": [
+        709.2565,
+        704.0365,
+        700.8981,
+        699.3773,
+        700.0553
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.002457947271839717,
+      "crossjit_median_ns": 470.5412,
+      "crossjit_process_medians_ns": [
+        471.3219,
+        470.098,
+        470.4044,
+        472.9757,
+        470.5412
+      ],
+      "dtype": "float64",
+      "element_count": 64,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 3,
+      "speedup": 1.4895573437565084,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.006589379926341049,
+      "baseline_median_ns": 728.0217,
+      "baseline_process_medians_ns": [
+        733.7142,
+        732.8897,
+        722.0784,
+        728.0217,
+        726.4124
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.0038874643657864456,
+      "crossjit_median_ns": 499.2377,
+      "crossjit_process_medians_ns": [
+        500.1122,
+        498.8239,
+        495.1915,
+        499.2377,
+        499.4204
+      ],
+      "dtype": "float64",
+      "element_count": 128,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 3,
+      "speedup": 1.4582666733702203,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.008303624939432376,
+      "baseline_median_ns": 810.5650281618024,
+      "baseline_process_medians_ns": [
+        823.0384024577573,
+        810.5650281618024,
+        808.0847414234511,
+        819.4119303635433,
+        809.0015360983103
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.0016129774169209847,
+      "crossjit_median_ns": 542.6547619047619,
+      "crossjit_process_medians_ns": [
+        541.9461085509473,
+        542.6547619047619,
+        544.2850742447516,
+        542.47363031234,
+        542.9575012800819
+      ],
+      "dtype": "float64",
+      "element_count": 256,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 54677,
+      "provider_exec_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed_min": 54677,
+      "region_length": 3,
+      "speedup": 1.4937029674569773,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0014839425626706042,
+      "baseline_median_ns": 1055.9749103942652,
+      "baseline_process_medians_ns": [
+        1056.3763440860216,
+        1054.9129544290834,
+        1055.9749103942652,
+        1057.7711213517666,
+        1053.6072708653353
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.0016469958312513317,
+      "crossjit_median_ns": 590.5192012288786,
+      "crossjit_process_medians_ns": [
+        590.9444444444445,
+        590.5192012288786,
+        590.7081413210445,
+        589.8986175115207,
+        588.5248335893497
+      ],
+      "dtype": "float64",
+      "element_count": 512,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 27335,
+      "provider_exec_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed_min": 27335,
+      "region_length": 3,
+      "speedup": 1.7882143513653186,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.005599666301949061,
+      "baseline_median_ns": 1301.0721966205838,
+      "baseline_process_medians_ns": [
+        1305.3497183819763,
+        1301.0721966205838,
+        1290.704557091654,
+        1306.4295954941117,
+        1292.4219150025601
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.0038101384120991675,
+      "crossjit_median_ns": 732.910394265233,
+      "crossjit_process_medians_ns": [
+        735.7660010240655,
+        730.8131080389145,
+        737.1300563236047,
+        732.910394265233,
+        731.179211469534
+      ],
+      "dtype": "float64",
+      "element_count": 1024,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 13664,
+      "provider_exec_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed_min": 13664,
+      "region_length": 3,
+      "speedup": 1.7752131867701944,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.022150229643576283,
+      "baseline_median_ns": 2194.4815573770493,
+      "baseline_process_medians_ns": [
+        2192.09118852459,
+        2301.5174180327867,
+        2244.879098360656,
+        2194.4815573770493,
+        2186.9528688524592
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.0007977366098784943,
+      "crossjit_median_ns": 1048.4631147540983,
+      "crossjit_process_medians_ns": [
+        1048.9426229508197,
+        1048.2530737704917,
+        1047.1352459016393,
+        1048.4631147540983,
+        1049.3391393442623
+      ],
+      "dtype": "float64",
+      "element_count": 2048,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 6825,
+      "provider_exec_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed_min": 6825,
+      "region_length": 3,
+      "speedup": 2.093046027557901,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.003072248435771947,
+      "baseline_median_ns": 3780.3053278688526,
+      "baseline_process_medians_ns": [
+        3780.3053278688526,
+        3800.254098360656,
+        3776.127049180328,
+        3781.0204918032787,
+        3768.940573770492
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.0023605327475798715,
+      "crossjit_median_ns": 1590.1434426229507,
+      "crossjit_process_medians_ns": [
+        1590.1434426229507,
+        1593.2889344262296,
+        1585.4139344262296,
+        1588.2233606557377,
+        1594.686475409836
+      ],
+      "dtype": "float64",
+      "element_count": 4096,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 3409,
+      "provider_exec_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed_min": 3409,
+      "region_length": 3,
+      "speedup": 2.3773360481449504,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.013394906279855774,
+      "baseline_median_ns": 7836.88524590164,
+      "baseline_process_medians_ns": [
+        7745.512295081967,
+        7733.389344262295,
+        7836.88524590164,
+        7960.725409836065,
+        7936.426229508197
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.03293954947563706,
+      "crossjit_median_ns": 2779.2008196721313,
+      "crossjit_process_medians_ns": [
+        2779.2008196721313,
+        2791.5696721311474,
+        2721.6639344262294,
+        2944.3975409836066,
+        2718.0
+      ],
+      "dtype": "float64",
+      "element_count": 8192,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 1701,
+      "provider_exec_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed_min": 1701,
+      "region_length": 3,
+      "speedup": 2.8198341013824884,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.023943075086001967,
+      "baseline_median_ns": 12459.803278688525,
+      "baseline_process_medians_ns": [
+        12472.106557377048,
+        12443.983606557376,
+        13125.532786885246,
+        12433.860655737704,
+        12459.803278688525
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.05125364692457197,
+      "crossjit_median_ns": 5033.959016393443,
+      "crossjit_process_medians_ns": [
+        5033.959016393443,
+        4967.0327868852455,
+        5092.352459016393,
+        4970.336065573771,
+        5592.581967213115
+      ],
+      "dtype": "float64",
+      "element_count": 16384,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 847,
+      "provider_exec_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed_min": 847,
+      "region_length": 3,
+      "speedup": 2.4751499243661494,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.02175183629450383,
+      "baseline_median_ns": 26116.508196721312,
+      "baseline_process_medians_ns": [
+        26209.55737704918,
+        25966.360655737706,
+        26116.508196721312,
+        25720.45901639344,
+        27210.93442622951
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.01336547670663387,
+      "crossjit_median_ns": 9989.95081967213,
+      "crossjit_process_medians_ns": [
+        10238.377049180328,
+        10140.311475409837,
+        9951.032786885246,
+        9989.95081967213,
+        9927.032786885246
+      ],
+      "dtype": "float64",
+      "element_count": 32768,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 420,
+      "provider_exec_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed_min": 420,
+      "region_length": 3,
+      "speedup": 2.614277954731558,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.002997841348479264,
+      "baseline_median_ns": 68995.76666666666,
+      "baseline_process_medians_ns": [
+        68995.76666666666,
+        69466.8,
+        69130.66666666667,
+        68989.83333333333,
+        68981.43333333333
+      ],
+      "case_identifier": "branched_3",
+      "crossjit_cv": 0.006920584070431492,
+      "crossjit_median_ns": 30795.666666666668,
+      "crossjit_process_medians_ns": [
+        30795.666666666668,
+        30808.966666666667,
+        30852.5,
+        30359.033333333333,
+        30546.866666666665
+      ],
+      "dtype": "float64",
+      "element_count": 65536,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "branched_dag",
+      "provider_exec_hit_min": 203,
+      "provider_exec_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed_min": 203,
+      "region_length": 3,
+      "speedup": 2.240437507441523,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.007914044253155632,
+      "baseline_median_ns": 461.5363,
+      "baseline_process_medians_ns": [
+        468.6982,
+        466.1205,
+        461.5363,
+        460.1527,
+        461.2856
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.002100394770472403,
+      "crossjit_median_ns": 383.6411,
+      "crossjit_process_medians_ns": [
+        383.6411,
+        382.9643,
+        384.6613,
+        384.5502,
+        383.0419
+      ],
+      "dtype": "float64",
+      "element_count": 16,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.2030418534406246,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.013249325433789254,
+      "baseline_median_ns": 475.0205,
+      "baseline_process_medians_ns": [
+        482.2624,
+        480.4503,
+        475.0205,
+        466.5102,
+        472.7681
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.00636742213596756,
+      "crossjit_median_ns": 386.7445,
+      "crossjit_process_medians_ns": [
+        391.5885,
+        385.5452,
+        386.2623,
+        386.7445,
+        389.0178
+      ],
+      "dtype": "float64",
+      "element_count": 32,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.228254054033089,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.013780663373591377,
+      "baseline_median_ns": 475.0875,
+      "baseline_process_medians_ns": [
+        484.3653,
+        480.2453,
+        475.0875,
+        467.0097,
+        474.3221
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.004798756233007425,
+      "crossjit_median_ns": 392.2851,
+      "crossjit_process_medians_ns": [
+        394.3828,
+        390.6181,
+        390.0949,
+        393.7716,
+        392.2851
+      ],
+      "dtype": "float64",
+      "element_count": 64,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.2110770967339823,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.015173185055118048,
+      "baseline_median_ns": 498.3822,
+      "baseline_process_medians_ns": [
+        507.7261,
+        502.9766,
+        498.3822,
+        487.3713,
+        497.6852
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.002668279914061109,
+      "crossjit_median_ns": 416.7629,
+      "crossjit_process_medians_ns": [
+        418.3281,
+        415.3674,
+        416.7629,
+        417.1693,
+        416.143
+      ],
+      "dtype": "float64",
+      "element_count": 128,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.1958410885421904,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0143606038194505,
+      "baseline_median_ns": 552.9534050179211,
+      "baseline_process_medians_ns": [
+        560.5704045058884,
+        539.60496671787,
+        553.92140296979,
+        546.916026625704,
+        552.9534050179211
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.0019390884494051848,
+      "crossjit_median_ns": 454.68881208397335,
+      "crossjit_process_medians_ns": [
+        454.68830005120327,
+        454.0069124423963,
+        456.03136200716847,
+        455.94713261648747,
+        454.68881208397335
+      ],
+      "dtype": "float64",
+      "element_count": 256,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 54677,
+      "provider_exec_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed_min": 54677,
+      "region_length": 2,
+      "speedup": 1.2161139450156515,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.017331581757460048,
+      "baseline_median_ns": 665.0939580133129,
+      "baseline_process_medians_ns": [
+        684.599846390169,
+        665.0939580133129,
+        654.9746543778801,
+        671.2713773681515,
+        659.3566308243728
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.004471148645497324,
+      "crossjit_median_ns": 485.43804403481823,
+      "crossjit_process_medians_ns": [
+        485.1794674859191,
+        483.8963133640553,
+        485.6333845366103,
+        489.65284178187403,
+        485.43804403481823
+      ],
+      "dtype": "float64",
+      "element_count": 512,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 27335,
+      "provider_exec_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed_min": 27335,
+      "region_length": 2,
+      "speedup": 1.3700903054182725,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.11157314765450739,
+      "baseline_median_ns": 1068.5453149001537,
+      "baseline_process_medians_ns": [
+        1077.4352278545828,
+        1068.5453149001537,
+        871.331797235023,
+        1080.4009216589861,
+        874.7619047619048
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.0023583150884499897,
+      "crossjit_median_ns": 563.4987199180748,
+      "crossjit_process_medians_ns": [
+        563.4987199180748,
+        563.0926779313876,
+        565.3712237583205,
+        565.9539170506912,
+        563.2401433691756
+      ],
+      "dtype": "float64",
+      "element_count": 1024,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 13664,
+      "provider_exec_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed_min": 13664,
+      "region_length": 2,
+      "speedup": 1.8962692853242078,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.15191378972796296,
+      "baseline_median_ns": 2160.6004098360654,
+      "baseline_process_medians_ns": [
+        2175.029713114754,
+        2160.6004098360654,
+        1633.1915983606557,
+        2164.157786885246,
+        1618.4918032786886
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.015059414952236096,
+      "crossjit_median_ns": 863.484631147541,
+      "crossjit_process_medians_ns": [
+        866.5870901639345,
+        859.2612704918033,
+        863.484631147541,
+        891.1424180327868,
+        860.9303278688525
+      ],
+      "dtype": "float64",
+      "element_count": 2048,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 6825,
+      "provider_exec_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed_min": 6825,
+      "region_length": 2,
+      "speedup": 2.5021874529077635,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.14622709515159107,
+      "baseline_median_ns": 3025.7622950819673,
+      "baseline_process_medians_ns": [
+        3025.7622950819673,
+        3039.997950819672,
+        2299.7131147540986,
+        3036.6618852459014,
+        2304.94262295082
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.015225542867974775,
+      "crossjit_median_ns": 1303.0983606557377,
+      "crossjit_process_medians_ns": [
+        1306.52868852459,
+        1302.952868852459,
+        1302.639344262295,
+        1348.3565573770493,
+        1303.0983606557377
+      ],
+      "dtype": "float64",
+      "element_count": 4096,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 3409,
+      "provider_exec_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed_min": 3409,
+      "region_length": 2,
+      "speedup": 2.3219753676609343,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.17953712806401603,
+      "baseline_median_ns": 5592.602459016393,
+      "baseline_process_medians_ns": [
+        5603.770491803279,
+        5592.602459016393,
+        4035.1065573770493,
+        5791.754098360656,
+        4019.6065573770493
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.020632856783891707,
+      "crossjit_median_ns": 2185.1352459016393,
+      "crossjit_process_medians_ns": [
+        2199.0,
+        2184.7418032786886,
+        2185.1352459016393,
+        2286.8606557377047,
+        2177.3852459016393
+      ],
+      "dtype": "float64",
+      "element_count": 8192,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 1701,
+      "provider_exec_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed_min": 1701,
+      "region_length": 2,
+      "speedup": 2.5593850401276885,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.1980930634542207,
+      "baseline_median_ns": 7585.368852459016,
+      "baseline_process_medians_ns": [
+        7433.516393442623,
+        10632.139344262296,
+        7418.418032786885,
+        10645.66393442623,
+        7585.368852459016
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.02847692788266275,
+      "crossjit_median_ns": 4228.180327868852,
+      "crossjit_process_medians_ns": [
+        4228.180327868852,
+        4121.836065573771,
+        4096.877049180328,
+        4341.040983606557,
+        4357.5327868852455
+      ],
+      "dtype": "float64",
+      "element_count": 16384,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 847,
+      "provider_exec_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed_min": 847,
+      "region_length": 2,
+      "speedup": 1.7940031560296064,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.29846400707067244,
+      "baseline_median_ns": 19322.83606557377,
+      "baseline_process_medians_ns": [
+        19322.83606557377,
+        19216.29508196721,
+        19765.491803278688,
+        34265.770491803276,
+        19149.147540983606
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.027788997043746422,
+      "crossjit_median_ns": 8030.508196721312,
+      "crossjit_process_medians_ns": [
+        7833.049180327869,
+        8073.098360655737,
+        7842.704918032787,
+        8381.540983606557,
+        8030.508196721312
+      ],
+      "dtype": "float64",
+      "element_count": 32768,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 420,
+      "provider_exec_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed_min": 420,
+      "region_length": 2,
+      "speedup": 2.4061784873668244,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.1925331618894628,
+      "baseline_median_ns": 41382.2,
+      "baseline_process_medians_ns": [
+        41382.2,
+        40954.5,
+        41626.86666666667,
+        60605.9,
+        40866.566666666666
+      ],
+      "case_identifier": "linear_2",
+      "crossjit_cv": 0.018509738980358313,
+      "crossjit_median_ns": 21969.533333333333,
+      "crossjit_process_medians_ns": [
+        22106.1,
+        21969.533333333333,
+        22796.566666666666,
+        21826.2,
+        21796.6
+      ],
+      "dtype": "float64",
+      "element_count": 65536,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 203,
+      "provider_exec_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed_min": 203,
+      "region_length": 2,
+      "speedup": 1.8836176159105185,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.008790646499692491,
+      "baseline_median_ns": 697.1085,
+      "baseline_process_medians_ns": [
+        707.448,
+        705.4931,
+        694.1067,
+        695.231,
+        697.1085
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.022251750115675283,
+      "crossjit_median_ns": 464.2848,
+      "crossjit_process_medians_ns": [
+        464.9825,
+        486.4304,
+        461.4059,
+        464.2848,
+        462.74
+      ],
+      "dtype": "float64",
+      "element_count": 16,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 3,
+      "speedup": 1.5014674182743006,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.00823498920859563,
+      "baseline_median_ns": 695.8462,
+      "baseline_process_medians_ns": [
+        701.1619,
+        702.1803,
+        690.4309,
+        695.8462,
+        690.0401
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.0026860090203802214,
+      "crossjit_median_ns": 465.9676,
+      "crossjit_process_medians_ns": [
+        464.1125,
+        466.4984,
+        464.6233,
+        467.0709,
+        465.9676
+      ],
+      "dtype": "float64",
+      "element_count": 32,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 3,
+      "speedup": 1.4933360173539962,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.007292460686993239,
+      "baseline_median_ns": 703.9152,
+      "baseline_process_medians_ns": [
+        708.1338,
+        707.9738,
+        696.2678,
+        703.9152,
+        700.1104
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.002691979761321852,
+      "crossjit_median_ns": 471.4835,
+      "crossjit_process_medians_ns": [
+        470.4224,
+        471.5106,
+        471.4835,
+        473.1798,
+        469.8658
+      ],
+      "dtype": "float64",
+      "element_count": 64,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 3,
+      "speedup": 1.492979499812825,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.007934869783518643,
+      "baseline_median_ns": 732.987,
+      "baseline_process_medians_ns": [
+        745.45,
+        740.3287,
+        732.7589,
+        732.987,
+        732.4896
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.014176663859412193,
+      "crossjit_median_ns": 495.2127,
+      "crossjit_process_medians_ns": [
+        495.3057,
+        510.1401,
+        494.7233,
+        492.8453,
+        495.2127
+      ],
+      "dtype": "float64",
+      "element_count": 128,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 3,
+      "speedup": 1.4801458040151232,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.006436122612439619,
+      "baseline_median_ns": 822.4246031746031,
+      "baseline_process_medians_ns": [
+        832.7456477214541,
+        830.3993855606759,
+        821.8442140296979,
+        822.4246031746031,
+        821.7295186891961
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.0023259378399038116,
+      "crossjit_median_ns": 541.2651049667179,
+      "crossjit_process_medians_ns": [
+        542.5494111623144,
+        541.8548387096774,
+        539.1903481822836,
+        540.9758064516129,
+        541.2651049667179
+      ],
+      "dtype": "float64",
+      "element_count": 256,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 54677,
+      "provider_exec_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed_min": 54677,
+      "region_length": 3,
+      "speedup": 1.5194487795868046,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.006209879445494613,
+      "baseline_median_ns": 1010.4206349206349,
+      "baseline_process_medians_ns": [
+        1020.4720942140297,
+        1010.4206349206349,
+        1003.6111111111111,
+        1007.5455709165386,
+        1012.0834613415259
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.004528269839705217,
+      "crossjit_median_ns": 594.1530977982591,
+      "crossjit_process_medians_ns": [
+        592.8300051203277,
+        598.9613415258576,
+        592.3975934459805,
+        594.1530977982591,
+        596.094982078853
+      ],
+      "dtype": "float64",
+      "element_count": 512,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 27335,
+      "provider_exec_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed_min": 27335,
+      "region_length": 3,
+      "speedup": 1.700606524925865,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.050611589472282156,
+      "baseline_median_ns": 1352.8443420378903,
+      "baseline_process_medians_ns": [
+        1352.8443420378903,
+        1353.8172043010752,
+        1340.3568868407579,
+        1503.457757296467,
+        1344.5970302099333
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.007931931522796394,
+      "crossjit_median_ns": 743.7885304659499,
+      "crossjit_process_medians_ns": [
+        743.7885304659499,
+        746.279057859703,
+        731.6072708653354,
+        740.2227342549924,
+        744.7962109575013
+      ],
+      "dtype": "float64",
+      "element_count": 1024,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 13664,
+      "provider_exec_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed_min": 13664,
+      "region_length": 3,
+      "speedup": 1.8188561487905637,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.13356824711894735,
+      "baseline_median_ns": 2280.7243852459014,
+      "baseline_process_medians_ns": [
+        2276.465163934426,
+        2273.2653688524592,
+        2280.7243852459014,
+        3021.156762295082,
+        2353.159836065574
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.0025650254058003337,
+      "crossjit_median_ns": 1048.8483606557377,
+      "crossjit_process_medians_ns": [
+        1045.4774590163934,
+        1045.515368852459,
+        1051.2858606557377,
+        1050.296106557377,
+        1048.8483606557377
+      ],
+      "dtype": "float64",
+      "element_count": 2048,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 6825,
+      "provider_exec_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed_min": 6825,
+      "region_length": 3,
+      "speedup": 2.174503456171679,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.16593105288225354,
+      "baseline_median_ns": 3804.0061475409834,
+      "baseline_process_medians_ns": [
+        3890.5553278688526,
+        3788.967213114754,
+        3804.0061475409834,
+        5343.538934426229,
+        3784.6495901639346
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.0026416373121075807,
+      "crossjit_median_ns": 1587.4118852459017,
+      "crossjit_process_medians_ns": [
+        1585.0553278688524,
+        1594.967213114754,
+        1587.4118852459017,
+        1588.2151639344263,
+        1584.424180327869
+      ],
+      "dtype": "float64",
+      "element_count": 4096,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 3409,
+      "provider_exec_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed_min": 3409,
+      "region_length": 3,
+      "speedup": 2.396357355578017,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.19333645824039727,
+      "baseline_median_ns": 6586.508196721312,
+      "baseline_process_medians_ns": [
+        6798.758196721312,
+        6551.606557377049,
+        6586.508196721312,
+        9759.295081967213,
+        6583.725409836065
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.03504625230084931,
+      "crossjit_median_ns": 2738.3975409836066,
+      "crossjit_process_medians_ns": [
+        2738.7418032786886,
+        2738.3975409836066,
+        2731.655737704918,
+        2732.2950819672133,
+        2952.909836065574
+      ],
+      "dtype": "float64",
+      "element_count": 8192,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 1701,
+      "provider_exec_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed_min": 1701,
+      "region_length": 3,
+      "speedup": 2.405241787631572,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.20042575838677157,
+      "baseline_median_ns": 12744.237704918032,
+      "baseline_process_medians_ns": [
+        12744.237704918032,
+        13030.61475409836,
+        12631.27049180328,
+        19055.188524590165,
+        12697.426229508197
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.04499896432302889,
+      "crossjit_median_ns": 4997.122950819672,
+      "crossjit_process_medians_ns": [
+        4975.934426229508,
+        4955.163934426229,
+        5156.991803278688,
+        5504.426229508197,
+        4997.122950819672
+      ],
+      "dtype": "float64",
+      "element_count": 16384,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 847,
+      "provider_exec_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed_min": 847,
+      "region_length": 3,
+      "speedup": 2.550315017329644,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.20000889799822213,
+      "baseline_median_ns": 26422.754098360656,
+      "baseline_process_medians_ns": [
+        26365.72131147541,
+        26422.754098360656,
+        26432.786885245903,
+        39018.75409836065,
+        25528.475409836065
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.01772587077311101,
+      "crossjit_median_ns": 10325.983606557376,
+      "crossjit_process_medians_ns": [
+        10514.573770491803,
+        10523.672131147541,
+        10075.327868852459,
+        10325.983606557376,
+        10312.852459016394
+      ],
+      "dtype": "float64",
+      "element_count": 32768,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 420,
+      "provider_exec_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed_min": 420,
+      "region_length": 3,
+      "speedup": 2.558860744421601,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0876093593305609,
+      "baseline_median_ns": 124005.7,
+      "baseline_process_medians_ns": [
+        144882.06666666668,
+        123241.93333333333,
+        144433.63333333333,
+        124005.7,
+        123412.23333333334
+      ],
+      "case_identifier": "linear_3",
+      "crossjit_cv": 0.005705437824431572,
+      "crossjit_median_ns": 29103.733333333334,
+      "crossjit_process_medians_ns": [
+        29103.733333333334,
+        29108.0,
+        29101.233333333334,
+        29119.6,
+        28738.066666666666
+      ],
+      "dtype": "float64",
+      "element_count": 65536,
+      "eliminated_materializations": 2,
+      "fixed_fast_path_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 203,
+      "provider_exec_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed_min": 203,
+      "region_length": 3,
+      "speedup": 4.260817627062736,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.006675503393135594,
+      "baseline_median_ns": 910.8038,
+      "baseline_process_medians_ns": [
+        922.1763,
+        910.8038,
+        908.4949,
+        911.3865,
+        906.4633
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.003972421965343884,
+      "crossjit_median_ns": 544.1461,
+      "crossjit_process_medians_ns": [
+        544.1461,
+        543.9147,
+        542.1612,
+        545.0554,
+        548.052
+      ],
+      "dtype": "float64",
+      "element_count": 16,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 4,
+      "speedup": 1.6738221591590934,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0066117997532056305,
+      "baseline_median_ns": 917.34,
+      "baseline_process_medians_ns": [
+        931.0445,
+        921.7945,
+        916.6172,
+        917.2144,
+        917.34
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.00314938988432196,
+      "crossjit_median_ns": 549.5809,
+      "crossjit_process_medians_ns": [
+        550.194,
+        548.7977,
+        548.8729,
+        549.5809,
+        553.0199
+      ],
+      "dtype": "float64",
+      "element_count": 32,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 4,
+      "speedup": 1.6691628111530077,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.006627751476568771,
+      "baseline_median_ns": 920.6593,
+      "baseline_process_medians_ns": [
+        934.0731,
+        922.1662,
+        920.6593,
+        919.1362,
+        920.4484
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.0021653476452093904,
+      "crossjit_median_ns": 555.5662,
+      "crossjit_process_medians_ns": [
+        554.279,
+        553.9209,
+        556.1618,
+        555.5662,
+        556.725
+      ],
+      "dtype": "float64",
+      "element_count": 64,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 4,
+      "speedup": 1.6571549889104127,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.008226890109264385,
+      "baseline_median_ns": 974.738,
+      "baseline_process_medians_ns": [
+        990.3954,
+        974.738,
+        970.545,
+        977.0822,
+        971.3201
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.004481986839021154,
+      "crossjit_median_ns": 601.6702,
+      "crossjit_process_medians_ns": [
+        602.3173,
+        601.6702,
+        597.5089,
+        601.3057,
+        605.0265
+      ],
+      "dtype": "float64",
+      "element_count": 128,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 4,
+      "speedup": 1.6200536440063011,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.006427690894527704,
+      "baseline_median_ns": 1131.3556067588327,
+      "baseline_process_medians_ns": [
+        1144.3329493087558,
+        1127.450204813108,
+        1126.1812596006143,
+        1134.939708141321,
+        1131.3556067588327
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.003882349640283602,
+      "crossjit_median_ns": 669.0688684075781,
+      "crossjit_process_medians_ns": [
+        669.0688684075781,
+        674.5505632360471,
+        669.0999743983615,
+        668.5698924731183,
+        668.3714797747056
+      ],
+      "dtype": "float64",
+      "element_count": 256,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 54677,
+      "provider_exec_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed_min": 54677,
+      "region_length": 4,
+      "speedup": 1.6909404400350045,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.006831275940708891,
+      "baseline_median_ns": 1560.0499231950844,
+      "baseline_process_medians_ns": [
+        1575.3333333333333,
+        1557.5870455709166,
+        1569.110599078341,
+        1560.0499231950844,
+        1547.7240143369177
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.004124329889886826,
+      "crossjit_median_ns": 770.9342037890425,
+      "crossjit_process_medians_ns": [
+        768.1853558627752,
+        765.4078341013825,
+        770.9342037890425,
+        772.6546338965694,
+        772.8356374807988
+      ],
+      "dtype": "float64",
+      "element_count": 512,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 27335,
+      "provider_exec_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed_min": 27335,
+      "region_length": 4,
+      "speedup": 2.0235837449261425,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.02405201238640421,
+      "baseline_median_ns": 1950.5775729646698,
+      "baseline_process_medians_ns": [
+        2041.5657962109576,
+        1945.5555555555557,
+        2023.888888888889,
+        1950.5775729646698,
+        1943.6907322068612
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.005725367508057925,
+      "crossjit_median_ns": 981.289298515105,
+      "crossjit_process_medians_ns": [
+        981.289298515105,
+        986.6876600102406,
+        975.1377368151561,
+        977.5908858166923,
+        988.1351766513056
+      ],
+      "dtype": "float64",
+      "element_count": 1024,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 13664,
+      "provider_exec_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed_min": 13664,
+      "region_length": 4,
+      "speedup": 1.9877701468020692,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.1132156505073385,
+      "baseline_median_ns": 3378.1311475409834,
+      "baseline_process_medians_ns": [
+        4004.970286885246,
+        3204.939549180328,
+        3979.8954918032787,
+        3220.155737704918,
+        3378.1311475409834
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.0017542732302597958,
+      "crossjit_median_ns": 1369.9118852459017,
+      "crossjit_process_medians_ns": [
+        1368.876024590164,
+        1368.2131147540983,
+        1369.9118852459017,
+        1369.923155737705,
+        1374.3555327868853
+      ],
+      "dtype": "float64",
+      "element_count": 2048,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 6825,
+      "provider_exec_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed_min": 6825,
+      "region_length": 4,
+      "speedup": 2.465947761986606,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.17997666634473417,
+      "baseline_median_ns": 5775.838114754099,
+      "baseline_process_medians_ns": [
+        8029.754098360656,
+        5747.254098360656,
+        7806.360655737705,
+        5775.838114754099,
+        5723.766393442623
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.0008975723519287725,
+      "crossjit_median_ns": 2151.3278688524592,
+      "crossjit_process_medians_ns": [
+        2151.1680327868853,
+        2151.8196721311474,
+        2155.375,
+        2151.3278688524592,
+        2150.4631147540986
+      ],
+      "dtype": "float64",
+      "element_count": 4096,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 3409,
+      "provider_exec_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed_min": 3409,
+      "region_length": 4,
+      "speedup": 2.684778177412349,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.2271436199051482,
+      "baseline_median_ns": 11473.942622950819,
+      "baseline_process_medians_ns": [
+        17095.909836065573,
+        11401.819672131147,
+        17072.872950819674,
+        11473.942622950819,
+        11358.651639344262
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.10163854678392543,
+      "crossjit_median_ns": 3724.3852459016393,
+      "crossjit_process_medians_ns": [
+        3720.55737704918,
+        3722.995901639344,
+        3724.3852459016393,
+        3725.1024590163934,
+        4609.733606557377
+      ],
+      "dtype": "float64",
+      "element_count": 8192,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 1701,
+      "provider_exec_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed_min": 1701,
+      "region_length": 4,
+      "speedup": 3.0807614855570837,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.2160694526096285,
+      "baseline_median_ns": 20059.549180327867,
+      "baseline_process_medians_ns": [
+        28814.803278688523,
+        20059.549180327867,
+        29346.17213114754,
+        19628.844262295082,
+        19750.43442622951
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.009563268347564435,
+      "crossjit_median_ns": 6926.803278688524,
+      "crossjit_process_medians_ns": [
+        7004.254098360656,
+        6926.803278688524,
+        6921.61475409836,
+        6921.286885245901,
+        7070.098360655737
+      ],
+      "dtype": "float64",
+      "element_count": 16384,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 847,
+      "provider_exec_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed_min": 847,
+      "region_length": 4,
+      "speedup": 2.895931697965849,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.15057771786810029,
+      "baseline_median_ns": 34855.88524590164,
+      "baseline_process_medians_ns": [
+        45301.80327868852,
+        34618.19672131148,
+        45467.19672131148,
+        34855.88524590164,
+        34555.016393442624
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.011626047668101215,
+      "crossjit_median_ns": 13858.475409836066,
+      "crossjit_process_medians_ns": [
+        14094.573770491803,
+        13849.704918032787,
+        13965.639344262296,
+        13858.475409836066,
+        13657.262295081968
+      ],
+      "dtype": "float64",
+      "element_count": 32768,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 420,
+      "provider_exec_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed_min": 420,
+      "region_length": 4,
+      "speedup": 2.515131298004299,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.12871490297368837,
+      "baseline_median_ns": 88417.83333333333,
+      "baseline_process_medians_ns": [
+        99148.43333333333,
+        76494.23333333334,
+        99941.1,
+        88417.83333333333,
+        77191.13333333333
+      ],
+      "case_identifier": "linear_4",
+      "crossjit_cv": 0.005735326011686135,
+      "crossjit_median_ns": 37668.3,
+      "crossjit_process_medians_ns": [
+        37847.5,
+        38090.3,
+        37668.3,
+        37553.833333333336,
+        37618.63333333333
+      ],
+      "dtype": "float64",
+      "element_count": 65536,
+      "eliminated_materializations": 3,
+      "fixed_fast_path_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 203,
+      "provider_exec_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed_min": 203,
+      "region_length": 4,
+      "speedup": 2.347274321732951,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.008637681199058809,
+      "baseline_median_ns": 1148.7152,
+      "baseline_process_medians_ns": [
+        1162.788,
+        1159.5077,
+        1142.4549,
+        1148.7152,
+        1140.7133
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.002238490237530466,
+      "crossjit_median_ns": 625.8766,
+      "crossjit_process_medians_ns": [
+        625.1438,
+        625.3608,
+        625.8766,
+        627.1439,
+        628.4927
+      ],
+      "dtype": "float64",
+      "element_count": 16,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 5,
+      "speedup": 1.8353701033079044,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0061081775223732395,
+      "baseline_median_ns": 1151.0518,
+      "baseline_process_medians_ns": [
+        1162.4325,
+        1156.4306,
+        1145.9142,
+        1151.0518,
+        1146.2825
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.0029046732341549922,
+      "crossjit_median_ns": 631.1643,
+      "crossjit_process_medians_ns": [
+        629.939,
+        632.3008,
+        628.5637,
+        631.1643,
+        633.159
+      ],
+      "dtype": "float64",
+      "element_count": 32,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 5,
+      "speedup": 1.8236959853401087,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.005063757412534396,
+      "baseline_median_ns": 1160.339,
+      "baseline_process_medians_ns": [
+        1166.9657,
+        1166.0859,
+        1153.8764,
+        1160.339,
+        1155.8803
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.003507548258031449,
+      "crossjit_median_ns": 638.6422,
+      "crossjit_process_medians_ns": [
+        638.7166,
+        637.5317,
+        634.7201,
+        640.8598,
+        638.6422
+      ],
+      "dtype": "float64",
+      "element_count": 64,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 5,
+      "speedup": 1.816884321142574,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.007602991263750326,
+      "baseline_median_ns": 1235.8083,
+      "baseline_process_medians_ns": [
+        1248.3609,
+        1236.0915,
+        1223.0109,
+        1235.8083,
+        1229.5929
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.005128564026973389,
+      "crossjit_median_ns": 687.4532,
+      "crossjit_process_medians_ns": [
+        687.4532,
+        687.9856,
+        681.514,
+        685.0663,
+        690.9277
+      ],
+      "dtype": "float64",
+      "element_count": 128,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 5,
+      "speedup": 1.7976617171903482,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.007610098008281915,
+      "baseline_median_ns": 1427.0367383512544,
+      "baseline_process_medians_ns": [
+        1446.376728110599,
+        1431.5160010240656,
+        1417.2118535586278,
+        1424.2538402457758,
+        1427.0367383512544
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.004327973949502017,
+      "crossjit_median_ns": 753.1121351766513,
+      "crossjit_process_medians_ns": [
+        751.1254480286739,
+        753.1245519713261,
+        749.6378648233487,
+        758.2589605734767,
+        753.1121351766513
+      ],
+      "dtype": "float64",
+      "element_count": 256,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 54677,
+      "provider_exec_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed_min": 54677,
+      "region_length": 5,
+      "speedup": 1.8948529331777744,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.005491534349732993,
+      "baseline_median_ns": 1804.9621095750128,
+      "baseline_process_medians_ns": [
+        1819.05325140809,
+        1804.9621095750128,
+        1792.7555043522786,
+        1808.6456733230928,
+        1799.3179723502303
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.005348084722823724,
+      "crossjit_median_ns": 862.5542754736304,
+      "crossjit_process_medians_ns": [
+        854.9383000512033,
+        866.2191500256016,
+        862.5542754736304,
+        860.3077316948285,
+        865.7644649257552
+      ],
+      "dtype": "float64",
+      "element_count": 512,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 27335,
+      "provider_exec_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed_min": 27335,
+      "region_length": 5,
+      "speedup": 2.09257801033321,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.008658773160819096,
+      "baseline_median_ns": 2450.8279569892475,
+      "baseline_process_medians_ns": [
+        2450.8279569892475,
+        2460.9119303635434,
+        2430.5862775217615,
+        2440.7306707629286,
+        2485.9969278033795
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.002360778557260863,
+      "crossjit_median_ns": 1072.0727086533539,
+      "crossjit_process_medians_ns": [
+        1071.6149513568869,
+        1076.4920634920634,
+        1069.8878648233488,
+        1072.0727086533539,
+        1074.0716845878137
+      ],
+      "dtype": "float64",
+      "element_count": 1024,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 13664,
+      "provider_exec_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed_min": 13664,
+      "region_length": 5,
+      "speedup": 2.286065056229039,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.021894269460966946,
+      "baseline_median_ns": 4181.061475409836,
+      "baseline_process_medians_ns": [
+        4219.476434426229,
+        4181.061475409836,
+        4173.486680327869,
+        4391.6598360655735,
+        4180.3473360655735
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.004491356401449972,
+      "crossjit_median_ns": 1462.326844262295,
+      "crossjit_process_medians_ns": [
+        1461.0983606557377,
+        1474.8821721311476,
+        1457.4815573770493,
+        1462.326844262295,
+        1464.982581967213
+      ],
+      "dtype": "float64",
+      "element_count": 2048,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 6825,
+      "provider_exec_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed_min": 6825,
+      "region_length": 5,
+      "speedup": 2.859183972321229,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.008437610174858518,
+      "baseline_median_ns": 7815.036885245901,
+      "baseline_process_medians_ns": [
+        7815.036885245901,
+        7817.7151639344265,
+        7681.2213114754095,
+        7791.93237704918,
+        7853.854508196721
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.0009119070588324545,
+      "crossjit_median_ns": 2268.245901639344,
+      "crossjit_process_medians_ns": [
+        2268.245901639344,
+        2271.184426229508,
+        2269.280737704918,
+        2267.5122950819673,
+        2265.6106557377047
+      ],
+      "dtype": "float64",
+      "element_count": 4096,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 3409,
+      "provider_exec_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed_min": 3409,
+      "region_length": 5,
+      "speedup": 3.4454099000455325,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.009416424852346925,
+      "baseline_median_ns": 12224.47131147541,
+      "baseline_process_medians_ns": [
+        12273.95081967213,
+        12200.08606557377,
+        12224.47131147541,
+        12326.512295081968,
+        12023.180327868853
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.03179067191048723,
+      "crossjit_median_ns": 3925.872950819672,
+      "crossjit_process_medians_ns": [
+        3925.872950819672,
+        4190.4713114754095,
+        3982.282786885246,
+        3888.438524590164,
+        3888.4467213114754
+      ],
+      "dtype": "float64",
+      "element_count": 8192,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 1701,
+      "provider_exec_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed_min": 1701,
+      "region_length": 5,
+      "speedup": 3.1138224452533794,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.013966392795364333,
+      "baseline_median_ns": 26269.360655737706,
+      "baseline_process_medians_ns": [
+        26304.10655737705,
+        26269.360655737706,
+        26957.696721311477,
+        26076.352459016394,
+        26050.17213114754
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.01963386299556184,
+      "crossjit_median_ns": 7222.860655737705,
+      "crossjit_process_medians_ns": [
+        7191.508196721312,
+        7222.860655737705,
+        7410.11475409836,
+        7493.950819672131,
+        7178.770491803279
+      ],
+      "dtype": "float64",
+      "element_count": 16384,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 847,
+      "provider_exec_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed_min": 847,
+      "region_length": 5,
+      "speedup": 3.6369745877445134,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0029993365075539485,
+      "baseline_median_ns": 53030.96721311475,
+      "baseline_process_medians_ns": [
+        53131.50819672131,
+        53006.08196721312,
+        53030.96721311475,
+        53313.18032786885,
+        52888.57377049181
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.01611377033268165,
+      "crossjit_median_ns": 15504.754098360656,
+      "crossjit_process_medians_ns": [
+        15382.540983606557,
+        15504.754098360656,
+        15233.360655737704,
+        15905.786885245901,
+        15531.524590163934
+      ],
+      "dtype": "float64",
+      "element_count": 32768,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 420,
+      "provider_exec_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed_min": 420,
+      "region_length": 5,
+      "speedup": 3.4203036614893367,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.11425027020831013,
+      "baseline_median_ns": 173607.5,
+      "baseline_process_medians_ns": [
+        219912.06666666668,
+        173161.8,
+        172272.23333333334,
+        174096.83333333334,
+        173607.5
+      ],
+      "case_identifier": "linear_5",
+      "crossjit_cv": 0.010228786443156345,
+      "crossjit_median_ns": 45063.0,
+      "crossjit_process_medians_ns": [
+        45063.0,
+        45917.9,
+        45284.73333333333,
+        44748.433333333334,
+        44865.666666666664
+      ],
+      "dtype": "float64",
+      "element_count": 65536,
+      "eliminated_materializations": 4,
+      "fixed_fast_path_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 203,
+      "provider_exec_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed_min": 203,
+      "region_length": 5,
+      "speedup": 3.852550873221934,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0056943648774350295,
+      "baseline_median_ns": 1370.0698,
+      "baseline_process_medians_ns": [
+        1383.4004,
+        1363.1918,
+        1370.0698,
+        1374.9394,
+        1367.0503
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.0024319605380933463,
+      "crossjit_median_ns": 706.8702,
+      "crossjit_process_medians_ns": [
+        710.3888,
+        706.6624,
+        706.8231,
+        706.8702,
+        709.3048
+      ],
+      "dtype": "float64",
+      "element_count": 16,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 6,
+      "speedup": 1.9382197750025394,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0056815369287477255,
+      "baseline_median_ns": 1369.3598,
+      "baseline_process_medians_ns": [
+        1383.4989,
+        1367.2083,
+        1372.3724,
+        1369.3598,
+        1362.7811
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.001143083193289917,
+      "crossjit_median_ns": 710.2673,
+      "crossjit_process_medians_ns": [
+        710.5948,
+        708.9005,
+        710.2673,
+        710.511,
+        709.0955
+      ],
+      "dtype": "float64",
+      "element_count": 32,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 6,
+      "speedup": 1.927949942225976,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0076154801358662184,
+      "baseline_median_ns": 1383.0418,
+      "baseline_process_medians_ns": [
+        1401.0653,
+        1374.3873,
+        1386.1519,
+        1383.0418,
+        1376.5428
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.00169474458840529,
+      "crossjit_median_ns": 720.7015,
+      "crossjit_process_medians_ns": [
+        722.4634,
+        720.0888,
+        720.7015,
+        720.1422,
+        722.5334
+      ],
+      "dtype": "float64",
+      "element_count": 64,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 6,
+      "speedup": 1.919021675409306,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.008574194598156311,
+      "baseline_median_ns": 1461.1393,
+      "baseline_process_medians_ns": [
+        1473.8322,
+        1444.2431,
+        1455.308,
+        1461.1393,
+        1473.3259
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.0036710692664392755,
+      "crossjit_median_ns": 764.8728,
+      "crossjit_process_medians_ns": [
+        768.6994,
+        763.6352,
+        761.6941,
+        764.8728,
+        767.3177
+      ],
+      "dtype": "float64",
+      "element_count": 128,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 6,
+      "speedup": 1.9103036478745226,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.009497724722206571,
+      "baseline_median_ns": 1651.4831029185868,
+      "baseline_process_medians_ns": [
+        1670.720430107527,
+        1627.765104966718,
+        1643.7921146953406,
+        1651.4831029185868,
+        1654.2657450076804
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.00435996756496617,
+      "crossjit_median_ns": 841.3166922683051,
+      "crossjit_process_medians_ns": [
+        839.0501792114695,
+        842.268561187916,
+        836.758064516129,
+        841.3166922683051,
+        846.5194572452637
+      ],
+      "dtype": "float64",
+      "element_count": 256,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 54677,
+      "provider_exec_hits": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed": [
+        54677,
+        54677,
+        54677,
+        54677,
+        54677
+      ],
+      "provider_regions_executed_min": 54677,
+      "region_length": 6,
+      "speedup": 1.9629743687433112,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.006158297169980438,
+      "baseline_median_ns": 2122.7706093189963,
+      "baseline_process_medians_ns": [
+        2150.00051203277,
+        2117.7101894521247,
+        2122.7706093189963,
+        2133.3026113671276,
+        2121.1395289298516
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.0015137991396185235,
+      "crossjit_median_ns": 945.8128520225295,
+      "crossjit_process_medians_ns": [
+        947.1466973886329,
+        945.8128520225295,
+        947.3732718894009,
+        944.1917562724014,
+        944.6464413722479
+      ],
+      "dtype": "float64",
+      "element_count": 512,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 27335,
+      "provider_exec_hits": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed": [
+        27335,
+        27335,
+        27335,
+        27335,
+        27335
+      ],
+      "provider_regions_executed_min": 27335,
+      "region_length": 6,
+      "speedup": 2.2443875707331067,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.007432103993722757,
+      "baseline_median_ns": 2593.8084997439837,
+      "baseline_process_medians_ns": [
+        2633.8161802355353,
+        2585.8883768561186,
+        2590.6984126984125,
+        2593.8084997439837,
+        2594.8996415770607
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.0035570263002790937,
+      "crossjit_median_ns": 1203.5883256528418,
+      "crossjit_process_medians_ns": [
+        1211.5509472606248,
+        1203.5883256528418,
+        1200.8970814132103,
+        1203.1797235023041,
+        1208.0906298003072
+      ],
+      "dtype": "float64",
+      "element_count": 1024,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 13664,
+      "provider_exec_hits": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed": [
+        13664,
+        13664,
+        13664,
+        13664,
+        13664
+      ],
+      "provider_regions_executed_min": 13664,
+      "region_length": 6,
+      "speedup": 2.1550628603323054,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.01540462574971035,
+      "baseline_median_ns": 5259.696721311476,
+      "baseline_process_medians_ns": [
+        5259.696721311476,
+        5411.944672131148,
+        5233.448770491803,
+        5206.336065573771,
+        5315.262295081967
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.0015938864271974628,
+      "crossjit_median_ns": 1662.438524590164,
+      "crossjit_process_medians_ns": [
+        1662.438524590164,
+        1661.9631147540983,
+        1660.4569672131147,
+        1662.563524590164,
+        1667.4784836065573
+      ],
+      "dtype": "float64",
+      "element_count": 2048,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 6825,
+      "provider_exec_hits": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed": [
+        6825,
+        6825,
+        6825,
+        6825,
+        6825
+      ],
+      "provider_regions_executed_min": 6825,
+      "region_length": 6,
+      "speedup": 3.163844342820516,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.0029290787155482104,
+      "baseline_median_ns": 9268.16393442623,
+      "baseline_process_medians_ns": [
+        9305.883196721312,
+        9252.819672131147,
+        9244.48975409836,
+        9298.11475409836,
+        9268.16393442623
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.0010943945321098133,
+      "crossjit_median_ns": 2605.1680327868853,
+      "crossjit_process_medians_ns": [
+        2604.3278688524592,
+        2605.1680327868853,
+        2603.997950819672,
+        2607.93237704918,
+        2610.715163934426
+      ],
+      "dtype": "float64",
+      "element_count": 4096,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 3409,
+      "provider_exec_hits": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed": [
+        3409,
+        3409,
+        3409,
+        3409,
+        3409
+      ],
+      "provider_regions_executed_min": 3409,
+      "region_length": 6,
+      "speedup": 3.557606963460083,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.009356559107590326,
+      "baseline_median_ns": 15356.184426229509,
+      "baseline_process_medians_ns": [
+        15356.184426229509,
+        15504.70081967213,
+        15247.856557377048,
+        15570.081967213115,
+        15263.5
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.00043943236377611304,
+      "crossjit_median_ns": 4430.05737704918,
+      "crossjit_process_medians_ns": [
+        4430.827868852459,
+        4430.05737704918,
+        4430.901639344263,
+        4428.065573770492,
+        4426.44262295082
+      ],
+      "dtype": "float64",
+      "element_count": 8192,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 1701,
+      "provider_exec_hits": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed": [
+        1701,
+        1701,
+        1701,
+        1701,
+        1701
+      ],
+      "provider_regions_executed_min": 1701,
+      "region_length": 6,
+      "speedup": 3.466362423607732,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.005396811901672323,
+      "baseline_median_ns": 28909.131147540982,
+      "baseline_process_medians_ns": [
+        29046.016393442624,
+        28909.131147540982,
+        29042.213114754097,
+        28740.06557377049,
+        28725.885245901638
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.007943170047897264,
+      "crossjit_median_ns": 8318.680327868853,
+      "crossjit_process_medians_ns": [
+        8321.61475409836,
+        8243.83606557377,
+        8302.319672131147,
+        8426.762295081968,
+        8318.680327868853
+      ],
+      "dtype": "float64",
+      "element_count": 16384,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 847,
+      "provider_exec_hits": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed": [
+        847,
+        847,
+        847,
+        847,
+        847
+      ],
+      "provider_regions_executed_min": 847,
+      "region_length": 6,
+      "speedup": 3.4752064039161312,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.004601529901081807,
+      "baseline_median_ns": 58765.360655737706,
+      "baseline_process_medians_ns": [
+        58765.360655737706,
+        58539.72131147541,
+        59188.62295081967,
+        58541.147540983606,
+        58883.770491803276
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.013825819633318089,
+      "crossjit_median_ns": 19825.114754098362,
+      "crossjit_process_medians_ns": [
+        20370.245901639344,
+        19825.114754098362,
+        19738.360655737706,
+        20053.016393442624,
+        19711.39344262295
+      ],
+      "dtype": "float64",
+      "element_count": 32768,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 420,
+      "provider_exec_hits": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed": [
+        420,
+        420,
+        420,
+        420,
+        420
+      ],
+      "provider_regions_executed_min": 420,
+      "region_length": 6,
+      "speedup": 2.9641876672410885,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_fast",
+      "baseline_cv": 0.00653603421952984,
+      "baseline_median_ns": 129031.2,
+      "baseline_process_medians_ns": [
+        129031.2,
+        129247.46666666666,
+        129959.3,
+        127689.73333333334,
+        128561.9
+      ],
+      "case_identifier": "linear_6",
+      "crossjit_cv": 0.017508587594756337,
+      "crossjit_median_ns": 51243.03333333333,
+      "crossjit_process_medians_ns": [
+        53192.53333333333,
+        51132.3,
+        51492.5,
+        51243.03333333333,
+        50989.5
+      ],
+      "dtype": "float64",
+      "element_count": 65536,
+      "eliminated_materializations": 5,
+      "fixed_fast_path_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "linear_chain",
+      "provider_exec_hit_min": 203,
+      "provider_exec_hits": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed": [
+        203,
+        203,
+        203,
+        203,
+        203
+      ],
+      "provider_regions_executed_min": 203,
+      "region_length": 6,
+      "speedup": 2.518024238742047,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.014429891909915771,
+      "baseline_median_ns": 585.1186,
+      "baseline_process_medians_ns": [
+        603.6447,
+        595.8911,
+        585.0751,
+        585.1186,
+        584.8878
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.006382420341168528,
+      "crossjit_median_ns": 385.7406,
+      "crossjit_process_medians_ns": [
+        385.3205,
+        385.7406,
+        382.3279,
+        388.9997,
+        387.1396
+      ],
+      "dtype": "float64",
+      "element_count": 16,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.516870663860636,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.01748349062653682,
+      "baseline_median_ns": 576.0624,
+      "baseline_process_medians_ns": [
+        596.6961,
+        588.5206,
+        576.0624,
+        574.282,
+        574.2037
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.00948870595254909,
+      "crossjit_median_ns": 404.1186,
+      "crossjit_process_medians_ns": [
+        404.4177,
+        404.1186,
+        395.7348,
+        401.9908,
+        405.001
+      ],
+      "dtype": "float64",
+      "element_count": 32,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.425478560006889,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.014083923929774282,
+      "baseline_median_ns": 580.829,
+      "baseline_process_medians_ns": [
+        597.7039,
+        591.9492,
+        579.6354,
+        580.829,
+        580.2609
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.010935528996669741,
+      "crossjit_median_ns": 444.3973,
+      "crossjit_process_medians_ns": [
+        448.9891,
+        439.2395,
+        437.5975,
+        444.3973,
+        446.6904
+      ],
+      "dtype": "float64",
+      "element_count": 64,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.3070038904376782,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "fixed_generic",
+      "baseline_cv": 0.024043420901164354,
+      "baseline_median_ns": 593.9144,
+      "baseline_process_medians_ns": [
+        622.541,
+        613.7336,
+        591.078,
+        593.9144,
+        592.1065
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.011128805447099422,
+      "crossjit_median_ns": 545.8758,
+      "crossjit_process_medians_ns": [
+        552.1408,
+        540.2786,
+        537.9295,
+        545.8758,
+        549.8423
+      ],
+      "dtype": "float64",
+      "element_count": 128,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 69993,
+      "provider_exec_hits": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed": [
+        69993,
+        69993,
+        69993,
+        69993,
+        69993
+      ],
+      "provider_regions_executed_min": 69993,
+      "region_length": 2,
+      "speedup": 1.0880028021026027,
+      "valid_crossjit_execution": true
+    },
+    {
+      "backend_path": "mixed",
+      "baseline_cv": 0.010405258659958656,
+      "baseline_median_ns": 639.1701228878649,
+      "baseline_process_medians_ns": [
+        649.766129032258,
+        641.6469534050179,
+        633.5912698412699,
+        639.1701228878649,
+        633.826164874552
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.009926564891138367,
+      "crossjit_median_ns": 654.5162570404506,
+      "crossjit_process_medians_ns": [
+        662.6587301587301,
+        657.7923707117255,
+        649.6856118791603,
+        646.2162058371736,
+        654.5162570404506
+      ],
+      "dtype": "float64",
+      "element_count": 256,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 0,
+      "provider_exec_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed_min": 0,
+      "region_length": 2,
+      "speedup": 0.976553471380563,
+      "valid_crossjit_execution": false
+    },
+    {
+      "backend_path": "mixed",
+      "baseline_cv": 0.006266005194352507,
+      "baseline_median_ns": 762.7803379416283,
+      "baseline_process_medians_ns": [
+        769.1620583717358,
+        761.7386072708654,
+        762.984126984127,
+        762.7803379416283,
+        755.7153097798259
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.017413383070282853,
+      "crossjit_median_ns": 770.6705069124424,
+      "crossjit_process_medians_ns": [
+        798.7690732206861,
+        771.1034306195596,
+        770.6705069124424,
+        764.7181259600615,
+        770.0962621607783
+      ],
+      "dtype": "float64",
+      "element_count": 512,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 0,
+      "provider_exec_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed_min": 0,
+      "region_length": 2,
+      "speedup": 0.9897619424902807,
+      "valid_crossjit_execution": false
+    },
+    {
+      "backend_path": "mixed",
+      "baseline_cv": 0.00865887812663383,
+      "baseline_median_ns": 896.9278033794163,
+      "baseline_process_medians_ns": [
+        909.4828469022017,
+        897.7936507936508,
+        896.9278033794163,
+        893.9621095750128,
+        888.2713773681515
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.01027805356010282,
+      "crossjit_median_ns": 902.1223758320533,
+      "crossjit_process_medians_ns": [
+        907.6021505376344,
+        902.242191500256,
+        889.3333333333334,
+        886.1966205837174,
+        902.1223758320533
+      ],
+      "dtype": "float64",
+      "element_count": 1024,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 0,
+      "provider_exec_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed_min": 0,
+      "region_length": 2,
+      "speedup": 0.9942418317161839,
+      "valid_crossjit_execution": false
+    },
+    {
+      "backend_path": "mixed",
+      "baseline_cv": 0.008333484199273464,
+      "baseline_median_ns": 1371.5215163934427,
+      "baseline_process_medians_ns": [
+        1390.7776639344263,
+        1371.5215163934427,
+        1363.8647540983607,
+        1373.045081967213,
+        1361.842213114754
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.057083169602615516,
+      "crossjit_median_ns": 1464.764344262295,
+      "crossjit_process_medians_ns": [
+        1476.8309426229507,
+        1464.764344262295,
+        1458.6680327868853,
+        1657.6495901639344,
+        1464.4764344262296
+      ],
+      "dtype": "float64",
+      "element_count": 2048,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 0,
+      "provider_exec_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed_min": 0,
+      "region_length": 2,
+      "speedup": 0.9363427787998126,
+      "valid_crossjit_execution": false
+    },
+    {
+      "backend_path": "mixed",
+      "baseline_cv": 0.007807725753753385,
+      "baseline_median_ns": 2243.1680327868853,
+      "baseline_process_medians_ns": [
+        2260.909836065574,
+        2262.1967213114754,
+        2243.1680327868853,
+        2239.061475409836,
+        2219.6721311475408
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.005842916290839194,
+      "crossjit_median_ns": 1986.717213114754,
+      "crossjit_process_medians_ns": [
+        2005.8053278688524,
+        1999.6967213114754,
+        1986.717213114754,
+        1976.5676229508197,
+        1986.5368852459017
+      ],
+      "dtype": "float64",
+      "element_count": 4096,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 0,
+      "provider_exec_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed_min": 0,
+      "region_length": 2,
+      "speedup": 1.129082698825602,
+      "valid_crossjit_execution": false
+    },
+    {
+      "backend_path": "mixed",
+      "baseline_cv": 0.003953161375065747,
+      "baseline_median_ns": 3246.94262295082,
+      "baseline_process_medians_ns": [
+        3260.6024590163934,
+        3246.94262295082,
+        3263.2049180327867,
+        3235.6475409836066,
+        3237.1147540983607
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.009738881089371963,
+      "crossjit_median_ns": 3917.8811475409834,
+      "crossjit_process_medians_ns": [
+        3919.8811475409834,
+        3907.1967213114754,
+        3917.8811475409834,
+        3996.315573770492,
+        3903.6434426229507
+      ],
+      "dtype": "float64",
+      "element_count": 8192,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 0,
+      "provider_exec_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed_min": 0,
+      "region_length": 2,
+      "speedup": 0.8287496482604453,
+      "valid_crossjit_execution": false
+    },
+    {
+      "backend_path": "mixed",
+      "baseline_cv": 0.028302800768839453,
+      "baseline_median_ns": 7535.55737704918,
+      "baseline_process_medians_ns": [
+        7918.565573770492,
+        7933.393442622951,
+        7535.55737704918,
+        7535.016393442623,
+        7516.663934426229
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.01959763216204556,
+      "crossjit_median_ns": 7543.188524590164,
+      "crossjit_process_medians_ns": [
+        7873.795081967213,
+        7598.270491803279,
+        7521.131147540984,
+        7526.483606557377,
+        7543.188524590164
+      ],
+      "dtype": "float64",
+      "element_count": 16384,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 0,
+      "provider_exec_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed_min": 0,
+      "region_length": 2,
+      "speedup": 0.9989883392790586,
+      "valid_crossjit_execution": false
+    },
+    {
+      "backend_path": "mixed",
+      "baseline_cv": 0.018447869394626528,
+      "baseline_median_ns": 12236.360655737704,
+      "baseline_process_medians_ns": [
+        11916.098360655738,
+        12195.081967213115,
+        12236.360655737704,
+        12276.131147540984,
+        12549.295081967213
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.0251400603553379,
+      "crossjit_median_ns": 15178.426229508197,
+      "crossjit_process_medians_ns": [
+        15236.524590163934,
+        14516.655737704918,
+        15417.639344262296,
+        15178.426229508197,
+        14725.672131147541
+      ],
+      "dtype": "float64",
+      "element_count": 32768,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 0,
+      "provider_exec_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed_min": 0,
+      "region_length": 2,
+      "speedup": 0.8061679432844718,
+      "valid_crossjit_execution": false
+    },
+    {
+      "backend_path": "mixed",
+      "baseline_cv": 0.025522052607186468,
+      "baseline_median_ns": 31807.133333333335,
+      "baseline_process_medians_ns": [
+        31829.133333333335,
+        31661.233333333334,
+        33489.63333333333,
+        31462.7,
+        31807.133333333335
+      ],
+      "case_identifier": "scalar_array_2",
+      "crossjit_cv": 0.1615002935572858,
+      "crossjit_median_ns": 32987.3,
+      "crossjit_process_medians_ns": [
+        33056.03333333333,
+        45534.9,
+        32724.566666666666,
+        32382.233333333334,
+        32987.3
+      ],
+      "dtype": "float64",
+      "element_count": 65536,
+      "eliminated_materializations": 1,
+      "fixed_fast_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixed_generic_path_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_admission": true,
+      "independent_process_count": 5,
+      "layout": "CONTIGUOUS_SAME_SHAPE",
+      "operation_pattern": "scalar_array",
+      "provider_exec_hit_min": 0,
+      "provider_exec_hits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "provider_regions_executed_min": 0,
+      "region_length": 2,
+      "speedup": 0.9642236052460593,
+      "valid_crossjit_execution": false
+    }
+  ],
+  "schema_version": 2
+}

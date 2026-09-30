@@ -1,0 +1,104 @@
+{
+  "artifact_summary": {
+    "decision_db_bytes": 212138,
+    "generated_c_bytes": 36419,
+    "generated_header_bytes": 8188,
+    "generated_kernel_count": 28,
+    "generated_metadata_bytes": 285578,
+    "generated_object_bytes": 26104,
+    "generated_object_text_bytes": 9434,
+    "profiled_execution_specialization_count": 17,
+    "selected_execution_specializations": 8,
+    "structural_production_policies": 13,
+    "unselected_execution_specializations": 2
+  },
+  "coverage": {
+    "generated_dynamic_coverage": 0.4148387379417577,
+    "generated_execution_opportunities": 2698694,
+    "generic_fallback_opportunities": 0,
+    "original_numpy_fallback_opportunities": 3806711,
+    "prepared_regions_accepted": 26,
+    "prepared_regions_total": 81,
+    "production_generated_variant_count": 9,
+    "refined_profile_variant_count": 32,
+    "structural_signature_count": 24,
+    "total_dynamic_execution_opportunities": 6505405
+  },
+  "coverage_freezes": {
+    "generator_schema_freeze": true,
+    "numpy_adapter_coverage_freeze": true
+  },
+  "formal_npbench_timing_started": false,
+  "observed_classes": [
+    {
+      "class": "FULL_CONTIGUOUS",
+      "dynamic_opportunities": 0,
+      "frequency": 0.0,
+      "generated": true,
+      "implemented": true,
+      "profitability_measured": true,
+      "production_decision": "retain frozen GEN-AUTO exact-point policy"
+    },
+    {
+      "class": "INNER_CONTIGUOUS",
+      "dynamic_opportunities": 102859,
+      "frequency": 0.01581131382289035,
+      "generated": true,
+      "implemented": true,
+      "profitability_measured": true,
+      "production_decision": "generated at measured specialization/count; otherwise original NumPy"
+    },
+    {
+      "class": "SCALAR_OPERAND",
+      "dynamic_opportunities": 5690648,
+      "frequency": 0.874756913674091,
+      "generated": true,
+      "implemented": "partial: 14 of 24 refined variants are descriptor-supported",
+      "profitability_measured": true,
+      "production_decision": "generated for selected exact specializations/counts; rejected, unmeasured, fixed/general-stride residuals use original NumPy"
+    },
+    {
+      "class": "ZERO_STRIDE_BROADCAST",
+      "dynamic_opportunities": 0,
+      "frequency": 0.0,
+      "generated": true,
+      "implemented": true,
+      "profitability_measured": true,
+      "production_decision": "validation specialization only; alternate or unmeasured relations use original NumPy"
+    },
+    {
+      "class": "FIXED_AFFINE_STRIDE",
+      "dynamic_opportunities": 710648,
+      "frequency": 0.10923962458909169,
+      "generated": false,
+      "implemented": false,
+      "operand_bearing_opportunities_including_scalar_primary": 3017583,
+      "profitability_measured": false,
+      "production_decision": "DEFER",
+      "reason": "frequency is concentrated in two workloads and 59/98-element strided fixtures; no fixed-stride static-oracle or generic-signature benefit exists to justify a new access lowering and policy family before the research freeze"
+    },
+    {
+      "class": "TRULY_GENERAL_STRIDED",
+      "dynamic_opportunities": 1250,
+      "frequency": 0.00019214791392695765,
+      "generated": false,
+      "implemented": false,
+      "operand_bearing_opportunities_including_scalar_primary": 2500,
+      "profitability_measured": false,
+      "production_decision": "UNSUPPORTED",
+      "reason": "four primary variants in one workload and 0.02% primary dynamic frequency do not justify general stride machinery"
+    },
+    {
+      "class": "UNSUPPORTED_SEMANTIC_OPERATIONS",
+      "dynamic_opportunities": 0,
+      "frequency": 0.0,
+      "generated": false,
+      "implemented": false,
+      "prepare_occurrences": 5,
+      "profitability_measured": false,
+      "production_decision": "UNSUPPORTED",
+      "reason": "two in-place adds violate the pure/fresh Recipe model and three matmul nodes are non-elementwise"
+    }
+  ],
+  "schema_version": 1
+}
