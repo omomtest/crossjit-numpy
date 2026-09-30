@@ -69,7 +69,7 @@
         "structural_signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
       },
       "execution_specialization_hash": "70e6436485c353ba9a479891b5f74757d7d96adf759470d01dc7fc9019848393",
-      "expected_generated_execution_count": 50844,
+      "expected_generated_execution_count": 0,
       "generation_mode": "FORCE",
       "generation_source": "observed",
       "identity_layer": "refined_execution",
@@ -88,7 +88,7 @@
       "production_artifact_decision": "REJECT",
       "profile_dynamic_opportunity_count": 50844,
       "profile_variant_hash": "6522d875ba382cb56559971b95e07a7267a6ce95cc80acd3907d97638e2f2597",
-      "reason": "no exact specialization measurement; measured structural flat artifact dominates this duplicate at lower total cost",
+      "reason": "no exact specialization measurement",
       "structural_signature": {
         "domain": "elementwise",
         "dtype_class": "float64",
@@ -451,7 +451,7 @@
         "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
       },
       "execution_specialization_hash": "5f9a51d5dc4a19ba311253ca3773d6ae4ed610070d74cad9b8c3476e66507c18",
-      "expected_generated_execution_count": 1086872,
+      "expected_generated_execution_count": 1638407,
       "generation_mode": "AUTO",
       "generation_source": "observed",
       "identity_layer": "structural",
@@ -643,7 +643,7 @@
         "reason": "at least one stable generated-profitable element range"
       },
       "production_artifact_decision": "SELECT",
-      "profile_dynamic_opportunity_count": 1086872,
+      "profile_dynamic_opportunity_count": 1638407,
       "reason": "exact measured AUTO_SELECTED artifact covers frozen-profile executions authorized by the unchanged runtime DecisionDB",
       "structural_signature": {
         "domain": "elementwise",
@@ -956,7 +956,7 @@
         "structural_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
       },
       "execution_specialization_hash": "74901c171538dc430e4e10dcb285f6c0b5fd205f5a0fe80991c10ae041415b85",
-      "expected_generated_execution_count": 1086872,
+      "expected_generated_execution_count": 0,
       "generation_mode": "FORCE",
       "generation_source": "observed",
       "identity_layer": "refined_execution",
@@ -975,7 +975,7 @@
       "production_artifact_decision": "REJECT",
       "profile_dynamic_opportunity_count": 1086872,
       "profile_variant_hash": "3cf9e55bf2d070b02dc57f45e9e0a182aba72d9cb57e90b7ed831274b8fcd080",
-      "reason": "no exact specialization measurement; measured structural flat artifact dominates this duplicate at lower total cost",
+      "reason": "no exact specialization measurement",
       "structural_signature": {
         "domain": "elementwise",
         "dtype_class": "float64",
@@ -1398,7 +1398,7 @@
         "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
       },
       "execution_specialization_hash": "6ff59b93f45987165ec8fefc84ce448dd88a9dc29526e91725ce865ac008c686",
-      "expected_generated_execution_count": 0,
+      "expected_generated_execution_count": 1518,
       "generation_mode": "AUTO",
       "generation_source": "observed",
       "identity_layer": "structural",
@@ -1589,9 +1589,9 @@
         },
         "reason": "at least one stable generated-profitable element range"
       },
-      "production_artifact_decision": "REJECT",
-      "profile_dynamic_opportunity_count": 0,
-      "reason": "valid measured artifact has zero expected generated executions under the frozen profile and runtime DecisionDB",
+      "production_artifact_decision": "SELECT",
+      "profile_dynamic_opportunity_count": 1518,
+      "reason": "exact measured AUTO_SELECTED artifact covers frozen-profile executions authorized by the unchanged runtime DecisionDB",
       "structural_signature": {
         "domain": "elementwise",
         "dtype_class": "float64",
@@ -1676,7 +1676,7 @@
         "structural_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
       },
       "execution_specialization_hash": "73b3dbdca06a55ad75e6a36d20c31352a895086599e85c713a808ef3fb3c8490",
-      "expected_generated_execution_count": 1518,
+      "expected_generated_execution_count": 0,
       "generation_mode": "FORCE",
       "generation_source": "observed",
       "identity_layer": "refined_execution",
@@ -1815,10 +1815,10 @@
         },
         "reason": "at least one measured-profitable specialization cell"
       },
-      "production_artifact_decision": "SELECT",
+      "production_artifact_decision": "REJECT",
       "profile_dynamic_opportunity_count": 1518,
       "profile_variant_hash": "8c4cbc0752dac8d17abccdd008af5d8015ec6316eddaad2afba67214b7ac9580",
-      "reason": "exact measured AUTO_SELECTED artifact covers frozen-profile executions authorized by the unchanged runtime DecisionDB",
+      "reason": "valid measured artifact has zero expected generated executions under the frozen profile and runtime DecisionDB",
       "structural_signature": {
         "domain": "elementwise",
         "dtype_class": "float64",
@@ -2408,7 +2408,7 @@
         "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
       },
       "execution_specialization_hash": "b5d30d438371c4c64bad8c5fe5a8d3eb560688e1ba6c161cf57367ab81039f59",
-      "expected_generated_execution_count": 199828,
+      "expected_generated_execution_count": 302687,
       "generation_mode": "AUTO",
       "generation_source": "observed",
       "identity_layer": "structural",
@@ -2600,7 +2600,7 @@
         "reason": "at least one stable generated-profitable element range"
       },
       "production_artifact_decision": "SELECT",
-      "profile_dynamic_opportunity_count": 199828,
+      "profile_dynamic_opportunity_count": 302687,
       "reason": "exact measured AUTO_SELECTED artifact covers frozen-profile executions authorized by the unchanged runtime DecisionDB",
       "structural_signature": {
         "domain": "elementwise",
@@ -2913,7 +2913,7 @@
         "structural_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
       },
       "execution_specialization_hash": "e4991220f3b692483724de302a8b0ac585f662698e3ed937620eeedf1094e90f",
-      "expected_generated_execution_count": 199828,
+      "expected_generated_execution_count": 0,
       "generation_mode": "FORCE",
       "generation_source": "observed",
       "identity_layer": "refined_execution",
@@ -2932,7 +2932,7 @@
       "production_artifact_decision": "REJECT",
       "profile_dynamic_opportunity_count": 199828,
       "profile_variant_hash": "0652b1eb0a0f831677b09673d0b4a6c141ea54b6e84348ad95e77888ab8aa9da",
-      "reason": "no exact specialization measurement; measured structural flat artifact dominates this duplicate at lower total cost",
+      "reason": "no exact specialization measurement",
       "structural_signature": {
         "domain": "elementwise",
         "dtype_class": "float64",
@@ -5176,7 +5176,7 @@
         "structural_signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
       },
       "execution_specialization_hash": "c618a37bca7edca32c6740ec40cb8325baa97c358f262c8f3f98b08b1c8c4672",
-      "expected_generated_execution_count": 50844,
+      "expected_generated_execution_count": 0,
       "generation_mode": "FORCE",
       "generation_source": "observed",
       "identity_layer": "refined_execution",
@@ -5195,7 +5195,7 @@
       "production_artifact_decision": "REJECT",
       "profile_dynamic_opportunity_count": 50844,
       "profile_variant_hash": "289a103ca7611131fb0a828aff89b811dd04de27030bf3d035b78976c8f2d212",
-      "reason": "no exact specialization measurement; measured structural flat artifact dominates this duplicate at lower total cost",
+      "reason": "no exact specialization measurement",
       "structural_signature": {
         "domain": "elementwise",
         "dtype_class": "float64",
@@ -6544,8 +6544,8 @@
     "rules": [
       "DISABLE rejects and FORCE selects only with an exact valid frozen measurement record",
       "AUTO_REJECTED, STALE, and UNMEASURED identities reject",
-      "AUTO_SELECTED requires at least one generated execution authorized by the unchanged runtime DecisionDB at a frozen-profile count",
-      "an unmeasured duplicate is dominated by an already measured structural artifact serving the same flat runtime policy",
+      "AUTO_SELECTED requires nonzero frozen-profile opportunity and at least one observed count authorized as GENERATED by its unchanged exact DecisionDB",
+      "when PF6 profiles cannot prove physical-stride dominance, measured structural and refined identities are both retained rather than assigned arbitrary overlap weights",
       "zero-frequency validation seeds remain validation-only"
     ],
     "weights": null
@@ -6557,8 +6557,8 @@
     "pf6_generated_artifact_count": 28,
     "production_rejected_artifact_count": 19,
     "production_selected_artifact_count": 9,
-    "selected_generated_source_function_bytes": 6683,
-    "selected_object_text_function_bytes": 1824,
+    "selected_generated_source_function_bytes": 6241,
+    "selected_object_text_function_bytes": 1670,
     "total_dynamic_execution_opportunities": 6505405
   }
 }

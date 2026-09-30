@@ -297,8 +297,8 @@ def test_pf9_production_selection_filters_only_the_frozen_artifact_set(
         "pf6_generated_artifact_count": 28,
         "production_rejected_artifact_count": 19,
         "production_selected_artifact_count": 9,
-        "selected_generated_source_function_bytes": 6683,
-        "selected_object_text_function_bytes": 1824,
+        "selected_generated_source_function_bytes": 6241,
+        "selected_object_text_function_bytes": 1670,
         "total_dynamic_execution_opportunities": 6505405,
     }
     serialized = selection.read_text().lower()
@@ -337,11 +337,11 @@ def test_pf9_production_selection_filters_only_the_frozen_artifact_set(
     assert len(metadata["kernels"]) == 9
     assert len(metadata["production_policies"]) == 13
     assert metadata["generation_universe"][
-        "profiled_execution_specialization_count"] == 5
+        "profiled_execution_specialization_count"] == 4
     assert metadata["production_selection"] == {
         "candidate_universe_hash": selection_data["candidate_universe_hash"],
         "manifest_sha256": (
-            "347b1af549c5027c390ba86e18d94182a6ea0d3aad35ff21e8328f626257e221"),
+            "0c47c85fd321e6bed46dcf8551c97f78f2fd6ed8d3b2b7423b8ba3e0998a85c7"),
         "policy_name": "GEN-PROFILED-PF9",
         "rejected_artifact_count": 19,
         "runtime_profitability_retuned": False,

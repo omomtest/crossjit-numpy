@@ -103,6 +103,15 @@ def _candidate_cost(
     }
 
 
+def _runtime_decision(record: dict[str, Any] | None, element_count: int) -> str:
+    if record is None:
+        return "ORIGINAL"
+    for point in record["profitability"]["points"]:
+        if point["min_elements"] <= element_count <= point["max_elements"]:
+            return point["decision"]
+    return "ORIGINAL"
+
+
 def _record_decision(
     *,
     artifact_present: bool,
@@ -110,7 +119,7 @@ def _record_decision(
     measurement: dict[str, Any],
     frequency: int,
     expected_generated_executions: int,
-    duplicate_of_measured_structural_artifact: bool,
+    shadowed_by_measured_structural_artifact: bool,
 ) -> tuple[str, str, str]:
     state = measurement["artifact_decision"]
     if generation_source == "validation_seed" and frequency == 0:
@@ -129,16 +138,22 @@ def _record_decision(
         return "REJECT", "AUTO", "preserve frozen AUTO_REJECTED profitability outcome"
     if state in ("STALE", "UNMEASURED"):
         reason = "stale measurement" if state == "STALE" else "no exact specialization measurement"
-        if duplicate_of_measured_structural_artifact:
-            reason += "; measured structural flat artifact dominates this duplicate at lower total cost"
+        if shadowed_by_measured_structural_artifact:
+            reason += "; frozen registry precedence routes these executions to the measured structural artifact"
         return "REJECT", "AUTO", reason
     if state != "AUTO_SELECTED":
         raise ValueError(f"unsupported artifact decision: {state}")
     if expected_generated_executions == 0:
+        suffix = (
+            "; frozen registry precedence routes these executions to the "
+            "measured structural artifact"
+            if shadowed_by_measured_structural_artifact else ""
+        )
         return (
             "REJECT",
             "AUTO",
-            "valid measured artifact has zero expected generated executions under the frozen profile and runtime DecisionDB",
+            "valid measured artifact has zero expected generated executions "
+            "under the frozen profile and runtime DecisionDB" + suffix,
         )
     return (
         "SELECT",
@@ -194,23 +209,9 @@ def main() -> int:
         record["profile_variant_hash"]: record
         for record in opportunity["signatures"]
     }
-    production_by_variant = {
-        record["profile_variant_hash"]: record
-        for record in production["signatures"]
-    }
-    flat_frequency: dict[str, int] = {}
-    flat_generated: dict[str, int] = {}
-    for profile in opportunity["signatures"]:
-        if profile["iteration_rank_class"] == 1:
-            key = profile["canonical_signature_hash"]
-            flat_frequency[key] = flat_frequency.get(key, 0) + profile[
-                "dynamic_execution_opportunity_count"]
-    for profile in production["signatures"]:
-        if profile["iteration_rank_class"] == 1:
-            key = profile["canonical_signature_hash"]
-            flat_generated[key] = flat_generated.get(key, 0) + profile[
-                "generated_execution_count"]
-
+    structural_frequency: dict[str, int] = {}
+    structural_generated: dict[str, int] = {}
+    refined_generated: dict[str, int] = {}
     kernels = metadata["kernels"]
     if len(kernels) != 28:
         raise ValueError("PF9 expects the exact frozen 28-artifact PF6 universe")
@@ -221,6 +222,54 @@ def main() -> int:
         kernel["optimization_signature_hash"]: kernel
         for kernel in kernels if "profiled_layout_class" not in kernel
     }
+    profiled_outer_by_variant = {
+        kernel["profile_variant_hash"]: kernel
+        for kernel in kernels
+        if kernel.get("entry_abi") == "outer_inner_v1" and
+        kernel.get("profile_variant_hash") is not None
+    }
+
+    # PF6 profiles do not encode enough physical-stride detail to prove that
+    # a refined OUTER_INNER artifact is dominated by a structural FLAT
+    # artifact.  Conservatively record potential coverage for every measured
+    # identity whose unchanged DecisionDB authorizes the observed count.  The
+    # final expected-coverage total below is a union over profile variants, so
+    # overlapping potential coverage is never double-counted.
+    for profile in opportunity["signatures"]:
+        signature_hash = profile["canonical_signature_hash"]
+        if (profile["legacy_layout_class"] == "contiguous_same_shape" and
+                signature_hash in nonprofiled_by_signature):
+            structural_frequency[signature_hash] = (
+                structural_frequency.get(signature_hash, 0) +
+                profile["dynamic_execution_opportunity_count"])
+    for profile in production["signatures"]:
+        generated_count = profile["generated_execution_count"]
+        if generated_count == 0:
+            continue
+        outer = profile["outer_count_samples"]
+        inner = profile["inner_extent_samples"]
+        if len(outer) != 1 or len(inner) != 1:
+            raise ValueError(
+                "PF9 requires an exact frozen element count per generated variant")
+        element_count = outer[0] * inner[0]
+        signature_hash = profile["canonical_signature_hash"]
+        structural_kernel = nonprofiled_by_signature.get(signature_hash)
+        structural_record = structural_records.get(signature_hash)
+        if (profile["legacy_layout_class"] == "contiguous_same_shape" and
+                structural_kernel is not None and
+                _runtime_decision(structural_record, element_count) ==
+                "GENERATED"):
+            structural_generated[signature_hash] = (
+                structural_generated.get(signature_hash, 0) + generated_count)
+        kernel = profiled_outer_by_variant.get(profile["profile_variant_hash"])
+        if kernel is not None:
+            specialization_hash = kernel["execution_specialization_hash"]
+            if _runtime_decision(
+                    execution_records.get(specialization_hash),
+                    element_count) == "GENERATED":
+                refined_generated[specialization_hash] = (
+                    refined_generated.get(specialization_hash, 0) +
+                    generated_count)
 
     records: list[dict[str, Any]] = []
     optimizer = ElementwiseOptimizer()
@@ -251,15 +300,15 @@ def main() -> int:
             generation_source = kernel["generation_source"]
             generation_mode = kernel["generation_mode"]
         measurement = _measurement_summary(decision_record, layer="DecisionDB")
-        frequency = flat_frequency.get(signature_hash, 0)
-        expected = flat_generated.get(signature_hash, 0)
+        frequency = structural_frequency.get(signature_hash, 0)
+        expected = structural_generated.get(signature_hash, 0)
         decision, developer_policy, reason = _record_decision(
             artifact_present=kernel is not None,
             generation_source=generation_source,
             measurement=measurement,
             frequency=frequency,
             expected_generated_executions=expected,
-            duplicate_of_measured_structural_artifact=False,
+            shadowed_by_measured_structural_artifact=False,
         )
         records.append({
             "artifact_cost": _candidate_cost(kernel, source_sizes, text_sizes),
@@ -294,12 +343,7 @@ def main() -> int:
         else:
             frequency = opportunity_by_variant[variant_hash][
                 "dynamic_execution_opportunity_count"]
-            expected = production_by_variant.get(
-                variant_hash, {}).get("generated_execution_count", 0)
-        duplicate = (
-            kernel["entry_abi"] == "flat_v1" and
-            kernel["optimization_signature_hash"] in nonprofiled_by_signature
-        )
+            expected = refined_generated.get(specialization_hash, 0)
         selection_source = kernel.get(
             "profiled_source", kernel["generation_source"])
         decision, developer_policy, reason = _record_decision(
@@ -308,7 +352,7 @@ def main() -> int:
             measurement=measurement,
             frequency=frequency,
             expected_generated_executions=expected,
-            duplicate_of_measured_structural_artifact=duplicate,
+            shadowed_by_measured_structural_artifact=False,
         )
         records.append({
             "artifact_cost": _candidate_cost(kernel, source_sizes, text_sizes),
@@ -344,8 +388,41 @@ def main() -> int:
         raise ValueError(
             "unexpected frozen selection counts: "
             f"{len(records)}/{len(artifact_records)}/{len(selected)}")
-    expected_coverage = sum(
-        item["expected_generated_execution_count"] for item in selected)
+    selected_candidate_hashes = {item["candidate_hash"] for item in selected}
+    expected_coverage = 0
+    for profile in production["signatures"]:
+        generated_count = profile["generated_execution_count"]
+        if generated_count == 0:
+            continue
+        outer = profile["outer_count_samples"]
+        inner = profile["inner_extent_samples"]
+        if len(outer) != 1 or len(inner) != 1:
+            raise ValueError(
+                "PF9 requires an exact frozen element count per generated variant")
+        element_count = outer[0] * inner[0]
+        signature_hash = profile["canonical_signature_hash"]
+        structural_kernel = nonprofiled_by_signature.get(signature_hash)
+        structural_covered = (
+            structural_kernel is not None and
+            structural_kernel["candidate_hash"] in selected_candidate_hashes and
+            _runtime_decision(
+                structural_records.get(signature_hash), element_count) ==
+            "GENERATED"
+        )
+        refined_kernel = profiled_outer_by_variant.get(
+            profile["profile_variant_hash"])
+        refined_covered = (
+            refined_kernel is not None and
+            refined_kernel["candidate_hash"] in selected_candidate_hashes and
+            _runtime_decision(
+                execution_records.get(
+                    refined_kernel["execution_specialization_hash"]),
+                element_count) == "GENERATED"
+        )
+        if not (structural_covered or refined_covered):
+            raise ValueError(
+                "selected artifacts do not cover a frozen generated variant")
+        expected_coverage += generated_count
     total_opportunities = opportunity["coverage"][
         "total_dynamic_execution_opportunities"]
     if expected_coverage != 2_698_694:
@@ -385,8 +462,8 @@ def main() -> int:
             "rules": [
                 "DISABLE rejects and FORCE selects only with an exact valid frozen measurement record",
                 "AUTO_REJECTED, STALE, and UNMEASURED identities reject",
-                "AUTO_SELECTED requires at least one generated execution authorized by the unchanged runtime DecisionDB at a frozen-profile count",
-                "an unmeasured duplicate is dominated by an already measured structural artifact serving the same flat runtime policy",
+                "AUTO_SELECTED requires nonzero frozen-profile opportunity and at least one observed count authorized as GENERATED by its unchanged exact DecisionDB",
+                "when PF6 profiles cannot prove physical-stride dominance, measured structural and refined identities are both retained rather than assigned arbitrary overlap weights",
                 "zero-frequency validation seeds remain validation-only",
             ],
             "weights": None,

@@ -1,0 +1,89 @@
+{
+  "artifact_hashes": {
+    "generated_c_sha256": "3f911134f7273efac61e225888b98ca8e09ab9dbdccadb1591ddf43fac6c4977",
+    "generated_header_sha256": "cd37427bdd20791909be00e88798c75515b0bc7ceb2fec532576347b3249c715",
+    "generated_metadata_sha256": "a316f5275832d5486e239f20b6446d6d5ad363048ced0bcd37c3a423943036c2",
+    "generated_object_sha256": "9e50246fc521bc454ba6ec6afaf993c9865bd26ac91d014e34f5a18332260adf",
+    "production_selection_manifest_sha256": "0c47c85fd321e6bed46dcf8551c97f78f2fd6ed8d3b2b7423b8ba3e0998a85c7"
+  },
+  "compiler": {
+    "flags": [
+      "-std=c11",
+      "-O3",
+      "-fno-strict-aliasing",
+      "-msse",
+      "-msse2",
+      "-msse3",
+      "-mssse3",
+      "-msse4.1",
+      "-msse4.2",
+      "-mpopcnt",
+      "-msahf",
+      "-mcx16",
+      "-fPIC"
+    ],
+    "id": "gcc",
+    "target_features": [
+      "cx16",
+      "popcnt",
+      "sahf",
+      "sse",
+      "sse2",
+      "sse3",
+      "sse4.1",
+      "sse4.2",
+      "ssse3"
+    ],
+    "target_triple": "x86_64-linux-gnu",
+    "version": "13.3.0"
+  },
+  "decision_db": {
+    "artifact_format_version": 1,
+    "execution_schema_version": 1,
+    "pf4_content_sha256": "09a516bc3b87965debea5d859fff929ca0b2d2d448c6191e458def01f1e160aa",
+    "pf5_content_sha256": "0ffbe9f093fb08c722a64fd7fe79fdda441bae7f5867a43e5ec331e576b41176",
+    "schema_version": 1,
+    "structural_content_sha256": "6edf4bcd08b9d68d070acdda890e8bf8769ce2059e113cc3a979fc7a3f242e05"
+  },
+  "diagnostic_totals": {
+    "correct_workloads": 53,
+    "generated_executions": 2698694,
+    "generic_fallback_executions": 0,
+    "provider_accepted_preparations": 26,
+    "unprofitable_rejections": 50,
+    "unsupported_node_rejections": 5,
+    "workloads": 53
+  },
+  "production_summary": {
+    "decision_db_input_bytes": 212138,
+    "expected_generated_dynamic_coverage": 0.4148387379417577,
+    "expected_generated_execution_count": 2698694,
+    "generated_c_bytes": 16534,
+    "generated_header_bytes": 4311,
+    "generated_metadata_bytes": 169233,
+    "generated_object_bytes": 13984,
+    "generated_object_text_bytes": 3762,
+    "rejected_pf6_artifacts": 19,
+    "selected_production_artifacts": 9,
+    "total_dynamic_execution_opportunities": 6505405
+  },
+  "recipe_hashes": {
+    "numpy.add": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+    "numpy.multiply": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+    "numpy.subtract": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+    "numpy.true_divide": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697",
+    "recipe_set": "55daa90da80f3dad7f9b53380e42817e1b209ba88ac181ef11cc7493c53e087f"
+  },
+  "schema_version": 1,
+  "versions": {
+    "c_backend": "1",
+    "crossjit_generator": "0.2.0",
+    "elementwise_ir_schema": 1,
+    "elementwise_optimizer": "1",
+    "execution_specialization_schema": 1,
+    "iteration_descriptor_schema": 1,
+    "optimization_signature_provider_abi": 3,
+    "optimization_signature_schema": 1,
+    "recipe_schema": 1
+  }
+}

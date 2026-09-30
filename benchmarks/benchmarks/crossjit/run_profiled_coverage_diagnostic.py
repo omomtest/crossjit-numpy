@@ -205,17 +205,32 @@ def _unsupported_atomic_fit(operation, inplace):
     return False
 
 
+def _recipe_hash_catalog(metadata):
+    """Recover frozen recipes even when PF9 prunes validation artifacts."""
+    catalog = {}
+    signatures = [
+        kernel["optimization_signature"] for kernel in metadata["kernels"]
+    ]
+    signatures.extend(
+        policy["signature"] for policy in metadata["production_policies"])
+    for signature in signatures:
+        for operation in signature["operations"]:
+            operation_id = operation["operation_id"]
+            recipe_hash = operation["recipe_hash"]
+            previous = catalog.setdefault(operation_id, recipe_hash)
+            if previous != recipe_hash:
+                raise ValueError(
+                    f"conflicting recipe hashes for {operation_id}")
+    return catalog
+
+
 def _summarize(args, workloads):
     metadata = json.loads(args.generated_metadata.read_text())
     unsupported = {
         item["signature_hash"]: item["reason"]
         for item in metadata["unsupported_observed_signatures"]
     }
-    recipes = {
-        operation["operation_id"]: operation["recipe_hash"]
-        for kernel in metadata["kernels"]
-        for operation in kernel["optimization_signature"]["operations"]
-    }
+    recipes = _recipe_hash_catalog(metadata)
     groups = {}
     unsupported_groups = {}
     totals = defaultdict(int)

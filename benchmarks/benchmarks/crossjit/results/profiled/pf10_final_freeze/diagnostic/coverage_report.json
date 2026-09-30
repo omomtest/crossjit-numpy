@@ -1,0 +1,6906 @@
+{
+  "configuration": {
+    "benchmark_identity_in_canonical_signature": false,
+    "excluded_workloads": [
+      "spmv"
+    ],
+    "execution_mode": "production",
+    "forced_generic_profile_execution": false,
+    "formal_timing": false,
+    "preset": "S",
+    "profile_guided_analysis_only": true,
+    "python": "/home/dualz/crossjit-workspace/venv/bin/python",
+    "repeat": 100
+  },
+  "correct_count": 53,
+  "coverage": {
+    "dynamic_coverage": 0.7575145607467909,
+    "observed_profile_variant_count": 31,
+    "optimizer_supported_dynamic_opportunities": 2044300,
+    "optimizer_supported_variant_count": 11,
+    "signature_coverage": 0.3548387096774194,
+    "total_dynamic_execution_opportunities": 2698694
+  },
+  "elapsed_seconds": 110.08675571694039,
+  "layout_summary": [
+    {
+      "distinct_signature_count": 0,
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 0,
+      "estimated_recoverable_dynamic_coverage": 0,
+      "layout_class": "FULL_CONTIGUOUS",
+      "workload_count": 0,
+      "workloads": []
+    },
+    {
+      "distinct_signature_count": 1,
+      "dynamic_execution_opportunity_count": 102859,
+      "dynamic_prepare_count": 2,
+      "estimated_recoverable_dynamic_coverage": 102859,
+      "layout_class": "INNER_CONTIGUOUS",
+      "workload_count": 1,
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "distinct_signature_count": 0,
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 0,
+      "estimated_recoverable_dynamic_coverage": 0,
+      "layout_class": "ZERO_STRIDE_BROADCAST",
+      "workload_count": 0,
+      "workloads": []
+    },
+    {
+      "distinct_signature_count": 23,
+      "dynamic_execution_opportunity_count": 2595835,
+      "dynamic_prepare_count": 62,
+      "estimated_recoverable_dynamic_coverage": 2595835,
+      "layout_class": "SCALAR_OPERAND",
+      "workload_count": 7,
+      "workloads": [
+        "adi",
+        "cavity_flow",
+        "channel_flow",
+        "jacobi_1d",
+        "jacobi_2d",
+        "nbody",
+        "vadv"
+      ]
+    },
+    {
+      "distinct_signature_count": 3,
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 8,
+      "estimated_recoverable_dynamic_coverage": 0,
+      "layout_class": "FIXED_AFFINE_STRIDE",
+      "workload_count": 1,
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "distinct_signature_count": 4,
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 4,
+      "estimated_recoverable_dynamic_coverage": 0,
+      "layout_class": "TRULY_GENERAL_STRIDED",
+      "workload_count": 1,
+      "workloads": [
+        "vadv"
+      ]
+    }
+  ],
+  "provider_totals": {
+    "allocation_time_ns": 0,
+    "candidate_records_dropped": 0,
+    "exec_error": 0,
+    "exec_hit": 2698694,
+    "exec_miss": 0,
+    "execution_lower_time_ns": 0,
+    "execution_plans_destroyed": 0,
+    "execution_plans_lowered": 26,
+    "fixed_fast_path_hit": 2698694,
+    "fixed_fast_plans_built": 26,
+    "fixed_generic_path_hit": 0,
+    "fixed_generic_plans_built": 0,
+    "generated_exec_hit": 2698694,
+    "generated_registry_hit": 26,
+    "generated_registry_miss": 50,
+    "generic_fallback_hit": 0,
+    "guard_checks": 87642070,
+    "guard_error": 0,
+    "guard_hit": 5397388,
+    "guard_lower_time_ns": 0,
+    "guard_metadata_reads": 87897342,
+    "guard_miss": 0,
+    "guard_plans_destroyed": 0,
+    "guard_plans_lowered": 26,
+    "guard_time_ns": 0,
+    "internal_allocations": 0,
+    "kernel_time_ns": 0,
+    "nodes_recognized": 664,
+    "observed_signature_records_dropped": 0,
+    "output_allocations": 2698694,
+    "prepare_time_ns": 0,
+    "region_time_ns": 0,
+    "regions_executed": 2698694,
+    "regions_prepare_called": 81,
+    "regions_provider_accepted": 26,
+    "regions_rejected_other": 0,
+    "regions_rejected_unprofitable": 50,
+    "regions_rejected_unsupported_contract": 0,
+    "regions_rejected_unsupported_node": 5,
+    "unsupported_node_records_dropped": 0
+  },
+  "records": [
+    {
+      "accepted_regions": 2,
+      "correct": true,
+      "execution_hits": 101688,
+      "prepared_regions": 10,
+      "recognized_nodes": 30,
+      "unsupported_node_rejections": 0,
+      "workload": "adi"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "arc_distance"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "atax"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "azimint_hist"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 2,
+      "unsupported_node_rejections": 0,
+      "workload": "azimint_naive"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "bicg"
+    },
+    {
+      "accepted_regions": 2,
+      "correct": true,
+      "execution_hits": 16198,
+      "prepared_regions": 2,
+      "recognized_nodes": 8,
+      "unsupported_node_rejections": 0,
+      "workload": "cavity_flow"
+    },
+    {
+      "accepted_regions": 19,
+      "correct": true,
+      "execution_hits": 2579290,
+      "prepared_regions": 49,
+      "recognized_nodes": 335,
+      "unsupported_node_rejections": 0,
+      "workload": "channel_flow"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "cholesky"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "cholesky2"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "compute"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 2,
+      "unsupported_node_rejections": 0,
+      "workload": "contour_integral"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 2,
+      "unsupported_node_rejections": 0,
+      "workload": "conv2d_bias"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 1,
+      "unsupported_node_rejections": 0,
+      "workload": "correlation"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 1,
+      "unsupported_node_rejections": 0,
+      "workload": "covariance"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "covariance2"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "crc16"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 12,
+      "unsupported_node_rejections": 0,
+      "workload": "deriche"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "doitgen"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 2,
+      "unsupported_node_rejections": 0,
+      "workload": "durbin"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "fdtd_2d"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 1,
+      "unsupported_node_rejections": 0,
+      "workload": "floyd_warshall"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "gemm"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "gemver"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "gesummv"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "go_fast"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 3,
+      "unsupported_node_rejections": 0,
+      "workload": "gramschmidt"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "hdiff"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "heat_3d"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 2,
+      "recognized_nodes": 6,
+      "unsupported_node_rejections": 0,
+      "workload": "jacobi_1d"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 2,
+      "recognized_nodes": 10,
+      "unsupported_node_rejections": 0,
+      "workload": "jacobi_2d"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "k2mm"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "k3mm"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 1,
+      "unsupported_node_rejections": 0,
+      "workload": "lenet"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 55,
+      "unsupported_node_rejections": 0,
+      "workload": "lu"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 57,
+      "unsupported_node_rejections": 0,
+      "workload": "ludcmp"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 3,
+      "unsupported_node_rejections": 0,
+      "workload": "mandelbrot1"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "mandelbrot2"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "mlp"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "mvt"
+    },
+    {
+      "accepted_regions": 3,
+      "correct": true,
+      "execution_hits": 1518,
+      "prepared_regions": 7,
+      "recognized_nodes": 41,
+      "unsupported_node_rejections": 4,
+      "workload": "nbody"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "nussinov"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 2,
+      "unsupported_node_rejections": 0,
+      "workload": "resnet"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 12,
+      "unsupported_node_rejections": 0,
+      "workload": "scattering_self_energies"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 1,
+      "recognized_nodes": 7,
+      "unsupported_node_rejections": 1,
+      "workload": "seidel_2d"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "softmax"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "stockham_fft"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 6,
+      "unsupported_node_rejections": 0,
+      "workload": "symm"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 4,
+      "unsupported_node_rejections": 0,
+      "workload": "syr2k"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 2,
+      "unsupported_node_rejections": 0,
+      "workload": "syrk"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 28,
+      "unsupported_node_rejections": 0,
+      "workload": "trisolv"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 0,
+      "recognized_nodes": 0,
+      "unsupported_node_rejections": 0,
+      "workload": "trmm"
+    },
+    {
+      "accepted_regions": 0,
+      "correct": true,
+      "execution_hits": 0,
+      "prepared_regions": 8,
+      "recognized_nodes": 31,
+      "unsupported_node_rejections": 0,
+      "workload": "vadv"
+    }
+  ],
+  "schema_version": 1,
+  "signatures": [
+    {
+      "canonical_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 199828,
+      "dynamic_prepare_count": 3,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 199828,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 199828,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "CONTIGUOUS",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.subtract",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 3,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "0652b1eb0a0f831677b09673d0b4a6c141ea54b6e84348ad95e77888ab8aa9da",
+      "region_length": 2,
+      "scalar_mask": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.add"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        3198
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "CONTIGUOUS",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.add",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 2,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "07f2e950a610d04769b9b7d9d4dcc86a2f7a8136331f1d5e1ef4b305e9ee3b7e",
+      "region_length": 2,
+      "scalar_mask": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "workloads": [
+        "jacobi_1d"
+      ]
+    },
+    {
+      "canonical_signature_hash": "8756142f80154c6809c4ecd7a60cf391d938ff791bdea4baeb8375802b446171",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 1,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        60
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "TRULY_GENERAL_STRIDED",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "GENERAL_STRIDED",
+        "GENERAL_STRIDED",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.subtract",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        60
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 1,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "0a2376fd4678d054d3ba9020b897b2aefa5c22a8b418fbd5a70ab164c2c24b1c",
+      "region_length": 2,
+      "scalar_mask": 0,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "canonical_signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 102859,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 102859,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 102859,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "CONTIGUOUS",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.subtract",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        59
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 2,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "13d0ef65b7ec6d90fae662cc62cc9ec8b6b38dad3b1a42a9ac338e7b3dfdb1ec",
+      "region_length": 2,
+      "scalar_mask": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "de0d67e56fa99dae60b5608d2fa07b37c9d60e5bd6f3d194ad15c33bdd11177e",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.subtract"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 1,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        60
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "TRULY_GENERAL_STRIDED",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "GENERAL_STRIDED",
+        "CONTIGUOUS",
+        "GENERAL_STRIDED"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.subtract"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        60
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 1,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "180a02143d63eea71166572e2f8aef111e883621e9aea971cf40c0a610c97310",
+      "region_length": 2,
+      "scalar_mask": 0,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "canonical_signature_hash": "f7f72245912b7e16f927066d59a81f7f6dbe00f9c19872b87af32fd18e093508",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.subtract"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 9,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59,
+        98
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "SCALAR",
+        "FIXED_STRIDE",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.subtract"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 6,
+          "upper_bound": 64
+        },
+        {
+          "count": 3,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "273869d3b8d76f4d7ca43c0a4d9c8b2626145e57eff2199e15a646a01f354e28",
+      "region_length": 2,
+      "scalar_mask": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "workloads": [
+        "adi",
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.add"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 50844,
+      "dynamic_prepare_count": 1,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 50844,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 50844,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        98
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "SCALAR",
+        "CONTIGUOUS",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.add"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 1,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "289a103ca7611131fb0a828aff89b811dd04de27030bf3d035b78976c8f2d212",
+      "region_length": 2,
+      "scalar_mask": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "workloads": [
+        "adi"
+      ]
+    },
+    {
+      "canonical_signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.true_divide"
+        },
+        {
+          "operands": [
+            2,
+            4
+          ],
+          "operation": "numpy.add"
+        },
+        {
+          "operands": [
+            3,
+            5
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 4,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "SCALAR",
+        "CONTIGUOUS",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.true_divide",
+        "numpy.add",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 4,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "2b603cadb7ba8cc663b0ae7ffdaf4ced221b15b812c695c7748fc34c411cff6c",
+      "region_length": 3,
+      "scalar_mask": 10,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 10,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "d100351f5ac6c9a1e2284895337dec8f78de718315e8ac4bfd1eb50f72784938",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.add"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 1,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        98
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "SCALAR",
+        "FIXED_STRIDE",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.add"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 1,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "3304192baa689ccdbc22bd5ca26b9d1ac840b8a7cbf40d12af45bcbbc4323c35",
+      "region_length": 2,
+      "scalar_mask": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "workloads": [
+        "adi"
+      ]
+    },
+    {
+      "canonical_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.add"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 1086872,
+      "dynamic_prepare_count": 6,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 1086872,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 1086872,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "SCALAR",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.add"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 6,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "3cf9e55bf2d070b02dc57f45e9e0a182aba72d9cb57e90b7ed831274b8fcd080",
+      "region_length": 2,
+      "scalar_mask": 2,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 2,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "e7b56bc5c3785c36483820092b3d972b2f6d144ccee0b84b9fe22e80222f1945",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            4
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            3,
+            5
+          ],
+          "operation": "numpy.true_divide"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 1,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        60
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "GENERAL_STRIDED",
+        "CONTIGUOUS",
+        "CONTIGUOUS",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.subtract",
+        "numpy.true_divide"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        60
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 1,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "466c29a14a5343214057a1302ccafa7a2b5910c4afb074f805c78a483b9ae3a7",
+      "region_length": 3,
+      "scalar_mask": 8,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 8,
+        "schema_version": 1
+      },
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "canonical_signature_hash": "34adbefd6c9ae55f6484879df3b7d18baf312a627346b951fc5ea88b78be9acf",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.add"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        60
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "GENERAL_STRIDED",
+        "GENERAL_STRIDED",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.add",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        60
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 2,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "4ba87c82a8cfe1e58fce6158a438ef52d754cc9d90234f11dbccc81a84aacd8e",
+      "region_length": 2,
+      "scalar_mask": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "canonical_signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.add"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 551535,
+      "dynamic_prepare_count": 4,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 551535,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 551535,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "SCALAR",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.add"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        59
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 4,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "4ef20a884bcd82ebf4383dd17577ebb40ddea5a32f931497fc3842cc5c9e814e",
+      "region_length": 2,
+      "scalar_mask": 2,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 2,
+        "schema_version": 1
+      },
+      "workloads": [
+        "cavity_flow",
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.subtract"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 50844,
+      "dynamic_prepare_count": 1,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 50844,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 50844,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        98
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "SCALAR",
+        "CONTIGUOUS",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.subtract"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 1,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "6522d875ba382cb56559971b95e07a7267a6ce95cc80acd3907d97638e2f2597",
+      "region_length": 2,
+      "scalar_mask": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "workloads": [
+        "adi"
+      ]
+    },
+    {
+      "canonical_signature_hash": "3a5f8f7f28004f40bb42f23e39fe03de34c202e0c12dde0dfe36df56b55928d6",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            4
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 1,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        60
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "TRULY_GENERAL_STRIDED",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "GENERAL_STRIDED",
+        "CONTIGUOUS",
+        "GENERAL_STRIDED",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.subtract",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        60
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 1,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "675275c981f5cf6a805407c34f72f2de5f5655014178eaf80b2440604008fe90",
+      "region_length": 3,
+      "scalar_mask": 0,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              5,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "canonical_signature_hash": "6f833ba31a2de4c89d5d74211c3471b921c7df38e1b7b77b5cb2446fd47400f6",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 102859,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 102859,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 102859,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "INNER_CONTIGUOUS",
+      "legacy_layout_class": "inner_contiguous",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "CONTIGUOUS",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.subtract",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": "inner-contiguous IR requires outer/inner descriptor",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        59
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 2,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "6cb62180d40f6bea99bd417d06e8219e64fc61d810704e9c8072d6fac443f48f",
+      "region_length": 2,
+      "scalar_mask": 0,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "inner_contiguous",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "56766573f32449c31f8f21b69e00e1c6767005588801a92cc2d11812151a8982",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 1,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        60
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "GENERAL_STRIDED",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.subtract",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        60
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 1,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "8b940623a5942f75c65d57d62f5ef789dff8da7f945ab80be1c0decad5ce8589",
+      "region_length": 2,
+      "scalar_mask": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "canonical_signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 1518,
+      "dynamic_prepare_count": 3,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 1518,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 1518,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        25
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "CONTIGUOUS",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        25
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 3,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "8c4cbc0752dac8d17abccdd008af5d8015ec6316eddaad2afba67214b7ac9580",
+      "region_length": 2,
+      "scalar_mask": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "workloads": [
+        "nbody"
+      ]
+    },
+    {
+      "canonical_signature_hash": "944051c006240e659f34ae6204fd9a16d6321cc0f3c51518f0a08665d3dd737b",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.add"
+        },
+        {
+          "operands": [
+            3,
+            2
+          ],
+          "operation": "numpy.add"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 1,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        60
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "TRULY_GENERAL_STRIDED",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "GENERAL_STRIDED",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.add",
+        "numpy.add"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        60
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 1,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "98f23b327dcc9331d658d3ac422893f62238be9c2e85a4a47592e7468b669781",
+      "region_length": 2,
+      "scalar_mask": 0,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              2
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "workloads": [
+        "vadv"
+      ]
+    },
+    {
+      "canonical_signature_hash": "8756142f80154c6809c4ecd7a60cf391d938ff791bdea4baeb8375802b446171",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 3,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "FIXED_AFFINE_STRIDE",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "FIXED_STRIDE",
+        "FIXED_STRIDE",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.subtract",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 3,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "a2b86d17d5adcf11bb22386085bbcac191eabbe48696d9bdd7d3129d734c0192",
+      "region_length": 2,
+      "scalar_mask": 0,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "fcd7cb475d812f4d489b0054ba3f0a11763b0b1ca510138236f7a459cbd17388",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.add"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        148
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "inner_contiguous",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "CONTIGUOUS",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.add",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": "inner-contiguous IR requires outer/inner descriptor",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        148
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 2,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "aafa90dc21455e22e87e060c1ae78e9f561d057a840872e376f6a7f666eb0e4d",
+      "region_length": 2,
+      "scalar_mask": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "inner_contiguous",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "workloads": [
+        "jacobi_2d"
+      ]
+    },
+    {
+      "canonical_signature_hash": "68dd5ad22ddc3dfbb4fb6e1d2b351a0227cf898ce04f3539f1d73e75853a45db",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            2,
+            4
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            3,
+            5
+          ],
+          "operation": "numpy.subtract"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "FIXED_STRIDE",
+        "FIXED_STRIDE",
+        "SCALAR",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.subtract",
+        "numpy.multiply",
+        "numpy.subtract"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 2,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "b6707e2f1f7dee3705d37218e1bf043a653ce815bfce8a5f4c8d72d6fde318d8",
+      "region_length": 3,
+      "scalar_mask": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "6268a2573b6fd7fb31f6fade792d8b446e92744a27a97b1c3c425cfeb79dc901",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            3,
+            2
+          ],
+          "operation": "numpy.add"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        98
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "SCALAR",
+        "FIXED_STRIDE",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.add"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 2,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "b71acc11d3c4a6d5cc1988c3411282e96a274d10a26f97bbcadfb01dfa7d2535",
+      "region_length": 2,
+      "scalar_mask": 5,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              2
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 5,
+        "schema_version": 1
+      },
+      "workloads": [
+        "adi"
+      ]
+    },
+    {
+      "canonical_signature_hash": "997b090d124bbd5bcb8c0149eaf8c15a893404a15ce78ea5f9e6f81a6db0e05b",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            4,
+            2
+          ],
+          "operation": "numpy.add"
+        },
+        {
+          "operands": [
+            3,
+            5
+          ],
+          "operation": "numpy.true_divide"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        98
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "SCALAR",
+        "FIXED_STRIDE",
+        "SCALAR",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.add",
+        "numpy.true_divide"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 2,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "bab4c4400d5e2d93399f60c78f043b5efc0014b5e138532a985ebb2b1eb3d7c2",
+      "region_length": 3,
+      "scalar_mask": 5,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              4,
+              2
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 5,
+        "schema_version": 1
+      },
+      "workloads": [
+        "adi"
+      ]
+    },
+    {
+      "canonical_signature_hash": "7e50bbafbb177e86a8115e93513e8729e66443115874e1de7bf749caf1dcc122",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            2,
+            4
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            3,
+            5
+          ],
+          "operation": "numpy.subtract"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 3,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "FIXED_AFFINE_STRIDE",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "FIXED_STRIDE",
+        "FIXED_STRIDE",
+        "CONTIGUOUS",
+        "FIXED_STRIDE"
+      ],
+      "operation_sequence": [
+        "numpy.subtract",
+        "numpy.multiply",
+        "numpy.subtract"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 3,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "bb8a533b058eee11ce255dc1595603b0d6b8df26054b92cc1818abc529c5f287",
+      "region_length": 3,
+      "scalar_mask": 0,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "f7f72245912b7e16f927066d59a81f7f6dbe00f9c19872b87af32fd18e093508",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.subtract"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 4,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "SCALAR",
+        "FIXED_STRIDE",
+        "FIXED_STRIDE"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.subtract"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 4,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "d2a2219c0355e4d914d85382078efea823a8cc9ffc1e97d97798b41fe275d7b2",
+      "region_length": 2,
+      "scalar_mask": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "5113defd41790ece3ee9816ae2ef386e3a2d4144f778a3a2c6413b96f1cc9f2c",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.subtract"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 551535,
+      "dynamic_prepare_count": 4,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 551535,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 551535,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "inner_contiguous",
+      "operand_access_classes": [
+        "SCALAR",
+        "CONTIGUOUS",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.multiply",
+        "numpy.subtract"
+      ],
+      "optimizer_rejection_reason": "inner-contiguous IR requires outer/inner descriptor",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        59
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 4,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "de0e5f0a97af4c67a14f40c600a11074135e5a3b2476daafad889565aafa39eb",
+      "region_length": 2,
+      "scalar_mask": 1,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "inner_contiguous",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "workloads": [
+        "cavity_flow",
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "34adbefd6c9ae55f6484879df3b7d18baf312a627346b951fc5ea88b78be9acf",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.add"
+        },
+        {
+          "operands": [
+            2,
+            3
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "FIXED_STRIDE",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.add",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 2,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "e4a3a3c2c99e4c60bcbb83c7b344c1897cd9d4aae1b30a96fb384493bdc9e500",
+      "region_length": 2,
+      "scalar_mask": 4,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "7e50bbafbb177e86a8115e93513e8729e66443115874e1de7bf749caf1dcc122",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.subtract"
+        },
+        {
+          "operands": [
+            2,
+            4
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            3,
+            5
+          ],
+          "operation": "numpy.subtract"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 1,
+      "layout_class": "FIXED_AFFINE_STRIDE",
+      "legacy_layout_class": "general_strided",
+      "operand_access_classes": [
+        "FIXED_STRIDE",
+        "FIXED_STRIDE",
+        "CONTIGUOUS",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.subtract",
+        "numpy.multiply",
+        "numpy.subtract"
+      ],
+      "optimizer_rejection_reason": "unsupported layout class: general_strided",
+      "optimizer_status": "REJECTED",
+      "outer_count_samples": [
+        1
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 2,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "e9243012d9e08d9fa8da3f59c8f96e0b7306e85abeb2f8dcc03947034f0d230f",
+      "region_length": 3,
+      "scalar_mask": 0,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.true_divide"
+        },
+        {
+          "operands": [
+            2,
+            4
+          ],
+          "operation": "numpy.add"
+        },
+        {
+          "operands": [
+            3,
+            5
+          ],
+          "operation": "numpy.multiply"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "SCALAR",
+        "CONTIGUOUS",
+        "SCALAR"
+      ],
+      "operation_sequence": [
+        "numpy.true_divide",
+        "numpy.add",
+        "numpy.multiply"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        59
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 2,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "e9d7a28fbd4c3acd4dd085052f26d9b72d77c0bac1a3db5bc5a29748a076905a",
+      "region_length": 3,
+      "scalar_mask": 10,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 10,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    },
+    {
+      "canonical_signature_hash": "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367",
+      "dag_topology": [
+        {
+          "operands": [
+            0,
+            1
+          ],
+          "operation": "numpy.true_divide"
+        },
+        {
+          "operands": [
+            2,
+            4
+          ],
+          "operation": "numpy.multiply"
+        },
+        {
+          "operands": [
+            3,
+            5
+          ],
+          "operation": "numpy.subtract"
+        }
+      ],
+      "dtype_class": "float64",
+      "dynamic_execution_opportunity_count": 0,
+      "dynamic_prepare_count": 2,
+      "execution_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 0,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "generated_execution_count": 0,
+      "generic_execution_count": 0,
+      "inner_extent_samples": [
+        59
+      ],
+      "iteration_rank_class": 2,
+      "layout_class": "SCALAR_OPERAND",
+      "legacy_layout_class": "contiguous_same_shape",
+      "operand_access_classes": [
+        "CONTIGUOUS",
+        "SCALAR",
+        "SCALAR",
+        "CONTIGUOUS"
+      ],
+      "operation_sequence": [
+        "numpy.true_divide",
+        "numpy.multiply",
+        "numpy.subtract"
+      ],
+      "optimizer_rejection_reason": null,
+      "optimizer_status": "SUPPORTED",
+      "outer_count_samples": [
+        59
+      ],
+      "prepare_element_count_distribution": [
+        {
+          "count": 0,
+          "upper_bound": 16
+        },
+        {
+          "count": 0,
+          "upper_bound": 32
+        },
+        {
+          "count": 0,
+          "upper_bound": 64
+        },
+        {
+          "count": 0,
+          "upper_bound": 128
+        },
+        {
+          "count": 0,
+          "upper_bound": 256
+        },
+        {
+          "count": 0,
+          "upper_bound": 512
+        },
+        {
+          "count": 0,
+          "upper_bound": 1024
+        },
+        {
+          "count": 0,
+          "upper_bound": 2048
+        },
+        {
+          "count": 2,
+          "upper_bound": 4096
+        },
+        {
+          "count": 0,
+          "upper_bound": 8192
+        },
+        {
+          "count": 0,
+          "upper_bound": 16384
+        },
+        {
+          "count": 0,
+          "upper_bound": 32768
+        },
+        {
+          "count": 0,
+          "upper_bound": 65536
+        },
+        {
+          "count": 0,
+          "upper_bound": null
+        }
+      ],
+      "profile_variant_hash": "fb3d12366ffccfe83eed3903f7dcd40f0f3f7177759597db1b9d16cb35608412",
+      "region_length": 3,
+      "scalar_mask": 6,
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "contiguous_same_shape",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 6,
+        "schema_version": 1
+      },
+      "workloads": [
+        "channel_flow"
+      ]
+    }
+  ],
+  "unsupported_nodes": [
+    {
+      "dtype_class": "float64",
+      "fits_existing_atomic_recipe_model": false,
+      "inplace": true,
+      "is_elementwise": true,
+      "layout_class": "FULL_CONTIGUOUS",
+      "max_elements": 48,
+      "min_elements": 48,
+      "node_index": 1,
+      "occurrence_count": 1,
+      "operation_identity": "numpy.add",
+      "region_length": 2,
+      "scalar_mask": 0,
+      "workloads": [
+        "seidel_2d"
+      ]
+    },
+    {
+      "dtype_class": "float64",
+      "fits_existing_atomic_recipe_model": false,
+      "inplace": true,
+      "is_elementwise": true,
+      "layout_class": "SCALAR_OPERAND",
+      "max_elements": 75,
+      "min_elements": 75,
+      "node_index": 1,
+      "occurrence_count": 1,
+      "operation_identity": "numpy.add",
+      "region_length": 2,
+      "scalar_mask": 2,
+      "workloads": [
+        "nbody"
+      ]
+    },
+    {
+      "dtype_class": "float64",
+      "fits_existing_atomic_recipe_model": false,
+      "inplace": false,
+      "is_elementwise": false,
+      "layout_class": "SCALAR_OPERAND",
+      "max_elements": 625,
+      "min_elements": 625,
+      "node_index": 2,
+      "occurrence_count": 3,
+      "operation_identity": "numpy.matmul",
+      "region_length": 3,
+      "scalar_mask": 4,
+      "workloads": [
+        "nbody"
+      ]
+    }
+  ],
+  "workload_count": 53
+}
