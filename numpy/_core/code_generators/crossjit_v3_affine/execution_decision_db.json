@@ -1,0 +1,3305 @@
+{
+  "candidate_universe_hash": "e27a9b0f3c314e321682dac1955ef2474b6c3e88fc073fd89eaadc474948c94b",
+  "profile_identity_hash": "76474b924b26dadc6f57a4c44b35b27c29a57e302b6b7c8acafedce9566e9c65",
+  "records": [
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "f8c7e4a63fb3dda86767483a10d529cd2fb81aeb4e3e8c57dbe62507b39e11dd",
+      "confidence": 0.3212374753990159,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 727.5098849218058,
+            "confidence": 0.9633784020094592,
+            "decision": "GENERATED",
+            "generated_median_ns": 489.1233402183535,
+            "generated_speedup": 1.487375116053616,
+            "generic_median_ns": 1223.1127176158159,
+            "generic_speedup": 0.5948019953058156,
+            "max_cv": 0.0054932396985811075,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 768.7436274509804,
+            "confidence": 0.8904610538385859,
+            "decision": "GENERATED",
+            "generated_median_ns": 519.6946078431373,
+            "generated_speedup": 1.479221865782789,
+            "generic_median_ns": 1696.386274509804,
+            "generic_speedup": 0.45316543702472495,
+            "max_cv": 0.01643084192421212,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 889.57,
+            "confidence": 0.4325048291832766,
+            "decision": "GENERATED",
+            "generated_median_ns": 648.919,
+            "generated_speedup": 1.37084905820295,
+            "generic_median_ns": 2884.579,
+            "generic_speedup": 0.30838815646928025,
+            "max_cv": 0.0851242756225085,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 996.93,
+            "confidence": 0.3212374753990159,
+            "decision": "GENERATED",
+            "generated_median_ns": 863.934,
+            "generated_speedup": 1.1539423150379542,
+            "generic_median_ns": 5293.49,
+            "generic_speedup": 0.188331327725187,
+            "max_cv": 0.1018143786901476,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "7e50bbafbb177e86a8115e93513e8729e66443115874e1de7bf749caf1dcc122",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 3,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "b237ff0845b865a25d4e34e8f1e9a463e321622b2c9ea2754e6ef150a5f4c171",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "7e50bbafbb177e86a8115e93513e8729e66443115874e1de7bf749caf1dcc122"
+      },
+      "specialization_hash": "25984f26882a2111a021c370c41b96ebcc79107129e640f940590d881ad07615"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "da040c57ab68ab5e018840c2f54c9d115453c31d74d778ffbbadcd082b7849af",
+      "confidence": 0.3096159751183257,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 701.0923576276188,
+            "confidence": 0.768382260544737,
+            "decision": "GENERATED",
+            "generated_median_ns": 483.3605783416937,
+            "generated_speedup": 1.4504541517078533,
+            "generic_median_ns": 1224.6491590439657,
+            "generic_speedup": 0.5724842518774383,
+            "max_cv": 0.03474266091828944,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 717.7931372549019,
+            "confidence": 0.8749329829689312,
+            "decision": "GENERATED",
+            "generated_median_ns": 489.0558823529412,
+            "generated_speedup": 1.4677118978744559,
+            "generic_median_ns": 1675.7348039215685,
+            "generic_speedup": 0.4283453059369039,
+            "max_cv": 0.018760052554660313,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 798.965,
+            "confidence": 0.5519908539546357,
+            "decision": "GENERATED",
+            "generated_median_ns": 581.157,
+            "generated_speedup": 1.3747834062052078,
+            "generic_median_ns": 2886.558,
+            "generic_speedup": 0.2767881331329563,
+            "max_cv": 0.06720137190680464,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 880.408,
+            "confidence": 0.3096159751183257,
+            "decision": "GENERATED",
+            "generated_median_ns": 792.77,
+            "generated_speedup": 1.110546564577368,
+            "generic_median_ns": 5310.814,
+            "generic_speedup": 0.16577647042430782,
+            "max_cv": 0.10355760373225113,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "7e50bbafbb177e86a8115e93513e8729e66443115874e1de7bf749caf1dcc122",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 3,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "a2690f55e39c1dcd3bc2893e462bd6dd47d41a7aa98e7252f1c70f417855a792",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "7e50bbafbb177e86a8115e93513e8729e66443115874e1de7bf749caf1dcc122"
+      },
+      "specialization_hash": "301d78813706160ef35cd9b3f702b1d3022ba7917ed44114b85a35f0abcc3cb8"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "382f9b85b79af2e8b80a4e9cabe2b60aa70123d44ddf009ecdad139578e771e7",
+      "confidence": 0.5777548365111159,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 842.3195632930068,
+            "confidence": 0.9446640011067035,
+            "decision": "GENERATED",
+            "generated_median_ns": 266.10239008557096,
+            "generated_speedup": 3.1653964589425176,
+            "generic_median_ns": 802.4989672469756,
+            "generic_speedup": 1.0496207442891028,
+            "max_cv": 0.008300399833994474,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 857.3833333333333,
+            "confidence": 0.924223329481288,
+            "decision": "GENERATED",
+            "generated_median_ns": 275.16617647058825,
+            "generated_speedup": 3.115874720979657,
+            "generic_median_ns": 1095.25,
+            "generic_speedup": 0.7828197519592178,
+            "max_cv": 0.011366500577806799,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 973.799,
+            "confidence": 0.9715198271066874,
+            "decision": "GENERATED",
+            "generated_median_ns": 342.57,
+            "generated_speedup": 2.842627784102519,
+            "generic_median_ns": 2018.438,
+            "generic_speedup": 0.4824517770672173,
+            "max_cv": 0.004272025933996885,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1045.59,
+            "confidence": 0.9329075210407363,
+            "decision": "GENERATED",
+            "generated_median_ns": 542.92,
+            "generated_speedup": 1.9258638473439917,
+            "generic_median_ns": 3652.468,
+            "generic_speedup": 0.28626944849345703,
+            "max_cv": 0.010063871843889552,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 3604.5859375,
+            "confidence": 0.5777548365111159,
+            "decision": "GENERATED",
+            "generated_median_ns": 2261.7890625,
+            "generated_speedup": 1.5936879337084513,
+            "generic_median_ns": 22630.734375,
+            "generic_speedup": 0.15927834588885276,
+            "max_cv": 0.06333677452333261,
+            "max_elements": 3600,
+            "min_elements": 3600,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "34adbefd6c9ae55f6484879df3b7d18baf312a627346b951fc5ea88b78be9acf",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "OUTER_INNER",
+          "operands": [
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 0,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 2,
+              "outer_stride": 0
+            }
+          ],
+          "outer_count": "runtime_outer_count",
+          "outer_shape_class": "AFFINE_ROWS",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": "runtime_output_outer_stride",
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "f4f3d495fe968980529082cd91dd36d669523412b058f4d7ade236577099901b",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "34adbefd6c9ae55f6484879df3b7d18baf312a627346b951fc5ea88b78be9acf"
+      },
+      "specialization_hash": "495dd264f487966e93b6f3829da88431ca33d592b4cee95fa3a9d9c76a1d3132"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "e25f2c39a3844d6e450ff226badec35a45e60c7b17097c6c0e9b69234c2d858e",
+      "confidence": 0.39239608965465433,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+          "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 719.5036884036589,
+            "confidence": 0.9237471479109467,
+            "decision": "GENERATED",
+            "generated_median_ns": 326.687813514311,
+            "generated_speedup": 2.2024197372521215,
+            "generic_median_ns": 831.1643552670404,
+            "generic_speedup": 0.8656575367365139,
+            "max_cv": 0.011437927813358,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 742.3583333333333,
+            "confidence": 0.9148874188082087,
+            "decision": "GENERATED",
+            "generated_median_ns": 326.0289215686274,
+            "generated_speedup": 2.276970796828743,
+            "generic_median_ns": 1094.282843137255,
+            "generic_speedup": 0.6783971237317663,
+            "max_cv": 0.012766887178768704,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 854.253,
+            "confidence": 0.5530343502634261,
+            "decision": "GENERATED",
+            "generated_median_ns": 373.056,
+            "generated_speedup": 2.289878731343284,
+            "generic_median_ns": 1946.137,
+            "generic_speedup": 0.4389480288386686,
+            "max_cv": 0.0670448474604861,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 933.31,
+            "confidence": 0.8364641619391113,
+            "decision": "GENERATED",
+            "generated_median_ns": 440.61,
+            "generated_speedup": 2.1182224643108416,
+            "generic_median_ns": 3424.606,
+            "generic_speedup": 0.2725306210407854,
+            "max_cv": 0.024530375709133304,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 5286.5234375,
+            "confidence": 0.39239608965465433,
+            "decision": "GENERATED",
+            "generated_median_ns": 1788.328125,
+            "generated_speedup": 2.9561260954278175,
+            "generic_median_ns": 22005.859375,
+            "generic_speedup": 0.24023253749889056,
+            "max_cv": 0.09114058655180185,
+            "max_elements": 3600,
+            "min_elements": 3600,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              2
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "944051c006240e659f34ae6204fd9a16d6321cc0f3c51518f0a08665d3dd737b",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "OUTER_INNER",
+          "operands": [
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 0,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": "runtime_outer_stride"
+            }
+          ],
+          "outer_count": "runtime_outer_count",
+          "outer_shape_class": "AFFINE_ROWS",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": "runtime_output_outer_stride",
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "7372107adf857a48db6bbb44ff54f7359a6fbdda743b48d54e90d51ca0a0262c",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "944051c006240e659f34ae6204fd9a16d6321cc0f3c51518f0a08665d3dd737b"
+      },
+      "specialization_hash": "4ca449942ac25aed73bf79f36d278999938ac1c64e8561034cb41b582ee45bd1"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "a00c9a1661bc1f2882c9c7780c58b3727130ae83804f712e7645418ce94b5f8c",
+      "confidence": 0.9000467682466164,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 713.2602537621717,
+            "confidence": 0.9000467682466164,
+            "decision": "GENERATED",
+            "generated_median_ns": 243.09471820596045,
+            "generated_speedup": 2.9340837144716017,
+            "generic_median_ns": 885.0767187961051,
+            "generic_speedup": 0.8058739300389228,
+            "max_cv": 0.014992984763007526,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 724.15,
+            "confidence": 0.9195020782971286,
+            "decision": "GENERATED",
+            "generated_median_ns": 253.78627450980392,
+            "generated_speedup": 2.853385201381431,
+            "generic_median_ns": 1286.8161764705883,
+            "generic_speedup": 0.5627454901803928,
+            "max_cv": 0.012074688255430706,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 820.203,
+            "confidence": 0.9175664234966167,
+            "decision": "GENERATED",
+            "generated_median_ns": 290.892,
+            "generated_speedup": 2.8196134647910562,
+            "generic_median_ns": 2299.892,
+            "generic_speedup": 0.35662674595154903,
+            "max_cv": 0.012365036475507508,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 905.972,
+            "confidence": 0.9243328603119474,
+            "decision": "GENERATED",
+            "generated_median_ns": 330.822,
+            "generated_speedup": 2.73854822230686,
+            "generic_median_ns": 4292.804,
+            "generic_speedup": 0.21104434304477912,
+            "max_cv": 0.011350070953207895,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              2
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 5,
+        "schema_version": 1
+      },
+      "signature_hash": "6268a2573b6fd7fb31f6fade792d8b446e92744a27a97b1c3c425cfeb79dc901",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 2,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "a1bd731453c87e5ca33cb2b6e98bc4a5b0203b0cd5a6d9bc283b3ca339dfc4cf",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "6268a2573b6fd7fb31f6fade792d8b446e92744a27a97b1c3c425cfeb79dc901"
+      },
+      "specialization_hash": "4f6cc2684ed4964ce7c3a5812672d604e9bc02bfe5327d7b002dc23dcf28ec47"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "adfbfa2dc8c5059c349eec7a80355ca018911b3de408bdb5ba30747bd84eb4ea",
+      "confidence": 0.5066970753864993,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+          "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 1075.454411330776,
+            "confidence": 0.9173399364789536,
+            "decision": "GENERATED",
+            "generated_median_ns": 331.0687518442018,
+            "generated_speedup": 3.2484322526363827,
+            "generic_median_ns": 1477.0059014458543,
+            "generic_speedup": 0.7281314247140138,
+            "max_cv": 0.012399009528156955,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1095.842156862745,
+            "confidence": 0.817385059923182,
+            "decision": "GENERATED",
+            "generated_median_ns": 358.8191176470588,
+            "generated_speedup": 3.0540238882718502,
+            "generic_median_ns": 2213.1686274509802,
+            "generic_speedup": 0.4951462546823116,
+            "max_cv": 0.027392241011522697,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1308.858,
+            "confidence": 0.8138437966326302,
+            "decision": "GENERATED",
+            "generated_median_ns": 419.068,
+            "generated_speedup": 3.123259232391879,
+            "generic_median_ns": 4110.407,
+            "generic_speedup": 0.3184254016694697,
+            "max_cv": 0.027923430505105463,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1469.062,
+            "confidence": 0.9353567283324742,
+            "decision": "GENERATED",
+            "generated_median_ns": 505.736,
+            "generated_speedup": 2.9048001328756503,
+            "generic_median_ns": 7924.446,
+            "generic_speedup": 0.185383558674007,
+            "max_cv": 0.009696490750128866,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 7119.9296875,
+            "confidence": 0.5066970753864993,
+            "decision": "GENERATED",
+            "generated_median_ns": 1813.0390625,
+            "generated_speedup": 3.927069104447384,
+            "generic_median_ns": 68058.4375,
+            "generic_speedup": 0.10461494487733428,
+            "max_cv": 0.0739954386920251,
+            "max_elements": 3600,
+            "min_elements": 3600,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 8,
+        "schema_version": 1
+      },
+      "signature_hash": "e7b56bc5c3785c36483820092b3d972b2f6d144ccee0b84b9fe22e80222f1945",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "OUTER_INNER",
+          "operands": [
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 0,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 1,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 3,
+              "outer_stride": 0
+            }
+          ],
+          "outer_count": "runtime_outer_count",
+          "outer_shape_class": "AFFINE_ROWS",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": "runtime_output_outer_stride",
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "6e35e25c648bc225e0e9d589517b85d9edd3a5b45af1b641f5f63d1557509bf8",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "e7b56bc5c3785c36483820092b3d972b2f6d144ccee0b84b9fe22e80222f1945"
+      },
+      "specialization_hash": "561cd952bdeaf63443cfb954833b16eeaa0613cab14688e61ba9a6777c9e32d2"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "26884510b22fd5e64160daaa8ca19f90e45ce9a42cdaa233f7c3a2b5ea96404c",
+      "confidence": 0.18592336632481643,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 731.8807907937445,
+            "confidence": 0.9059277044447402,
+            "decision": "GENERATED",
+            "generated_median_ns": 327.209796400118,
+            "generated_speedup": 2.2367325148749138,
+            "generic_median_ns": 840.0416051932724,
+            "generic_speedup": 0.8712435030231118,
+            "max_cv": 0.014110844333288956,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 747.3161764705883,
+            "confidence": 0.9119485993939408,
+            "decision": "GENERATED",
+            "generated_median_ns": 328.8509803921569,
+            "generated_speedup": 2.272507065599771,
+            "generic_median_ns": 1114.9975490196077,
+            "generic_speedup": 0.670240196606429,
+            "max_cv": 0.013207710090908879,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 854.43,
+            "confidence": 0.9268075747903772,
+            "decision": "GENERATED",
+            "generated_median_ns": 401.232,
+            "generated_speedup": 2.1295160904414403,
+            "generic_median_ns": 1987.5,
+            "generic_speedup": 0.4299018867924528,
+            "max_cv": 0.01097886378144342,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 950.796,
+            "confidence": 0.8671044571124823,
+            "decision": "GENERATED",
+            "generated_median_ns": 582.968,
+            "generated_speedup": 1.63095744534863,
+            "generic_median_ns": 3525.752,
+            "generic_speedup": 0.2696718317113626,
+            "max_cv": 0.01993433143312766,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 6281.453125,
+            "confidence": 0.18592336632481643,
+            "decision": "GENERATED",
+            "generated_median_ns": 2482.40625,
+            "generated_speedup": 2.5303888616136057,
+            "generic_median_ns": 21597.8359375,
+            "generic_speedup": 0.2908371534619173,
+            "max_cv": 0.12211149505127754,
+            "max_elements": 3600,
+            "min_elements": 3600,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "8756142f80154c6809c4ecd7a60cf391d938ff791bdea4baeb8375802b446171",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "OUTER_INNER",
+          "operands": [
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 0,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": "runtime_outer_stride"
+            }
+          ],
+          "outer_count": "runtime_outer_count",
+          "outer_shape_class": "AFFINE_ROWS",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": "runtime_output_outer_stride",
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "21f8a7dce3e777ddea454bcc535a274b70ab6c7e1d560f4b32b341d5f1d78ae0",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "8756142f80154c6809c4ecd7a60cf391d938ff791bdea4baeb8375802b446171"
+      },
+      "specialization_hash": "5f425db05be50240202b36672414930475823606eea4478ea75c00fd16f7666c"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "898fa1a8409a7c851e7d2465fe9d0288ab3f4eebbf6311c047dcb033db00e335",
+      "confidence": 0.9009511937715177,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 809.3021540277368,
+            "confidence": 0.9217079801976371,
+            "decision": "GENERATED",
+            "generated_median_ns": 400.4765417527294,
+            "generated_speedup": 2.0208478391411826,
+            "generic_median_ns": 1141.8804957214518,
+            "generic_speedup": 0.7087450543731474,
+            "max_cv": 0.01174380297035444,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 822.1122549019608,
+            "confidence": 0.9009511937715177,
+            "decision": "GENERATED",
+            "generated_median_ns": 421.3843137254902,
+            "generated_speedup": 1.9509797306729455,
+            "generic_median_ns": 1599.231862745098,
+            "generic_speedup": 0.5140669555512711,
+            "max_cv": 0.014857320934272354,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 950.645,
+            "confidence": 0.9300360084455553,
+            "decision": "GENERATED",
+            "generated_median_ns": 492.081,
+            "generated_speedup": 1.931887229947915,
+            "generic_median_ns": 2804.521,
+            "generic_speedup": 0.3389687579447613,
+            "max_cv": 0.010494598733166697,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1028.8,
+            "confidence": 0.9056794201931581,
+            "decision": "GENERATED",
+            "generated_median_ns": 692.086,
+            "generated_speedup": 1.4865204613299503,
+            "generic_median_ns": 5238.85,
+            "generic_speedup": 0.196378976302051,
+            "max_cv": 0.014148086971026295,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "68dd5ad22ddc3dfbb4fb6e1d2b351a0227cf898ce04f3539f1d73e75853a45db",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 2,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 3,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "cbcff4330f8ea698e0bda831825f8508479837a5c9d884a5fd1eca8f86c32e9d",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "68dd5ad22ddc3dfbb4fb6e1d2b351a0227cf898ce04f3539f1d73e75853a45db"
+      },
+      "specialization_hash": "6d23fc317fcec5828464f0e9bab0ac9b6619cd38d060b54c111c0061799d6ea0"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "7459fa72b53d1702a590014a57545a6d63da79e71c8203abbc1faa69d8842e26",
+      "confidence": 0.8564769415417267,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 613.3824136913544,
+            "confidence": 0.9104642813141391,
+            "decision": "GENERATED",
+            "generated_median_ns": 317.4269696075539,
+            "generated_speedup": 1.9323575890533202,
+            "generic_median_ns": 961.4269696075538,
+            "generic_speedup": 0.6379916864010293,
+            "max_cv": 0.013430357802879123,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 637.4710784313726,
+            "confidence": 0.8564769415417267,
+            "decision": "GENERATED",
+            "generated_median_ns": 326.3333333333333,
+            "generated_speedup": 1.9534353782370968,
+            "generic_median_ns": 1352.2210784313725,
+            "generic_speedup": 0.47142518971148056,
+            "max_cv": 0.021528458768740998,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 761.39,
+            "confidence": 0.9014148525102599,
+            "decision": "GENERATED",
+            "generated_median_ns": 397.656,
+            "generated_speedup": 1.9146951133643149,
+            "generic_median_ns": 2384.761,
+            "generic_speedup": 0.3192730843887501,
+            "max_cv": 0.014787772123461019,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 876.292,
+            "confidence": 0.9581605981456354,
+            "decision": "GENERATED",
+            "generated_median_ns": 589.952,
+            "generated_speedup": 1.4853615209372966,
+            "generic_median_ns": 4439.21,
+            "generic_speedup": 0.19739818571322376,
+            "max_cv": 0.006275910278154703,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "signature_hash": "f7f72245912b7e16f927066d59a81f7f6dbe00f9c19872b87af32fd18e093508",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 2,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "53cee136fab1d4147426ec0409bd739117cc41f928a840ec4d5d81ff720c9341",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "f7f72245912b7e16f927066d59a81f7f6dbe00f9c19872b87af32fd18e093508"
+      },
+      "specialization_hash": "88c9af556261c1b65cd8753adf897327ccd279c386ac3613f21da2ce453574d4"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "4360377e28635931e2f7866499ba0b9c4df4c42df6823e0553f42a83056a1f4a",
+      "confidence": 0.3314517651696375,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 1218.0044260843906,
+            "confidence": 0.921644727642365,
+            "decision": "GENERATED",
+            "generated_median_ns": 385.99114783121865,
+            "generated_speedup": 3.1555242469368343,
+            "generic_median_ns": 1426.1307170256714,
+            "generic_speedup": 0.8540622619956272,
+            "max_cv": 0.01175329085364525,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1258.7151960784313,
+            "confidence": 0.9110316732667498,
+            "decision": "GENERATED",
+            "generated_median_ns": 410.15245098039213,
+            "generated_speedup": 3.0688959509316835,
+            "generic_median_ns": 2088.425,
+            "generic_speedup": 0.602710270217236,
+            "max_cv": 0.01334524900998753,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1391.113,
+            "confidence": 0.9104492932855749,
+            "decision": "GENERATED",
+            "generated_median_ns": 487.989,
+            "generated_speedup": 2.850705651151973,
+            "generic_median_ns": 3832.517,
+            "generic_speedup": 0.36297634165745385,
+            "max_cv": 0.013432606007163768,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1550.962,
+            "confidence": 0.9337045108301316,
+            "decision": "GENERATED",
+            "generated_median_ns": 694.286,
+            "generated_speedup": 2.233894965475323,
+            "generic_median_ns": 7340.172,
+            "generic_speedup": 0.21129777340367503,
+            "max_cv": 0.009944323375480258,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 7798.5,
+            "confidence": 0.3314517651696375,
+            "decision": "GENERATED",
+            "generated_median_ns": 2925.9921875,
+            "generated_speedup": 2.6652497683745096,
+            "generic_median_ns": 60710.9140625,
+            "generic_speedup": 0.12845301574559867,
+            "max_cv": 0.10028223522455437,
+            "max_elements": 3600,
+            "min_elements": 3600,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              4
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              5,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "3a5f8f7f28004f40bb42f23e39fe03de34c202e0c12dde0dfe36df56b55928d6",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "OUTER_INNER",
+          "operands": [
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 0,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 1,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 2,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 3,
+              "outer_stride": "runtime_outer_stride"
+            }
+          ],
+          "outer_count": "runtime_outer_count",
+          "outer_shape_class": "AFFINE_ROWS",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": "runtime_output_outer_stride",
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "39f9f82b4e296cfb0294e9ff10503aed58ec329c0a25a8bbef5a7f24efba19f1",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "3a5f8f7f28004f40bb42f23e39fe03de34c202e0c12dde0dfe36df56b55928d6"
+      },
+      "specialization_hash": "8cdc56f1c5f77d69bf12432ada1fa15c7aefaafce1bcaa48cb8b00e794a807f4"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "94a8af0280e6a10826b2174587457d7f737558c5a49880cdc78dc486808d14cb",
+      "confidence": 0.4608362254899018,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 870.8439067571555,
+            "confidence": 0.8841935812841883,
+            "decision": "GENERATED",
+            "generated_median_ns": 263.65210976689286,
+            "generated_speedup": 3.3030037481099974,
+            "generic_median_ns": 782.8135143110062,
+            "generic_speedup": 1.1124538486329396,
+            "max_cv": 0.017370962807371753,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 889.0838235294118,
+            "confidence": 0.7857291095540839,
+            "decision": "GENERATED",
+            "generated_median_ns": 272.41323529411767,
+            "generated_speedup": 3.2637321111417017,
+            "generic_median_ns": 1079.570588235294,
+            "generic_speedup": 0.8235532101543643,
+            "max_cv": 0.03214063356688741,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 982.901,
+            "confidence": 0.92483069809272,
+            "decision": "GENERATED",
+            "generated_median_ns": 323.267,
+            "generated_speedup": 3.0405237775584886,
+            "generic_median_ns": 1954.985,
+            "generic_speedup": 0.502766517390159,
+            "max_cv": 0.011275395286091998,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1052.062,
+            "confidence": 0.8942187259400782,
+            "decision": "GENERATED",
+            "generated_median_ns": 380.922,
+            "generated_speedup": 2.7618830101700604,
+            "generic_median_ns": 3582.71,
+            "generic_speedup": 0.29364977907784884,
+            "max_cv": 0.015867191108988266,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 4039.9921875,
+            "confidence": 0.4608362254899018,
+            "decision": "GENERATED",
+            "generated_median_ns": 1615.4609375,
+            "generated_speedup": 2.5008293878972236,
+            "generic_median_ns": 21597.046875,
+            "generic_speedup": 0.18706225026425055,
+            "max_cv": 0.08087456617651473,
+            "max_elements": 3600,
+            "min_elements": 3600,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "56766573f32449c31f8f21b69e00e1c6767005588801a92cc2d11812151a8982",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "OUTER_INNER",
+          "operands": [
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 0,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 2,
+              "outer_stride": 0
+            }
+          ],
+          "outer_count": "runtime_outer_count",
+          "outer_shape_class": "AFFINE_ROWS",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": "runtime_output_outer_stride",
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "4febdf0c81ad1ef64ba7de7ef8059e2874e5e33ba66809008f723f35cc9c1fba",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "56766573f32449c31f8f21b69e00e1c6767005588801a92cc2d11812151a8982"
+      },
+      "specialization_hash": "ad361fedb4f7c6312e36bb40d6ba4cb680df6401142959262de1bb2271260993"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "66c77782a7d4c20d83f16ec7ccb6cc17cda037dbb9985c3ebedf703a49547d9c",
+      "confidence": 0.8878192902819032,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 486.9460017704338,
+            "confidence": 0.9277890324822949,
+            "decision": "GENERATED",
+            "generated_median_ns": 395.1587488934789,
+            "generated_speedup": 1.2322794399313617,
+            "generic_median_ns": 578.9675420478017,
+            "generic_speedup": 0.8410592415044741,
+            "max_cv": 0.010831645127655765,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 494.1549019607843,
+            "confidence": 0.9109291707615341,
+            "decision": "GENERATED",
+            "generated_median_ns": 415.54558823529413,
+            "generated_speedup": 1.1891713351098778,
+            "generic_median_ns": 653.3833333333333,
+            "generic_speedup": 0.7563016635881707,
+            "max_cv": 0.013360624385769886,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 570.996,
+            "confidence": 0.8878192902819032,
+            "decision": "GENERATED",
+            "generated_median_ns": 491.628,
+            "generated_speedup": 1.161439136908394,
+            "generic_median_ns": 891.424,
+            "generic_speedup": 0.6405436694547152,
+            "max_cv": 0.016827106457714524,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 655.554,
+            "confidence": 0.9318501320476027,
+            "decision": "ORIGINAL",
+            "generated_median_ns": 680.818,
+            "generated_speedup": 0.9628916979280806,
+            "generic_median_ns": 1292.15,
+            "generic_speedup": 0.5073358356227992,
+            "max_cv": 0.010222480192859592,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "conservative cross-stride rejection"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "8756142f80154c6809c4ecd7a60cf391d938ff791bdea4baeb8375802b446171",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "aa062948f1d182742621371566fc35bbc0e18a6c71fa625f50fc5b5b0d36c770",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "8756142f80154c6809c4ecd7a60cf391d938ff791bdea4baeb8375802b446171"
+      },
+      "specialization_hash": "b5cbfb4f26603316104248ce3ec016b2d45ea0cc97e4a474e332bc3dd54929e0"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "b86349afc39e6269b56c2c7051286e87fcda1762acd13f3c3867942e3b218705",
+      "confidence": 0.8776363881696575,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 602.8297432871053,
+            "confidence": 0.8908475473708288,
+            "decision": "GENERATED",
+            "generated_median_ns": 316.8592505163765,
+            "generated_speedup": 1.90251584040766,
+            "generic_median_ns": 960.235467689584,
+            "generic_speedup": 0.6277936647534691,
+            "max_cv": 0.01637286789437567,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 615.1421568627451,
+            "confidence": 0.8776363881696575,
+            "decision": "GENERATED",
+            "generated_median_ns": 326.1357843137255,
+            "generated_speedup": 1.8861535177967796,
+            "generic_median_ns": 1354.828431372549,
+            "generic_speedup": 0.45403694122329363,
+            "max_cv": 0.018354541774551376,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 698.247,
+            "confidence": 0.9576065772258225,
+            "decision": "GENERATED",
+            "generated_median_ns": 381.402,
+            "generated_speedup": 1.8307376468922554,
+            "generic_median_ns": 2414.146,
+            "generic_speedup": 0.28923147150172357,
+            "max_cv": 0.006359013416126619,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 780.422,
+            "confidence": 0.8856835885780198,
+            "decision": "GENERATED",
+            "generated_median_ns": 440.3,
+            "generated_speedup": 1.7724778560072678,
+            "generic_median_ns": 4459.094,
+            "generic_speedup": 0.17501806420766192,
+            "max_cv": 0.017147461713297035,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "signature_hash": "d100351f5ac6c9a1e2284895337dec8f78de718315e8ac4bfd1eb50f72784938",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "57da676cef7e93a4ad45d107a555b6580259e63fc3f3bfba73b7568c6ca2999b",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "d100351f5ac6c9a1e2284895337dec8f78de718315e8ac4bfd1eb50f72784938"
+      },
+      "specialization_hash": "cfdb9500068fa0bb0686be774fb95894a54f88b1fbb89e7528e6af58879cbef7"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "229b6ec6b8fa69bd1db832b09f14e39d5c8d974ed54290a26c5e22aa3973abb8",
+      "confidence": 0.8537286323080476,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 603.5019179699026,
+            "confidence": 0.9282173756417843,
+            "decision": "GENERATED",
+            "generated_median_ns": 319.5432280908823,
+            "generated_speedup": 1.8886393605508007,
+            "generic_median_ns": 493.38920035408677,
+            "generic_speedup": 1.2231761812718887,
+            "max_cv": 0.010767393653732353,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 622.7470588235294,
+            "confidence": 0.8537286323080476,
+            "decision": "GENERATED",
+            "generated_median_ns": 332.0147058823529,
+            "generated_speedup": 1.8756610710014618,
+            "generic_median_ns": 566.3166666666667,
+            "generic_speedup": 1.0996445901707455,
+            "max_cv": 0.02194070515379285,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 708.277,
+            "confidence": 0.8715979741582176,
+            "decision": "GENERATED",
+            "generated_median_ns": 375.976,
+            "generated_speedup": 1.883835670361938,
+            "generic_median_ns": 806.345,
+            "generic_speedup": 0.8783796017833558,
+            "max_cv": 0.019260303876267364,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 790.24,
+            "confidence": 0.9274160375122995,
+            "decision": "GENERATED",
+            "generated_median_ns": 432.912,
+            "generated_speedup": 1.8254056251616957,
+            "generic_median_ns": 1169.55,
+            "generic_speedup": 0.6756786798341242,
+            "max_cv": 0.010887594373155065,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 4,
+        "schema_version": 1
+      },
+      "signature_hash": "34adbefd6c9ae55f6484879df3b7d18baf312a627346b951fc5ea88b78be9acf",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 2,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "d24eb62a21a4de3aa18fde872452ea3f075b3ef3a7e62ff946919359593bf941",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "34adbefd6c9ae55f6484879df3b7d18baf312a627346b951fc5ea88b78be9acf"
+      },
+      "specialization_hash": "e2ab8b7c702ea087ffdeecb13b44f5e678139ae10a7e7caa18d131bbf8e5f4a9"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "581f9f7655198d9b7cb2b9b3f998fa2ded8a9765e92b5f483dba424c85f2a019",
+      "confidence": 0.8781751418770343,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+          "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 927.7757450575391,
+            "confidence": 0.8898691014228437,
+            "decision": "GENERATED",
+            "generated_median_ns": 319.609029212157,
+            "generated_speedup": 2.902845853086585,
+            "generic_median_ns": 1184.2744172322218,
+            "generic_speedup": 0.7834128066583183,
+            "max_cv": 0.016519634786573444,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 943.346568627451,
+            "confidence": 0.8781751418770343,
+            "decision": "GENERATED",
+            "generated_median_ns": 340.4759803921569,
+            "generated_speedup": 2.7706699531077454,
+            "generic_median_ns": 1712.3745098039215,
+            "generic_speedup": 0.5508996794956207,
+            "max_cv": 0.018273728718444855,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1070.944,
+            "confidence": 0.9060802282398135,
+            "decision": "GENERATED",
+            "generated_median_ns": 415.22,
+            "generated_speedup": 2.5792206541110736,
+            "generic_median_ns": 3161.977,
+            "generic_speedup": 0.33869443073115335,
+            "max_cv": 0.01408796576402797,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1226.74,
+            "confidence": 0.9360235897733401,
+            "decision": "GENERATED",
+            "generated_median_ns": 501.196,
+            "generated_speedup": 2.447625280329452,
+            "generic_median_ns": 5875.264,
+            "generic_speedup": 0.20879742595396564,
+            "max_cv": 0.009596461533998978,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 4,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              4,
+              2
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33"
+          },
+          {
+            "operands": [
+              3,
+              5
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 5,
+        "schema_version": 1
+      },
+      "signature_hash": "997b090d124bbd5bcb8c0149eaf8c15a893404a15ce78ea5f9e6f81a6db0e05b",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 2,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 3,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "a81a4d7ff49dc87e422475431881fb2434b3da6cd6fdd65456c45fa353de75f5",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "997b090d124bbd5bcb8c0149eaf8c15a893404a15ce78ea5f9e6f81a6db0e05b"
+      },
+      "specialization_hash": "ef00ae0b86c2e442708b28ebb3c2592d5568b398e1010ea3bf8db78f9caf70eb"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "686e789df267a3671d1e667d9424a088ef5c9dc4b5d76214dd6cf6d0898a72e2",
+      "confidence": 0.9011608162995635,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 595.0002950722927,
+            "confidence": 0.918831894158022,
+            "decision": "GENERATED",
+            "generated_median_ns": 317.1732074358218,
+            "generated_speedup": 1.875947530002791,
+            "generic_median_ns": 964.6515196223074,
+            "generic_speedup": 0.6168033564133655,
+            "max_cv": 0.012175215876296703,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 608.1475490196078,
+            "confidence": 0.9212949283526922,
+            "decision": "GENERATED",
+            "generated_median_ns": 332.53480392156865,
+            "generated_speedup": 1.8288237557324825,
+            "generic_median_ns": 1345.5735294117646,
+            "generic_speedup": 0.4519615879226367,
+            "max_cv": 0.011805760747096165,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 688.391,
+            "confidence": 0.9552171980219194,
+            "decision": "GENERATED",
+            "generated_median_ns": 377.006,
+            "generated_speedup": 1.825941762200071,
+            "generic_median_ns": 2380.49,
+            "generic_speedup": 0.2891803788295687,
+            "max_cv": 0.0067174202967120915,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 787.312,
+            "confidence": 0.9011608162995635,
+            "decision": "GENERATED",
+            "generated_median_ns": 430.07,
+            "generated_speedup": 1.8306601250959147,
+            "generic_median_ns": 4426.916,
+            "generic_speedup": 0.17784660924219026,
+            "max_cv": 0.01482587755506548,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 1,
+        "schema_version": 1
+      },
+      "signature_hash": "f7f72245912b7e16f927066d59a81f7f6dbe00f9c19872b87af32fd18e093508",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "FLAT",
+          "operands": [
+            {
+              "access_kind": "SCALAR",
+              "broadcast_relation": "SCALAR",
+              "inner_stride": 0,
+              "logical_input_slot": 0,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 1,
+              "outer_stride": null
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 2,
+              "outer_stride": null
+            }
+          ],
+          "outer_count": 1,
+          "outer_shape_class": "NONE",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": null,
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "57da676cef7e93a4ad45d107a555b6580259e63fc3f3bfba73b7568c6ca2999b",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "f7f72245912b7e16f927066d59a81f7f6dbe00f9c19872b87af32fd18e093508"
+      },
+      "specialization_hash": "f6e6da567bd127c56f1b096552400de95cd0821774aa835d0753c505e0567557"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "artifact_hash": "fa66c8715ba1e01e111f9156dfda3a0310bb582b2b256f34a749622f21df3314",
+      "confidence": 0.3081454379656323,
+      "environment": {
+        "artifact_format_version": 1,
+        "backend_version": "2",
+        "compiler_flags": [
+          "-std=c11",
+          "-O3",
+          "-fno-strict-aliasing",
+          "-msse",
+          "-msse2",
+          "-msse3",
+          "-mssse3",
+          "-msse4.1",
+          "-msse4.2",
+          "-mpopcnt",
+          "-msahf",
+          "-mcx16",
+          "-fPIC"
+        ],
+        "compiler_id": "gcc",
+        "compiler_version": "13.3.0",
+        "generator_version": "0.2.0",
+        "optimizer_version": "1",
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "recipe_hashes": [
+          "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+          "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+        ],
+        "target_features": [
+          "cx16",
+          "popcnt",
+          "sahf",
+          "sse",
+          "sse2",
+          "sse3",
+          "sse4.1",
+          "sse4.2",
+          "ssse3"
+        ],
+        "target_triple": "x86_64-linux-gnu"
+      },
+      "profitability": {
+        "points": [
+          {
+            "baseline_median_ns": 993.784007081735,
+            "confidence": 0.9389800455593774,
+            "decision": "GENERATED",
+            "generated_median_ns": 331.85984066096194,
+            "generated_speedup": 2.994589538470293,
+            "generic_median_ns": 1264.1180289170848,
+            "generic_speedup": 0.786148116195342,
+            "max_cv": 0.009152993166093384,
+            "max_elements": 59,
+            "min_elements": 59,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1020.1661764705882,
+            "confidence": 0.9029330835840773,
+            "decision": "GENERATED",
+            "generated_median_ns": 338.60833333333335,
+            "generated_speedup": 3.012820642740398,
+            "generic_median_ns": 1847.4475490196078,
+            "generic_speedup": 0.552203052807623,
+            "max_cv": 0.014560037462388396,
+            "max_elements": 98,
+            "min_elements": 98,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1117.639,
+            "confidence": 0.9271350793726737,
+            "decision": "GENERATED",
+            "generated_median_ns": 409.733,
+            "generated_speedup": 2.7277251283152686,
+            "generic_median_ns": 3434.27,
+            "generic_speedup": 0.32543713802351004,
+            "max_cv": 0.010929738094098949,
+            "max_elements": 200,
+            "min_elements": 200,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 1218.642,
+            "confidence": 0.8980590423958877,
+            "decision": "GENERATED",
+            "generated_median_ns": 609.902,
+            "generated_speedup": 1.9980947758820269,
+            "generic_median_ns": 6529.314,
+            "generic_speedup": 0.18664165944538738,
+            "max_cv": 0.015291143640616834,
+            "max_elements": 400,
+            "min_elements": 400,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          },
+          {
+            "baseline_median_ns": 5245.109375,
+            "confidence": 0.3081454379656323,
+            "decision": "GENERATED",
+            "generated_median_ns": 2489.2890625,
+            "generated_speedup": 2.107071233315235,
+            "generic_median_ns": 54510.640625,
+            "generic_speedup": 0.09622175257640352,
+            "max_cv": 0.10377818430515515,
+            "max_elements": 3600,
+            "min_elements": 3600,
+            "reason": "worst complete-path cell across strides 2 and 100; >=10% margin"
+          }
+        ]
+      },
+      "provenance": {
+        "independent_processes": 6,
+        "measured_at_utc": "2026-10-01T03:00:00Z",
+        "method": "generic_signature_microbenchmark",
+        "samples_per_process": 7
+      },
+      "reason": "frozen cross-stride complete-path measurements",
+      "signature": {
+        "domain": "elementwise",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "input_count": 3,
+        "layout_class": "general_strided",
+        "materialization_class": "virtual_intermediates_single_output",
+        "operations": [
+          {
+            "operands": [
+              0,
+              1
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b"
+          },
+          {
+            "operands": [
+              2,
+              3
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404"
+          }
+        ],
+        "provider": "numpy",
+        "provider_abi_version": 3,
+        "scalar_mask": 0,
+        "schema_version": 1
+      },
+      "signature_hash": "de0d67e56fa99dae60b5608d2fa07b37c9d60e5bd6f3d194ad15c33bdd11177e",
+      "specialization": {
+        "iteration_descriptor": {
+          "inner_extent": "runtime_inner_extent",
+          "iteration_rank_class": "OUTER_INNER",
+          "operands": [
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 0,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "CONTIGUOUS",
+              "broadcast_relation": "NONE",
+              "inner_stride": "element_size",
+              "logical_input_slot": 1,
+              "outer_stride": "runtime_outer_stride"
+            },
+            {
+              "access_kind": "FIXED_STRIDE",
+              "broadcast_relation": "NONE",
+              "inner_stride": "runtime_inner_stride",
+              "logical_input_slot": 2,
+              "outer_stride": "runtime_outer_stride"
+            }
+          ],
+          "outer_count": "runtime_outer_count",
+          "outer_shape_class": "AFFINE_ROWS",
+          "output": {
+            "access_kind": "CONTIGUOUS",
+            "inner_stride": "element_size",
+            "outer_stride": "runtime_output_outer_stride",
+            "ownership": "FRESH_PROVIDER_OUTPUT"
+          },
+          "schema_version": 2
+        },
+        "iteration_descriptor_hash": "75755e021c8111f261a620ce0ae7574270231f25015f03eb71edfd40f779621b",
+        "lowering_form": "affine_compiler_visible_loop",
+        "schema_version": 1,
+        "structural_signature_hash": "de0d67e56fa99dae60b5608d2fa07b37c9d60e5bd6f3d194ad15c33bdd11177e"
+      },
+      "specialization_hash": "ff349d8ab0d3932569b5716b355100c5ece9880a56fcbcdc327eef7e693293e6"
+    }
+  ],
+  "schema_version": 1
+}

@@ -4255,3 +4255,10 @@ def var(a, axis=None, dtype=None, out=None, ddof=0, keepdims=np._NoValue, *,
 
     return _methods._var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
                          **kwargs)
+
+
+# Public wrappers remain unchanged for ordinary execution and safe fallback.
+if hasattr(mu._multiarray_umath, '_crossjit_register_intrinsic'):
+    for _crossjit_callable, _crossjit_semantic in ((sum, 21), (max, 22), (amax, 24)):
+        mu._multiarray_umath._crossjit_register_intrinsic(_crossjit_callable, _crossjit_semantic)
+    del _crossjit_callable, _crossjit_semantic

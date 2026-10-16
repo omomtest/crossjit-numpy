@@ -1,0 +1,373 @@
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+
+def _command(root, manifest, outputs, *extra):
+    return [
+        sys.executable,
+        str(root / "numpy/_core/code_generators/generate_crossjit_kernels.py"),
+        "--generator-root", str(root.parent / "crossjit-generator"),
+        "--manifest", str(manifest),
+        "--output-c", str(outputs[0]),
+        "--output-h", str(outputs[1]),
+        "--output-json", str(outputs[2]),
+        *map(str, extra),
+    ]
+
+
+def test_repeated_supplemental_profile_preserves_artifact_universe(tmp_path):
+    root = Path(__file__).parents[2]
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    profile = json.loads((root / "benchmarks/benchmarks/crossjit/results/profiled/"
+                         "pf1_coverage/coverage_report.json").read_text())
+    path = tmp_path / "profile.json"
+    outputs = tuple(tmp_path / ("generated"+suffix) for suffix in (".c", ".h", ".json"))
+    path.write_text(json.dumps(profile))
+    command = _command(root, manifest, outputs, "--profiled-coverage", path,
+                       "--profiled-layout-class", "INNER_CONTIGUOUS")
+    subprocess.run(command, check=True)
+    original = {k["candidate_hash"] for k in json.loads(outputs[2].read_text())["kernels"]}
+    profile["signatures"] = [*profile["signatures"], *profile["signatures"]]
+    path.write_text(json.dumps(profile))
+    subprocess.run(command, check=True)
+    kernels = json.loads(outputs[2].read_text())["kernels"]
+    assert {k["candidate_hash"] for k in kernels} == original
+    assert len(kernels) == len(original)
+
+
+def test_build_time_generation_is_reproducible(tmp_path):
+    root = Path(__file__).parents[2]
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    outputs = (
+        tmp_path / "generated_crossjit_kernels.c",
+        tmp_path / "generated_crossjit_kernels.h",
+        tmp_path / "generated_crossjit_kernels.json",
+    )
+    command = _command(root, manifest, outputs)
+    subprocess.run(command, check=True)
+    first = tuple(path.read_bytes() for path in outputs)
+    subprocess.run(command, check=True)
+    second = tuple(path.read_bytes() for path in outputs)
+    assert first == second
+    metadata = json.loads(outputs[2].read_text())
+    assert metadata["provider"] == "numpy"
+    assert len(metadata["kernels"]) == 6
+    assert {kernel["generation_mode"] for kernel in metadata["kernels"]} == {
+        "AUTO"}
+    assert {kernel["generation_source"] for kernel in metadata["kernels"]} == {
+        "validation"}
+    assert metadata["generation_universe"] == {
+        "actual_generated_candidate_count": 6,
+        "disabled_signature_count": 0,
+        "forced_signature_count": 0,
+        "observed_signature_count": 0,
+        "profiled_execution_specialization_count": 0,
+        "unsupported_observed_signature_count": 0,
+        "validation_seed_count": 6,
+    }
+    assert all(len(kernel["optimization_signature_hash"]) == 64
+               for kernel in metadata["kernels"])
+    assert {kernel["signature_id"] for kernel in metadata["kernels"]} == {
+        "linear_2_add_multiply",
+        "linear_3_add_multiply_subtract",
+        "linear_4_add_multiply_subtract_divide",
+        "linear_5_add_multiply_subtract_divide_add",
+        "linear_6_add_multiply_subtract_divide_add_multiply",
+        "branched_3_multiply_multiply_add",
+    }
+    source = outputs[0].read_text()
+    assert source.count("for (") == 6
+    assert "switch" not in source
+    assert "Python.h" not in source
+    header = outputs[1].read_text()
+    assert "numpy_crossjit_generated_registry" in source
+    assert "NPY_CROSSJIT_GENERATED_COUNT = 6" in header
+    for signature_id in {
+        kernel["signature_id"] for kernel in metadata["kernels"]
+    }:
+        enum_name = "NPY_CROSSJIT_GENERATED_" + "".join(
+            character.upper() if character.isalnum() else "_"
+            for character in signature_id
+        )
+        assert enum_name in header
+
+
+def test_observed_force_disable_union_is_bounded(tmp_path):
+    root = Path(__file__).parents[2]
+    original = json.loads((
+        root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    ).read_text())
+    manifest = tmp_path / "manifest.json"
+    forced = dict(original["signatures"][0])
+    forced["mode"] = "FORCE"
+    forced["source"] = "developer_seed"
+    forced["id"] = "forced_duplicate"
+    disabled = dict(original["signatures"][1])
+    disabled["mode"] = "DISABLE"
+    disabled["source"] = "developer_seed"
+    disabled["id"] = "disabled_duplicate"
+    original["signatures"].extend((forced, disabled))
+    manifest.write_text(json.dumps(original))
+
+    generator_root = root.parent / "crossjit-generator"
+    sys.path.insert(0, str(generator_root))
+    from crossjit_generator.signature import (
+        ELEMENT_BUCKET_UPPER_BOUNDS,
+        ObservedSignatureProfile,
+        ObservedSignatures,
+        OptimizationSignature,
+    )
+
+    # Same topology as a validation seed, but a scalar relation makes this a
+    # distinct observed structural signature without any workload identity.
+    signature_data = json.loads(subprocess.check_output(
+        _command(root, manifest, (
+            tmp_path / "first.c", tmp_path / "first.h", tmp_path / "first.json"))
+    ) or (tmp_path / "first.json").read_bytes())
+    signature_data = signature_data["kernels"][0]["optimization_signature"]
+    signature_data["scalar_mask"] = 1
+    observed_signature = OptimizationSignature.from_data(signature_data)
+    buckets = [0] * len(ELEMENT_BUCKET_UPPER_BOUNDS)
+    buckets[4] = 3
+    observations = ObservedSignatures((ObservedSignatureProfile(
+        observed_signature, 1, 1, 3, 0, 3, 256, 256, tuple(buckets)),))
+    observations_path = tmp_path / "observations.json"
+    observations_path.write_text(observations.serialize())
+
+    outputs = (tmp_path / "out.c", tmp_path / "out.h", tmp_path / "out.json")
+    subprocess.run(_command(
+        root, manifest, outputs, "--observations", observations_path), check=True)
+    metadata = json.loads(outputs[2].read_text())
+    universe = metadata["generation_universe"]
+    assert universe == {
+        "actual_generated_candidate_count": 6,
+        "disabled_signature_count": 1,
+        "forced_signature_count": 1,
+        "observed_signature_count": 1,
+        "profiled_execution_specialization_count": 0,
+        "unsupported_observed_signature_count": 0,
+        "validation_seed_count": 6,
+    }
+    assert {kernel["generation_mode"] for kernel in metadata["kernels"]} == {
+        "AUTO", "FORCE"}
+    assert len(metadata["kernels"]) == 6
+
+
+def test_profiled_inner_contiguous_generation_keeps_identity_layers_separate(
+        tmp_path):
+    root = Path(__file__).parents[2]
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    coverage = (root /
+        "benchmarks/benchmarks/crossjit/results/profiled/pf1_coverage/"
+        "coverage_report.json")
+    outputs = (tmp_path / "profiled.c", tmp_path / "profiled.h",
+               tmp_path / "profiled.json")
+    subprocess.run(_command(
+        root, manifest, outputs,
+        "--profiled-coverage", coverage,
+        "--profiled-layout-class", "INNER_CONTIGUOUS",
+        "--profiled-inner-validation-seed", "linear_2_add_multiply"),
+        check=True)
+
+    report = json.loads(coverage.read_text())
+    profile = next(item for item in report["signatures"]
+                   if item["layout_class"] == "INNER_CONTIGUOUS")
+    metadata = json.loads(outputs[2].read_text())
+    profiled = [kernel for kernel in metadata["kernels"]
+                if kernel.get("profiled_layout_class") == "INNER_CONTIGUOUS"]
+    assert len(profiled) == 2
+    kernel = next(item for item in profiled
+                  if item["profiled_source"] == "observed")
+    assert kernel["optimization_signature"] == profile["signature"]
+    assert (kernel["optimization_signature_hash"] ==
+            profile["canonical_signature_hash"])
+    assert (kernel["execution_specialization"]
+            ["structural_signature_hash"] ==
+            profile["canonical_signature_hash"])
+    assert (kernel["execution_specialization_hash"] ==
+            kernel["profitability_specialization_hash"])
+    assert (kernel["execution_specialization_hash"] !=
+            kernel["optimization_signature_hash"])
+    assert kernel["profile_variant_hash"] == profile["profile_variant_hash"]
+    assert kernel["entry_abi"] == "outer_inner_v1"
+    assert (kernel["iteration_descriptor"]["iteration_rank_class"] ==
+            "OUTER_INNER")
+    assert metadata["generation_universe"][
+        "profiled_execution_specialization_count"] == 2
+    assert metadata["generation_universe"][
+        "actual_generated_candidate_count"] == 8
+    assert ("NPY_CROSSJIT_PROFILED_ITERATION_KERNEL_COUNT 2" in
+            outputs[1].read_text())
+    assert kernel["execution_specialization_hash"] in outputs[0].read_text()
+    seed = next(item for item in profiled
+                if item["profiled_source"] == "validation_seed")
+    assert seed["optimization_signature_hash"] != (
+        kernel["optimization_signature_hash"])
+    assert [operation["operation_id"] for operation in
+            seed["optimization_signature"]["operations"]] == [
+                "numpy.add", "numpy.multiply"]
+
+
+def test_profiled_scalar_and_zero_stride_use_operand_descriptors(tmp_path):
+    root = Path(__file__).parents[2]
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    coverage = (root /
+        "benchmarks/benchmarks/crossjit/results/profiled/pf1_coverage/"
+        "coverage_report.json")
+    outputs = (tmp_path / "profiled.c", tmp_path / "profiled.h",
+               tmp_path / "profiled.json")
+    subprocess.run(_command(
+        root, manifest, outputs,
+        "--profiled-coverage", coverage,
+        "--profiled-layout-class", "SCALAR_OPERAND",
+        "--profiled-zero-stride-validation-seed",
+        "linear_2_add_multiply"), check=True)
+    metadata = json.loads(outputs[2].read_text())
+    scalar = [kernel for kernel in metadata["kernels"]
+              if kernel.get("profiled_layout_class") == "SCALAR_OPERAND"]
+    assert len(scalar) == 14
+    assert sum(kernel["entry_abi"] == "outer_inner_v1"
+               for kernel in scalar) == 7
+    assert all(any(operand["access_kind"] == "SCALAR"
+                   for operand in kernel["iteration_descriptor"]["operands"])
+               for kernel in scalar)
+    zero = [kernel for kernel in metadata["kernels"]
+            if kernel.get("profiled_layout_class") ==
+            "ZERO_STRIDE_BROADCAST"]
+    assert len(zero) == 1
+    descriptor = zero[0]["iteration_descriptor"]
+    assert descriptor["iteration_rank_class"] == "OUTER_INNER"
+    assert descriptor["operands"][0] == {
+        "access_kind": "ZERO_STRIDE",
+        "broadcast_relation": "BROADCAST_INNER",
+        "inner_stride": 0,
+        "logical_input_slot": 0,
+        "outer_stride": "runtime_outer_stride",
+    }
+    source = outputs[0].read_text()
+    assert "input_0[0]" in source
+
+
+def test_decisiondb_selection_and_stale_environment_fail_closed(tmp_path):
+    root = Path(__file__).parents[2]
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    decision_db = (root /
+        "benchmarks/benchmarks/crossjit/results/g12/g12_decision_db.json")
+    environment = (root /
+        "numpy/_core/code_generators/crossjit_decision_environment.json")
+    outputs = (tmp_path / "selected.c", tmp_path / "selected.h",
+               tmp_path / "selected.json")
+    subprocess.run(_command(
+        root, manifest, outputs,
+        "--decision-db", decision_db,
+        "--decision-environment", environment), check=True)
+    selected = json.loads(outputs[2].read_text())
+    assert len(selected["kernels"]) == 6
+    assert len(selected["production_policies"]) == 8
+    assert selected["decision_db_sha256"] == (
+        "292c9e1e24134c6c46eb4783bc01224ddf75e0a0303ce9dc9540dd4ec416b1b4")
+
+    disabled_data = json.loads(decision_db.read_text())
+    disabled_record = disabled_data["records"][0]
+    disabled_record["artifact_decision"] = "DISABLED"
+    disabled_db = tmp_path / "disabled_decision_db.json"
+    disabled_db.write_text(json.dumps(disabled_data))
+    disabled_outputs = (tmp_path / "disabled.c", tmp_path / "disabled.h",
+                        tmp_path / "disabled.json")
+    subprocess.run(_command(
+        root, manifest, disabled_outputs,
+        "--decision-db", disabled_db,
+        "--decision-environment", environment), check=True)
+    disabled = json.loads(disabled_outputs[2].read_text())
+    assert len(disabled["production_policies"]) == 7
+    assert disabled_record["signature_hash"] not in {
+        policy["signature_hash"]
+        for policy in disabled["production_policies"]
+    }
+
+    stale_data = json.loads(environment.read_text())
+    stale_data["compiler_version"] = "stale-compiler"
+    stale_environment = tmp_path / "stale_environment.json"
+    stale_environment.write_text(json.dumps(stale_data))
+    stale_outputs = (tmp_path / "stale.c", tmp_path / "stale.h",
+                     tmp_path / "stale.json")
+    subprocess.run(_command(
+        root, manifest, stale_outputs,
+        "--decision-db", decision_db,
+        "--decision-environment", stale_environment), check=True)
+    stale = json.loads(stale_outputs[2].read_text())
+    assert stale["kernels"] == []
+    assert stale["production_policies"] == []
+
+
+def test_pf9_production_selection_filters_only_the_frozen_artifact_set(
+        tmp_path):
+    root = Path(__file__).parents[2]
+    crossjit = root / "benchmarks/benchmarks/crossjit/results"
+    selection = (root /
+        "numpy/_core/code_generators/crossjit_production_selection.json")
+    selection_data = json.loads(selection.read_text())
+    assert selection_data["runtime_profitability_retuned"] is False
+    assert selection_data["summary"] == {
+        "expected_generated_dynamic_coverage": 0.4148387379417577,
+        "expected_generated_execution_count": 2698694,
+        "frozen_candidate_count": 30,
+        "pf6_generated_artifact_count": 28,
+        "production_rejected_artifact_count": 19,
+        "production_selected_artifact_count": 9,
+        "selected_generated_source_function_bytes": 6241,
+        "selected_object_text_function_bytes": 1670,
+        "total_dynamic_execution_opportunities": 6505405,
+    }
+    serialized = selection.read_text().lower()
+    assert '"benchmark"' not in serialized
+    assert '"workload"' not in serialized
+    assert '"source_path"' not in serialized
+
+    manifest = root / "numpy/_core/code_generators/crossjit_kernel_manifest.json"
+    outputs = (tmp_path / "production.c", tmp_path / "production.h",
+               tmp_path / "production.json")
+    command = _command(
+        root, manifest, outputs,
+        "--decision-db", crossjit / "g14/g14_decision_db.json",
+        "--decision-environment",
+        root / "numpy/_core/code_generators/crossjit_decision_environment.json",
+        "--observations",
+        crossjit / "profiled/pf6_coverage/pf6_observed_signatures.json",
+        "--profiled-coverage",
+        crossjit / "profiled/pf6_coverage/opportunity/coverage_report.json",
+        "--profiled-layout-class", "INNER_CONTIGUOUS",
+        "--profiled-layout-class", "SCALAR_OPERAND",
+        "--profiled-inner-validation-seed", "linear_2_add_multiply",
+        "--profiled-zero-stride-validation-seed", "linear_2_add_multiply",
+        "--execution-decision-db",
+        crossjit / "profiled/pf4_inner_contiguous/execution_decision_db.json",
+        "--execution-decision-db",
+        crossjit / "profiled/pf5_scalar_zero_stride/execution_decision_db.json",
+        "--production-selection", selection,
+    )
+    subprocess.run(command, check=True)
+    first = tuple(path.read_bytes() for path in outputs)
+    subprocess.run(command, check=True)
+    assert first == tuple(path.read_bytes() for path in outputs)
+
+    metadata = json.loads(outputs[2].read_text())
+    assert len(metadata["kernels"]) == 9
+    assert len(metadata["production_policies"]) == 13
+    assert metadata["generation_universe"][
+        "profiled_execution_specialization_count"] == 4
+    assert metadata["production_selection"] == {
+        "candidate_universe_hash": selection_data["candidate_universe_hash"],
+        "manifest_sha256": (
+            "0c47c85fd321e6bed46dcf8551c97f78f2fd6ed8d3b2b7423b8ba3e0998a85c7"),
+        "policy_name": "GEN-PROFILED-PF9",
+        "rejected_artifact_count": 19,
+        "runtime_profitability_retuned": False,
+        "selected_artifact_count": 9,
+    }
+    assert all(kernel.get("profiled_source") != "validation_seed"
+               for kernel in metadata["kernels"])
+    assert all(kernel.get("profiled_layout_class") !=
+               "ZERO_STRIDE_BROADCAST" for kernel in metadata["kernels"])

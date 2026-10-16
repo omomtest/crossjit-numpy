@@ -1,0 +1,2353 @@
+{
+  "boundary_remeasurement": {
+    "cell_count": 9,
+    "independent_processes": 5,
+    "reason": "only cells at or above the 0.15 cross-process CV boundary were ambiguous",
+    "remaining_conservative_cells": [
+      {
+        "element_count": 8192,
+        "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+      }
+    ],
+    "result_file": "g14_boundary_remeasurement.json",
+    "samples_per_process": 7
+  },
+  "candidate_decisions": [
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "generated_ranges": [
+        [
+          16,
+          16
+        ],
+        [
+          17,
+          32
+        ],
+        [
+          33,
+          64
+        ],
+        [
+          65,
+          128
+        ],
+        [
+          129,
+          256
+        ],
+        [
+          257,
+          512
+        ],
+        [
+          513,
+          1024
+        ],
+        [
+          1025,
+          2048
+        ],
+        [
+          2049,
+          4096
+        ],
+        [
+          4097,
+          8192
+        ],
+        [
+          8193,
+          16384
+        ],
+        [
+          16385,
+          32768
+        ],
+        [
+          32769,
+          65536
+        ]
+      ],
+      "generic_ranges": [],
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "generated_ranges": [
+        [
+          16,
+          16
+        ],
+        [
+          17,
+          32
+        ],
+        [
+          33,
+          64
+        ],
+        [
+          65,
+          128
+        ],
+        [
+          129,
+          256
+        ],
+        [
+          257,
+          512
+        ],
+        [
+          513,
+          1024
+        ],
+        [
+          1025,
+          2048
+        ],
+        [
+          2049,
+          4096
+        ],
+        [
+          16384,
+          16384
+        ],
+        [
+          16385,
+          32768
+        ],
+        [
+          32769,
+          65536
+        ]
+      ],
+      "generic_ranges": [],
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "generated_ranges": [
+        [
+          16,
+          16
+        ],
+        [
+          17,
+          32
+        ],
+        [
+          33,
+          64
+        ],
+        [
+          65,
+          128
+        ],
+        [
+          129,
+          256
+        ],
+        [
+          257,
+          512
+        ],
+        [
+          513,
+          1024
+        ],
+        [
+          1025,
+          2048
+        ],
+        [
+          2049,
+          4096
+        ],
+        [
+          4097,
+          8192
+        ],
+        [
+          8193,
+          16384
+        ],
+        [
+          16385,
+          32768
+        ],
+        [
+          32769,
+          65536
+        ]
+      ],
+      "generic_ranges": [],
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "generated_ranges": [
+        [
+          16,
+          16
+        ],
+        [
+          17,
+          32
+        ],
+        [
+          33,
+          64
+        ],
+        [
+          65,
+          128
+        ],
+        [
+          129,
+          256
+        ],
+        [
+          257,
+          512
+        ],
+        [
+          513,
+          1024
+        ],
+        [
+          1025,
+          2048
+        ],
+        [
+          2049,
+          4096
+        ],
+        [
+          4097,
+          8192
+        ],
+        [
+          8193,
+          16384
+        ],
+        [
+          16385,
+          32768
+        ],
+        [
+          32769,
+          65536
+        ]
+      ],
+      "generic_ranges": [],
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "artifact_decision": "AUTO_SELECTED",
+      "generated_ranges": [
+        [
+          16,
+          16
+        ],
+        [
+          17,
+          32
+        ],
+        [
+          33,
+          64
+        ],
+        [
+          65,
+          128
+        ],
+        [
+          129,
+          256
+        ],
+        [
+          257,
+          512
+        ],
+        [
+          513,
+          1024
+        ],
+        [
+          1025,
+          2048
+        ],
+        [
+          2049,
+          4096
+        ],
+        [
+          4097,
+          8192
+        ],
+        [
+          8193,
+          16384
+        ],
+        [
+          16385,
+          32768
+        ],
+        [
+          32769,
+          65536
+        ]
+      ],
+      "generic_ranges": [],
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    }
+  ],
+  "configuration": {
+    "benchmark_identity_used_for_selection": false,
+    "element_grid": [
+      16,
+      32,
+      64,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536
+    ],
+    "formal_npbench_evaluation": false,
+    "independent_processes": 3,
+    "max_cv": 0.15,
+    "samples_per_process": 7,
+    "speedup_threshold": 1.05
+  },
+  "method": "generic_signature_microbenchmark",
+  "reconstruction_rejections": [
+    {
+      "reason": "generic harness could not reconstruct exact Host region",
+      "signature_hash": "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367"
+    },
+    {
+      "reason": "generic harness could not reconstruct exact Host region",
+      "signature_hash": "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb"
+    },
+    {
+      "reason": "generic harness could not reconstruct exact Host region",
+      "signature_hash": "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94"
+    }
+  ],
+  "rows": [
+    {
+      "baseline_cv": 0.0008805233241890575,
+      "baseline_median_ns": 559.9764,
+      "correct": true,
+      "element_count": 16,
+      "generated_cv": 0.005810263400611697,
+      "generated_median_ns": 298.9204,
+      "generated_speedup": 1.873329488385537,
+      "generic_cv": 0.0008669415553952106,
+      "generic_median_ns": 378.1072,
+      "generic_speedup": 1.480999039425856,
+      "process_medians_ns": {
+        "baseline": [
+          559.9088,
+          560.795,
+          559.9764
+        ],
+        "generated": [
+          300.0411,
+          296.6375,
+          298.9204
+        ],
+        "generic": [
+          377.9523,
+          378.1072,
+          378.5816
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.0025649001094804154,
+      "baseline_median_ns": 585.4752,
+      "correct": true,
+      "element_count": 32,
+      "generated_cv": 0.004583958745119167,
+      "generated_median_ns": 305.0905,
+      "generated_speedup": 1.919021405124053,
+      "generic_cv": 0.0049853042824542304,
+      "generic_median_ns": 407.6228,
+      "generic_speedup": 1.436316123631946,
+      "process_medians_ns": {
+        "baseline": [
+          583.553,
+          585.4752,
+          586.5109
+        ],
+        "generated": [
+          305.0905,
+          305.6596,
+          303.0075
+        ],
+        "generic": [
+          409.2803,
+          405.2401,
+          407.6228
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.003997466739951856,
+      "baseline_median_ns": 582.9196,
+      "correct": true,
+      "element_count": 64,
+      "generated_cv": 0.0029662659882609757,
+      "generated_median_ns": 309.0754,
+      "generated_speedup": 1.8860109863159602,
+      "generic_cv": 0.0016540126130408052,
+      "generic_median_ns": 454.2615,
+      "generic_speedup": 1.2832247505016383,
+      "process_medians_ns": {
+        "baseline": [
+          582.4404,
+          582.9196,
+          586.7023
+        ],
+        "generated": [
+          308.1694,
+          309.0754,
+          310.003
+        ],
+        "generic": [
+          454.2615,
+          454.3692,
+          453.0184
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.0014958411571022732,
+      "baseline_median_ns": 609.0024,
+      "correct": true,
+      "element_count": 128,
+      "generated_cv": 0.0013315496663239767,
+      "generated_median_ns": 331.9965,
+      "generated_speedup": 1.834363916487071,
+      "generic_cv": 0.0038196167600163433,
+      "generic_median_ns": 560.032,
+      "generic_speedup": 1.0874421461630763,
+      "process_medians_ns": {
+        "baseline": [
+          610.4218,
+          609.0024,
+          608.7213
+        ],
+        "generated": [
+          331.58,
+          331.9965,
+          332.4637
+        ],
+        "generic": [
+          562.7146,
+          560.032,
+          558.4839
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.002374092267279453,
+      "baseline_median_ns": 648.8319252432156,
+      "correct": true,
+      "element_count": 256,
+      "generated_cv": 0.004409677696299291,
+      "generated_median_ns": 366.57846902201743,
+      "generated_speedup": 1.769967360533238,
+      "generic_cv": 0.009247034022491425,
+      "generic_median_ns": 802.4522529441884,
+      "generic_speedup": 0.8085614101806785,
+      "process_medians_ns": {
+        "baseline": [
+          651.3557347670251,
+          648.8319252432156,
+          648.5583717357911
+        ],
+        "generated": [
+          365.2410394265233,
+          368.46031746031747,
+          366.57846902201743
+        ],
+        "generic": [
+          803.4225550435228,
+          802.4522529441884,
+          790.1730670762929
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.005718303943280711,
+      "baseline_median_ns": 768.2747055811571,
+      "correct": true,
+      "element_count": 512,
+      "generated_cv": 0.0007905745543861037,
+      "generated_median_ns": 388.8492063492063,
+      "generated_speedup": 1.9757651373247436,
+      "generic_cv": 0.006581742403834966,
+      "generic_median_ns": 1208.6912442396313,
+      "generic_speedup": 0.6356252758862887,
+      "process_medians_ns": {
+        "baseline": [
+          773.8661034306195,
+          768.2747055811571,
+          765.1899641577061
+        ],
+        "generated": [
+          389.23655913978496,
+          388.8492063492063,
+          388.62928827444955
+        ],
+        "generic": [
+          1208.6912442396313,
+          1215.405273937532,
+          1199.5663082437277
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.04904297435733933,
+      "baseline_median_ns": 882.9400921658986,
+      "correct": true,
+      "element_count": 1024,
+      "generated_cv": 0.0035593693738955588,
+      "generated_median_ns": 446.90220174091144,
+      "generated_speedup": 1.9756897341888175,
+      "generic_cv": 0.008952476387127185,
+      "generic_median_ns": 1984.4096262160779,
+      "generic_speedup": 0.44493842425543506,
+      "process_medians_ns": {
+        "baseline": [
+          957.742447516641,
+          882.9400921658986,
+          878.7188940092166
+        ],
+        "generated": [
+          449.14541730670766,
+          446.06605222734254,
+          446.90220174091144
+        ],
+        "generic": [
+          1985.258064516129,
+          1984.4096262160779,
+          1954.2237583205326
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.1460900158351494,
+      "baseline_median_ns": 1470.122950819672,
+      "correct": true,
+      "element_count": 2048,
+      "generated_cv": 0.010014603490691379,
+      "generated_median_ns": 625.8524590163935,
+      "generated_speedup": 2.3489928490976237,
+      "generic_cv": 0.012632239508299201,
+      "generic_median_ns": 3622.342213114754,
+      "generic_speedup": 0.4058487200621371,
+      "process_medians_ns": {
+        "baseline": [
+          1871.2909836065573,
+          1462.2438524590164,
+          1470.122950819672
+        ],
+        "generated": [
+          625.8524590163935,
+          632.1700819672132,
+          619.6342213114754
+        ],
+        "generic": [
+          3622.342213114754,
+          3628.0502049180327,
+          3546.6065573770493
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.09892954533192841,
+      "baseline_median_ns": 2032.6454918032787,
+      "correct": true,
+      "element_count": 4096,
+      "generated_cv": 0.024585246796927078,
+      "generated_median_ns": 919.030737704918,
+      "generated_speedup": 2.2117274302265173,
+      "generic_cv": 0.093788684899704,
+      "generic_median_ns": 6650.225409836065,
+      "generic_speedup": 0.30565061581174063,
+      "process_medians_ns": {
+        "baseline": [
+          2411.686475409836,
+          2010.8196721311476,
+          2032.6454918032787,
+          2414.2315573770493,
+          2016.5122950819673
+        ],
+        "generated": [
+          959.547131147541,
+          951.8401639344262,
+          915.9549180327868,
+          919.030737704918,
+          909.1536885245902
+        ],
+        "generic": [
+          7790.477459016393,
+          6650.225409836065,
+          7925.434426229508,
+          6631.415983606557,
+          6640.301229508197
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.11533442134835889,
+      "baseline_median_ns": 3440.9467213114754,
+      "correct": true,
+      "element_count": 8192,
+      "generated_cv": 0.0037137764967163298,
+      "generated_median_ns": 1471.1926229508197,
+      "generated_speedup": 2.3388825281150845,
+      "generic_cv": 0.010115090962640108,
+      "generic_median_ns": 13009.692622950819,
+      "generic_speedup": 0.26449100843790807,
+      "process_medians_ns": {
+        "baseline": [
+          4124.356557377049,
+          3440.9467213114754,
+          3359.6475409836066
+        ],
+        "generated": [
+          1466.3155737704917,
+          1477.2254098360656,
+          1471.1926229508197
+        ],
+        "generic": [
+          13009.692622950819,
+          13045.282786885246,
+          12802.66393442623
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.10762111201313895,
+      "baseline_median_ns": 6710.745901639344,
+      "correct": true,
+      "element_count": 16384,
+      "generated_cv": 0.017842232732418497,
+      "generated_median_ns": 2753.6475409836066,
+      "generated_speedup": 2.4370388009942103,
+      "generic_cv": 0.01379288590861705,
+      "generic_median_ns": 25512.22131147541,
+      "generic_speedup": 0.2630404393137201,
+      "process_medians_ns": {
+        "baseline": [
+          7854.94262295082,
+          6710.745901639344,
+          6433.934426229508
+        ],
+        "generated": [
+          2754.7868852459014,
+          2753.6475409836066,
+          2669.9754098360654
+        ],
+        "generic": [
+          25595.20491803279,
+          25512.22131147541,
+          24952.303278688523
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.13812218386710123,
+      "baseline_median_ns": 12460.04918032787,
+      "correct": true,
+      "element_count": 32768,
+      "generated_cv": 0.01919571940555585,
+      "generated_median_ns": 5478.213114754099,
+      "generated_speedup": 2.274473248725952,
+      "generic_cv": 0.015075677795488624,
+      "generic_median_ns": 50816.44262295082,
+      "generic_speedup": 0.24519719478947535,
+      "process_medians_ns": {
+        "baseline": [
+          15230.72131147541,
+          11805.16393442623,
+          12460.04918032787
+        ],
+        "generated": [
+          5478.213114754099,
+          5451.065573770492,
+          5646.836065573771
+        ],
+        "generic": [
+          50836.2131147541,
+          50816.44262295082,
+          49510.72131147541
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.1096827357875163,
+      "baseline_median_ns": 30099.0,
+      "correct": true,
+      "element_count": 65536,
+      "generated_cv": 0.023627191611796793,
+      "generated_median_ns": 16490.766666666666,
+      "generated_speedup": 1.8252031945149103,
+      "generic_cv": 0.11100693756817476,
+      "generic_median_ns": 102699.93333333333,
+      "generic_speedup": 0.29307711332496805,
+      "process_medians_ns": {
+        "baseline": [
+          35929.433333333334,
+          30099.0,
+          29663.833333333332
+        ],
+        "generated": [
+          16460.4,
+          17158.633333333335,
+          16490.766666666666
+        ],
+        "generic": [
+          102699.93333333333,
+          122424.0,
+          100565.33333333333
+        ]
+      },
+      "signature_hash": "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b"
+    },
+    {
+      "baseline_cv": 0.005153441913137179,
+      "baseline_median_ns": 573.4571,
+      "correct": true,
+      "element_count": 16,
+      "generated_cv": 0.003736246087114793,
+      "generated_median_ns": 299.9678,
+      "generated_speedup": 1.9117288588975214,
+      "generic_cv": 0.004992887876182419,
+      "generic_median_ns": 378.4792,
+      "generic_speedup": 1.515161467261609,
+      "process_medians_ns": {
+        "baseline": [
+          573.4571,
+          578.5289,
+          573.336
+        ],
+        "generated": [
+          300.0028,
+          298.0484,
+          299.9678
+        ],
+        "generic": [
+          378.1759,
+          378.4792,
+          381.5982
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.008311958062703356,
+      "baseline_median_ns": 579.3135,
+      "correct": true,
+      "element_count": 32,
+      "generated_cv": 0.007847352363730646,
+      "generated_median_ns": 298.7452,
+      "generated_speedup": 1.9391558425039128,
+      "generic_cv": 0.007560789598873682,
+      "generic_median_ns": 396.5985,
+      "generic_speedup": 1.4607052220318533,
+      "process_medians_ns": {
+        "baseline": [
+          574.1562,
+          583.7744,
+          579.3135
+        ],
+        "generated": [
+          298.7452,
+          296.5964,
+          301.2818
+        ],
+        "generic": [
+          401.086,
+          396.5985,
+          395.3753
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.012623895255066067,
+      "baseline_median_ns": 582.6153,
+      "correct": true,
+      "element_count": 64,
+      "generated_cv": 0.009448389048813843,
+      "generated_median_ns": 302.585,
+      "generated_speedup": 1.9254599534015238,
+      "generic_cv": 0.004792725718110483,
+      "generic_median_ns": 442.9186,
+      "generic_speedup": 1.3154003918552981,
+      "process_medians_ns": {
+        "baseline": [
+          573.126,
+          587.5611,
+          582.6153
+        ],
+        "generated": [
+          305.8401,
+          300.1361,
+          302.585
+        ],
+        "generic": [
+          442.9186,
+          443.9127,
+          439.847
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.0055179855885524815,
+      "baseline_median_ns": 610.4545,
+      "correct": true,
+      "element_count": 128,
+      "generated_cv": 0.004020764156184765,
+      "generated_median_ns": 318.6192,
+      "generated_speedup": 1.9159375831713847,
+      "generic_cv": 0.0017464820411967916,
+      "generic_median_ns": 546.18,
+      "generic_speedup": 1.117680068841774,
+      "process_medians_ns": {
+        "baseline": [
+          610.4545,
+          615.6097,
+          609.2565
+        ],
+        "generated": [
+          318.6192,
+          316.7415,
+          319.1856
+        ],
+        "generic": [
+          546.18,
+          546.7151,
+          544.8625
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.0032337649622461015,
+      "baseline_median_ns": 665.6199436763953,
+      "correct": true,
+      "element_count": 256,
+      "generated_cv": 0.0012798864718519174,
+      "generated_median_ns": 357.721198156682,
+      "generated_speedup": 1.860722672031456,
+      "generic_cv": 0.005825979127411749,
+      "generic_median_ns": 797.9270353302611,
+      "generic_speedup": 0.8341864784677913,
+      "process_medians_ns": {
+        "baseline": [
+          666.9799027137736,
+          665.6199436763953,
+          662.765616999488
+        ],
+        "generated": [
+          358.1879160266257,
+          357.27227342549924,
+          357.721198156682
+        ],
+        "generic": [
+          797.9270353302611,
+          802.5175371223759,
+          793.2208141321045
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.003215313894813421,
+      "baseline_median_ns": 783.8758320532514,
+      "correct": true,
+      "element_count": 512,
+      "generated_cv": 0.001163415030512629,
+      "generated_median_ns": 393.2058371735791,
+      "generated_speedup": 1.993550852876105,
+      "generic_cv": 0.009278253069629991,
+      "generic_median_ns": 1209.6666666666667,
+      "generic_speedup": 0.6480097812509656,
+      "process_medians_ns": {
+        "baseline": [
+          788.1449052739375,
+          783.8758320532514,
+          783.6748591909882
+        ],
+        "generated": [
+          392.6868919610855,
+          393.59882232462877,
+          393.2058371735791
+        ],
+        "generic": [
+          1209.6666666666667,
+          1222.5391705069123,
+          1200.1551459293394
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.08248257515365834,
+      "baseline_median_ns": 1016.3282130056324,
+      "correct": true,
+      "element_count": 1024,
+      "generated_cv": 0.0021650721394868696,
+      "generated_median_ns": 448.0931899641577,
+      "generated_speedup": 2.2681179624419796,
+      "generic_cv": 0.06311100291159968,
+      "generic_median_ns": 2016.8714797747057,
+      "generic_speedup": 0.5039132256058086,
+      "process_medians_ns": {
+        "baseline": [
+          1160.5084485407067,
+          1016.3282130056324,
+          1002.7670250896057
+        ],
+        "generated": [
+          448.7245263696877,
+          448.0931899641577,
+          446.82078853046596
+        ],
+        "generic": [
+          2016.8714797747057,
+          2212.2083973374297,
+          1965.131592421915
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.05269585943093927,
+      "baseline_median_ns": 1489.1137295081967,
+      "correct": true,
+      "element_count": 2048,
+      "generated_cv": 0.061396398903560315,
+      "generated_median_ns": 630.5870901639345,
+      "generated_speedup": 2.361471956428842,
+      "generic_cv": 0.09264374155668383,
+      "generic_median_ns": 3558.4149590163934,
+      "generic_speedup": 0.4184766944437006,
+      "process_medians_ns": {
+        "baseline": [
+          1660.079918032787,
+          1470.6526639344263,
+          1489.1137295081967,
+          1477.858606557377,
+          1491.2756147540983
+        ],
+        "generated": [
+          720.6485655737705,
+          630.5870901639345,
+          642.1198770491803,
+          628.8493852459017,
+          627.797131147541
+        ],
+        "generic": [
+          4191.313524590164,
+          3526.4631147540986,
+          4182.160860655737,
+          3547.6014344262294,
+          3558.4149590163934
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.059932300085999236,
+      "baseline_median_ns": 2212.0450819672133,
+      "correct": true,
+      "element_count": 4096,
+      "generated_cv": 0.046469152033066494,
+      "generated_median_ns": 913.8258196721312,
+      "generated_speedup": 2.4206419148463834,
+      "generic_cv": 0.0772015030337341,
+      "generic_median_ns": 6655.829918032787,
+      "generic_speedup": 0.3323469964240028,
+      "process_medians_ns": {
+        "baseline": [
+          2516.8504098360654,
+          2192.4795081967213,
+          2205.122950819672,
+          2212.0450819672133,
+          2256.7131147540986
+        ],
+        "generated": [
+          911.1741803278688,
+          915.6659836065573,
+          911.3032786885246,
+          913.8258196721312,
+          1009.780737704918
+        ],
+        "generic": [
+          7834.258196721312,
+          6610.625,
+          6639.368852459016,
+          6655.829918032787,
+          6683.104508196721
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.1578032558025769,
+      "baseline_median_ns": 4154.536885245901,
+      "correct": true,
+      "element_count": 8192,
+      "generated_cv": 0.007987778048381489,
+      "generated_median_ns": 1493.0696721311476,
+      "generated_speedup": 2.782547233255286,
+      "generic_cv": 0.08753419276540275,
+      "generic_median_ns": 12880.66393442623,
+      "generic_speedup": 0.32254058536082486,
+      "process_medians_ns": {
+        "baseline": [
+          5723.180327868852,
+          4134.4057377049185,
+          4164.954918032787,
+          4139.938524590164,
+          4154.536885245901
+        ],
+        "generated": [
+          1490.8319672131147,
+          1497.6844262295083,
+          1512.5819672131147,
+          1493.0696721311476,
+          1479.733606557377
+        ],
+        "generic": [
+          15480.422131147541,
+          12825.327868852459,
+          12816.061475409837,
+          12880.66393442623,
+          12927.081967213115
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.1110898167916463,
+      "baseline_median_ns": 6841.131147540984,
+      "correct": true,
+      "element_count": 16384,
+      "generated_cv": 0.0967416156309969,
+      "generated_median_ns": 2718.0737704918033,
+      "generated_speedup": 2.5169041480074186,
+      "generic_cv": 0.09774048925512774,
+      "generic_median_ns": 25814.016393442624,
+      "generic_speedup": 0.26501614639397203,
+      "process_medians_ns": {
+        "baseline": [
+          8192.77868852459,
+          6753.713114754099,
+          6841.131147540984
+        ],
+        "generated": [
+          3194.9918032786886,
+          2718.0737704918033,
+          2708.901639344262
+        ],
+        "generic": [
+          25814.016393442624,
+          30101.44262295082,
+          25273.696721311477
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.10888572543783909,
+      "baseline_median_ns": 12936.016393442624,
+      "correct": true,
+      "element_count": 32768,
+      "generated_cv": 0.018903243716035883,
+      "generated_median_ns": 5490.0,
+      "generated_speedup": 2.356287139060587,
+      "generic_cv": 0.08347313896192045,
+      "generic_median_ns": 49800.81967213115,
+      "generic_speedup": 0.25975508994848334,
+      "process_medians_ns": {
+        "baseline": [
+          16254.262295081968,
+          13204.295081967213,
+          12807.901639344262,
+          12936.016393442624,
+          12876.606557377048
+        ],
+        "generated": [
+          5432.0327868852455,
+          5500.229508196721,
+          5696.622950819672,
+          5462.213114754099,
+          5490.0
+        ],
+        "generic": [
+          59487.770491803276,
+          50056.737704918036,
+          49800.81967213115,
+          49717.72131147541,
+          49748.27868852459
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.1019706421406763,
+      "baseline_median_ns": 34945.666666666664,
+      "correct": true,
+      "element_count": 65536,
+      "generated_cv": 0.03545560473700995,
+      "generated_median_ns": 14746.3,
+      "generated_speedup": 2.369792196460581,
+      "generic_cv": 0.10524782377379302,
+      "generic_median_ns": 102443.66666666667,
+      "generic_speedup": 0.34112081111244874,
+      "process_medians_ns": {
+        "baseline": [
+          41116.53333333333,
+          34945.666666666664,
+          34332.4
+        ],
+        "generated": [
+          14441.666666666666,
+          14746.3,
+          15469.233333333334
+        ],
+        "generic": [
+          102443.66666666667,
+          120336.33333333333,
+          99422.9
+        ]
+      },
+      "signature_hash": "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4"
+    },
+    {
+      "baseline_cv": 0.003528330034266705,
+      "baseline_median_ns": 575.554,
+      "correct": true,
+      "element_count": 16,
+      "generated_cv": 0.007811866233581637,
+      "generated_median_ns": 297.5452,
+      "generated_speedup": 1.934341404263957,
+      "generic_cv": 0.0026479055788495476,
+      "generic_median_ns": 378.6321,
+      "generic_speedup": 1.5200877051892854,
+      "process_medians_ns": {
+        "baseline": [
+          575.554,
+          577.6736,
+          573.613
+        ],
+        "generated": [
+          297.5452,
+          296.6198,
+          301.0397
+        ],
+        "generic": [
+          378.8563,
+          378.6321,
+          377.0207
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.008921638628985719,
+      "baseline_median_ns": 580.1567,
+      "correct": true,
+      "element_count": 32,
+      "generated_cv": 0.009781529254064347,
+      "generated_median_ns": 300.2687,
+      "generated_speedup": 1.9321251265949464,
+      "generic_cv": 0.0010446955901230617,
+      "generic_median_ns": 398.564,
+      "generic_speedup": 1.455617416525326,
+      "process_medians_ns": {
+        "baseline": [
+          580.1567,
+          584.7616,
+          574.4364
+        ],
+        "generated": [
+          300.2687,
+          295.8352,
+          301.3604
+        ],
+        "generic": [
+          398.1127,
+          398.564,
+          398.9444
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.006735643191508942,
+      "baseline_median_ns": 576.5432,
+      "correct": true,
+      "element_count": 64,
+      "generated_cv": 0.007490308343183527,
+      "generated_median_ns": 302.7145,
+      "generated_speedup": 1.9045774153534105,
+      "generic_cv": 0.005907671529373516,
+      "generic_median_ns": 443.0597,
+      "generic_speedup": 1.3012765548299696,
+      "process_medians_ns": {
+        "baseline": [
+          582.7601,
+          576.5432,
+          575.5859
+        ],
+        "generated": [
+          302.7145,
+          300.7061,
+          305.2339
+        ],
+        "generic": [
+          443.0597,
+          446.9011,
+          441.8871
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.0062447004990348,
+      "baseline_median_ns": 607.7624,
+      "correct": true,
+      "element_count": 128,
+      "generated_cv": 0.002546826141537476,
+      "generated_median_ns": 319.9828,
+      "generated_speedup": 1.8993595905779934,
+      "generic_cv": 0.00478765159233946,
+      "generic_median_ns": 552.2937,
+      "generic_speedup": 1.1004333382763556,
+      "process_medians_ns": {
+        "baseline": [
+          609.9108,
+          607.7624,
+          602.5433
+        ],
+        "generated": [
+          319.9855,
+          318.5747,
+          319.9828
+        ],
+        "generic": [
+          552.2937,
+          554.7097,
+          549.4291
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.011494555270246556,
+      "baseline_median_ns": 650.5738607270865,
+      "correct": true,
+      "element_count": 256,
+      "generated_cv": 0.002387600924768731,
+      "generated_median_ns": 357.63018433179724,
+      "generated_speedup": 1.8191245851986195,
+      "generic_cv": 0.005007906321390287,
+      "generic_median_ns": 797.9599334357399,
+      "generic_speedup": 0.8152963995647503,
+      "process_medians_ns": {
+        "baseline": [
+          662.6031746031746,
+          648.7782898105479,
+          650.5738607270865
+        ],
+        "generated": [
+          357.63018433179724,
+          356.77662570404505,
+          358.484383000512
+        ],
+        "generic": [
+          797.9599334357399,
+          801.8640552995391,
+          793.8731438812084
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.009109799341424146,
+      "baseline_median_ns": 777.3192524321556,
+      "correct": true,
+      "element_count": 512,
+      "generated_cv": 0.000833856274889756,
+      "generated_median_ns": 391.31797235023043,
+      "generated_speedup": 1.9864133705989184,
+      "generic_cv": 0.012310656233612232,
+      "generic_median_ns": 1227.0801331285202,
+      "generic_speedup": 0.6334706523610075,
+      "process_medians_ns": {
+        "baseline": [
+          784.4372759856631,
+          770.2744495647721,
+          777.3192524321556
+        ],
+        "generated": [
+          391.7862263184844,
+          391.15821812596005,
+          391.31797235023043
+        ],
+        "generic": [
+          1227.0801331285202,
+          1242.3120839733742,
+          1212.0980542754737
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.00911143289700368,
+      "baseline_median_ns": 904.1920122887865,
+      "correct": true,
+      "element_count": 1024,
+      "generated_cv": 0.003353600720684374,
+      "generated_median_ns": 448.62826420890934,
+      "generated_speedup": 2.0154593110249026,
+      "generic_cv": 0.052835950251612376,
+      "generic_median_ns": 2023.111111111111,
+      "generic_speedup": 0.44693146477367524,
+      "process_medians_ns": {
+        "baseline": [
+          904.1920122887865,
+          903.3481822836661,
+          918.089605734767
+        ],
+        "generated": [
+          449.4162826420891,
+          448.62826420890934,
+          446.5099846390169
+        ],
+        "generic": [
+          2023.111111111111,
+          2192.5622119815666,
+          1988.3328213005632
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.11571822617061836,
+      "baseline_median_ns": 1432.9108606557377,
+      "correct": true,
+      "element_count": 2048,
+      "generated_cv": 0.00878207385768497,
+      "generated_median_ns": 623.0543032786885,
+      "generated_speedup": 2.29981697119393,
+      "generic_cv": 0.014989369765852564,
+      "generic_median_ns": 3674.027663934426,
+      "generic_speedup": 0.3900109067554675,
+      "process_medians_ns": {
+        "baseline": [
+          1731.6823770491803,
+          1418.5584016393443,
+          1432.9108606557377
+        ],
+        "generated": [
+          623.0543032786885,
+          632.1465163934427,
+          622.251024590164
+        ],
+        "generic": [
+          3674.027663934426,
+          3723.2940573770493,
+          3613.4579918032787
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.11817909252549315,
+      "baseline_median_ns": 2484.9795081967213,
+      "correct": true,
+      "element_count": 4096,
+      "generated_cv": 0.010395085789012253,
+      "generated_median_ns": 916.75,
+      "generated_speedup": 2.7106403143678444,
+      "generic_cv": 0.08162603932179506,
+      "generic_median_ns": 6774.206967213115,
+      "generic_speedup": 0.36682958170955227,
+      "process_medians_ns": {
+        "baseline": [
+          3107.6987704918033,
+          2383.127049180328,
+          2484.9795081967213,
+          2390.3913934426228,
+          2492.6700819672133
+        ],
+        "generated": [
+          915.0553278688525,
+          925.9672131147541,
+          916.75,
+          915.9467213114754,
+          937.483606557377
+        ],
+        "generic": [
+          8069.161885245901,
+          6768.065573770492,
+          6762.397540983607,
+          6774.206967213115,
+          6837.672131147541
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.0400557015803243,
+      "baseline_median_ns": 3839.0368852459014,
+      "correct": true,
+      "element_count": 8192,
+      "generated_cv": 0.04704589946585864,
+      "generated_median_ns": 1486.0245901639344,
+      "generated_speedup": 2.5834275628119916,
+      "generic_cv": 0.07206173187220105,
+      "generic_median_ns": 13066.139344262296,
+      "generic_speedup": 0.29381570057506917,
+      "process_medians_ns": {
+        "baseline": [
+          4180.9672131147545,
+          3839.0368852459014,
+          3987.217213114754,
+          3810.7622950819673,
+          3828.3237704918033
+        ],
+        "generated": [
+          1643.3688524590164,
+          1486.2540983606557,
+          1484.282786885246,
+          1486.0245901639344,
+          1479.5040983606557
+        ],
+        "generic": [
+          15200.213114754099,
+          13006.032786885246,
+          12954.655737704918,
+          13109.745901639344,
+          13066.139344262296
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.009109240197621866,
+      "baseline_median_ns": 7041.983606557377,
+      "correct": true,
+      "element_count": 16384,
+      "generated_cv": 0.005496052900397213,
+      "generated_median_ns": 2704.9836065573772,
+      "generated_speedup": 2.6033368888026955,
+      "generic_cv": 0.07048269927717152,
+      "generic_median_ns": 25546.237704918032,
+      "generic_speedup": 0.27565638775848744,
+      "process_medians_ns": {
+        "baseline": [
+          7003.286885245901,
+          7041.983606557377,
+          7054.262295081967,
+          7153.336065573771,
+          6990.360655737705
+        ],
+        "generated": [
+          2706.7131147540986,
+          2707.4918032786886,
+          2704.9836065573772,
+          2704.4508196721313,
+          2672.8524590163934
+        ],
+        "generic": [
+          29724.213114754097,
+          25480.44262295082,
+          25531.237704918032,
+          25546.237704918032,
+          25715.0
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.006596767709650546,
+      "baseline_median_ns": 13621.819672131147,
+      "correct": true,
+      "element_count": 32768,
+      "generated_cv": 0.009027264826482721,
+      "generated_median_ns": 5331.098360655737,
+      "generated_speedup": 2.55516194798845,
+      "generic_cv": 0.08610307137479711,
+      "generic_median_ns": 50460.39344262295,
+      "generic_speedup": 0.26995072259236585,
+      "process_medians_ns": {
+        "baseline": [
+          13579.557377049181,
+          13612.573770491803,
+          13807.868852459016,
+          13631.081967213115,
+          13621.819672131147
+        ],
+        "generated": [
+          5315.0327868852455,
+          5331.098360655737,
+          5370.2786885245905,
+          5334.049180327869,
+          5240.229508196721
+        ],
+        "generic": [
+          60424.229508196724,
+          50126.16393442623,
+          50297.59016393442,
+          50460.39344262295,
+          50508.55737704918
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.005664073731545213,
+      "baseline_median_ns": 34970.7,
+      "correct": true,
+      "element_count": 65536,
+      "generated_cv": 0.03510291204808234,
+      "generated_median_ns": 13611.133333333333,
+      "generated_speedup": 2.569271723638002,
+      "generic_cv": 0.010154421497063559,
+      "generic_median_ns": 101167.23333333334,
+      "generic_speedup": 0.3456721988707147,
+      "process_medians_ns": {
+        "baseline": [
+          34957.53333333333,
+          35308.066666666666,
+          34970.7
+        ],
+        "generated": [
+          13166.966666666667,
+          13611.133333333333,
+          14123.333333333334
+        ],
+        "generic": [
+          101167.23333333334,
+          101303.13333333333,
+          99468.93333333333
+        ]
+      },
+      "signature_hash": "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278"
+    },
+    {
+      "baseline_cv": 0.007046206015180233,
+      "baseline_median_ns": 577.7461,
+      "correct": true,
+      "element_count": 16,
+      "generated_cv": 0.003385431745316775,
+      "generated_median_ns": 305.3248,
+      "generated_speedup": 1.8922344336260926,
+      "generic_cv": 0.0062209531740062066,
+      "generic_median_ns": 369.7342,
+      "generic_speedup": 1.5625984829101554,
+      "process_medians_ns": {
+        "baseline": [
+          577.7461,
+          583.5404,
+          575.6683
+        ],
+        "generated": [
+          304.7142,
+          305.3248,
+          306.7316
+        ],
+        "generic": [
+          369.7342,
+          366.7523,
+          371.27
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.0031101184869778233,
+      "baseline_median_ns": 574.4072,
+      "correct": true,
+      "element_count": 32,
+      "generated_cv": 0.004576849670454314,
+      "generated_median_ns": 300.599,
+      "generated_speedup": 1.9108752856795932,
+      "generic_cv": 0.002869037472913475,
+      "generic_median_ns": 360.7389,
+      "generic_speedup": 1.592307344730496,
+      "process_medians_ns": {
+        "baseline": [
+          575.9799,
+          572.416,
+          574.4072
+        ],
+        "generated": [
+          300.599,
+          298.5666,
+          301.1835
+        ],
+        "generic": [
+          360.7221,
+          360.7389,
+          362.526
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.00025334224242671666,
+      "baseline_median_ns": 581.2063,
+      "correct": true,
+      "element_count": 64,
+      "generated_cv": 0.009790728194581695,
+      "generated_median_ns": 304.929,
+      "generated_speedup": 1.9060381269082314,
+      "generic_cv": 0.04026631585374137,
+      "generic_median_ns": 368.6808,
+      "generic_speedup": 1.5764485158977632,
+      "process_medians_ns": {
+        "baseline": [
+          581.2063,
+          581.4277,
+          581.1488
+        ],
+        "generated": [
+          305.7208,
+          300.2219,
+          304.929
+        ],
+        "generic": [
+          367.9636,
+          394.6141,
+          368.6808
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.0016388610388210515,
+      "baseline_median_ns": 605.8711,
+      "correct": true,
+      "element_count": 128,
+      "generated_cv": 0.0015552672891192998,
+      "generated_median_ns": 327.8255,
+      "generated_speedup": 1.848151226795963,
+      "generic_cv": 0.004347967420065455,
+      "generic_median_ns": 398.1369,
+      "generic_speedup": 1.5217657544427556,
+      "process_medians_ns": {
+        "baseline": [
+          607.4944,
+          605.6897,
+          605.8711
+        ],
+        "generated": [
+          327.8255,
+          327.1971,
+          328.2065
+        ],
+        "generic": [
+          398.1369,
+          396.001,
+          399.426
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.00812920721127875,
+      "baseline_median_ns": 651.6062467997951,
+      "correct": true,
+      "element_count": 256,
+      "generated_cv": 0.003576078294402193,
+      "generated_median_ns": 363.3584229390681,
+      "generated_speedup": 1.7932878548106854,
+      "generic_cv": 0.005367517381329956,
+      "generic_median_ns": 454.61559139784947,
+      "generic_speedup": 1.4333125812870604,
+      "process_medians_ns": {
+        "baseline": [
+          659.623783922171,
+          651.6062467997951,
+          649.5750128008193
+        ],
+        "generated": [
+          364.9139784946237,
+          363.3584229390681,
+          362.33192524321555
+        ],
+        "generic": [
+          454.17588325652844,
+          454.61559139784947,
+          458.61610343061955
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.0035148988395731513,
+      "baseline_median_ns": 778.2066052227343,
+      "correct": true,
+      "element_count": 512,
+      "generated_cv": 0.0012877873239230248,
+      "generated_median_ns": 389.60931899641577,
+      "generated_speedup": 1.9974024420855638,
+      "generic_cv": 0.027922821850883316,
+      "generic_median_ns": 502.7099334357399,
+      "generic_speedup": 1.5480231311606067,
+      "process_medians_ns": {
+        "baseline": [
+          781.2181259600615,
+          775.7557603686636,
+          778.2066052227343
+        ],
+        "generated": [
+          388.81080389144904,
+          389.73553507424475,
+          389.60931899641577
+        ],
+        "generic": [
+          500.7288786482335,
+          526.321300563236,
+          502.7099334357399
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.0012266497237547296,
+      "baseline_median_ns": 860.2073732718894,
+      "correct": true,
+      "element_count": 1024,
+      "generated_cv": 0.01097246836385271,
+      "generated_median_ns": 449.868407578085,
+      "generated_speedup": 1.9121311005209467,
+      "generic_cv": 0.0017788863685292962,
+      "generic_median_ns": 618.8868407578085,
+      "generic_speedup": 1.3899267468970435,
+      "process_medians_ns": {
+        "baseline": [
+          860.2073732718894,
+          860.2375832053251,
+          858.3963133640553
+        ],
+        "generated": [
+          456.08550947260625,
+          449.868407578085,
+          446.31387608806966
+        ],
+        "generic": [
+          618.1510496671787,
+          620.3169482846902,
+          618.8868407578085
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.001966372785252383,
+      "baseline_median_ns": 1469.0399590163934,
+      "correct": true,
+      "element_count": 2048,
+      "generated_cv": 0.009136845958585788,
+      "generated_median_ns": 631.1485655737705,
+      "generated_speedup": 2.327566026678528,
+      "generic_cv": 0.002469207999902292,
+      "generic_median_ns": 1035.6946721311476,
+      "generic_speedup": 1.4184102694991678,
+      "process_medians_ns": {
+        "baseline": [
+          1469.0399590163934,
+          1464.2694672131147,
+          1469.468237704918
+        ],
+        "generated": [
+          626.140368852459,
+          637.6506147540983,
+          631.1485655737705
+        ],
+        "generic": [
+          1035.6946721311476,
+          1032.998975409836,
+          1038.110655737705
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.03822738356742651,
+      "baseline_median_ns": 2390.284836065574,
+      "correct": true,
+      "element_count": 4096,
+      "generated_cv": 0.002911432539479359,
+      "generated_median_ns": 929.094262295082,
+      "generated_speedup": 2.5727043348228267,
+      "generic_cv": 0.004231616350212663,
+      "generic_median_ns": 1632.25,
+      "generic_speedup": 1.464410988552963,
+      "process_medians_ns": {
+        "baseline": [
+          2390.284836065574,
+          2548.122950819672,
+          2383.02868852459
+        ],
+        "generated": [
+          924.985655737705,
+          929.094262295082,
+          930.0799180327868
+        ],
+        "generic": [
+          1626.1680327868853,
+          1632.25,
+          1639.954918032787
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.005513117040379465,
+      "baseline_median_ns": 2877.80737704918,
+      "correct": true,
+      "element_count": 8192,
+      "generated_cv": 0.01400674707744545,
+      "generated_median_ns": 1488.8811475409836,
+      "generated_speedup": 1.9328657507700522,
+      "generic_cv": 0.003764998128269056,
+      "generic_median_ns": 2797.938524590164,
+      "generic_speedup": 1.0285456066161123,
+      "process_medians_ns": {
+        "baseline": [
+          2877.80737704918,
+          2883.032786885246,
+          2853.377049180328
+        ],
+        "generated": [
+          1481.7131147540983,
+          1488.8811475409836,
+          1521.0860655737704
+        ],
+        "generic": [
+          2789.2049180327867,
+          2797.938524590164,
+          2810.184426229508
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.008831157391849339,
+      "baseline_median_ns": 7432.270491803279,
+      "correct": true,
+      "element_count": 16384,
+      "generated_cv": 0.010907216910286954,
+      "generated_median_ns": 2648.6475409836066,
+      "generated_speedup": 2.806062481625327,
+      "generic_cv": 0.00461760532928111,
+      "generic_median_ns": 5202.754098360656,
+      "generic_speedup": 1.428526190416173,
+      "process_medians_ns": {
+        "baseline": [
+          7432.270491803279,
+          7415.8442622950815,
+          7537.303278688524
+        ],
+        "generated": [
+          2637.122950819672,
+          2648.6475409836066,
+          2692.122950819672
+        ],
+        "generic": [
+          5179.0,
+          5202.754098360656,
+          5227.049180327869
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.004873287255096258,
+      "baseline_median_ns": 14330.0,
+      "correct": true,
+      "element_count": 32768,
+      "generated_cv": 0.007851566553542643,
+      "generated_median_ns": 5906.6557377049185,
+      "generated_speedup": 2.426076723673766,
+      "generic_cv": 0.0068844190027187325,
+      "generic_median_ns": 11146.672131147541,
+      "generic_speedup": 1.2855854941635156,
+      "process_medians_ns": {
+        "baseline": [
+          14330.0,
+          14361.360655737704,
+          14228.016393442624
+        ],
+        "generated": [
+          5906.6557377049185,
+          5902.6557377049185,
+          5985.245901639344
+        ],
+        "generic": [
+          11023.868852459016,
+          11146.672131147541,
+          11164.295081967213
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.04062745491026963,
+      "baseline_median_ns": 33645.26666666667,
+      "correct": true,
+      "element_count": 65536,
+      "generated_cv": 0.043945302207581804,
+      "generated_median_ns": 13309.566666666668,
+      "generated_speedup": 2.5279009835030943,
+      "generic_cv": 0.0042278189471697146,
+      "generic_median_ns": 20869.7,
+      "generic_speedup": 1.61215861592005,
+      "process_medians_ns": {
+        "baseline": [
+          36043.066666666666,
+          33645.26666666667,
+          33596.26666666667
+        ],
+        "generated": [
+          14303.7,
+          13309.566666666668,
+          13229.9
+        ],
+        "generic": [
+          20928.6,
+          20869.7,
+          20755.233333333334
+        ]
+      },
+      "signature_hash": "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448"
+    },
+    {
+      "baseline_cv": 0.0034084216702775414,
+      "baseline_median_ns": 556.8573,
+      "correct": true,
+      "element_count": 16,
+      "generated_cv": 0.002196367199412931,
+      "generated_median_ns": 298.058,
+      "generated_speedup": 1.8682850317723396,
+      "generic_cv": 0.002091982532099844,
+      "generic_median_ns": 376.6285,
+      "generic_speedup": 1.47853202824534,
+      "process_medians_ns": {
+        "baseline": [
+          556.8573,
+          555.517,
+          559.2651
+        ],
+        "generated": [
+          298.058,
+          298.9281,
+          297.645
+        ],
+        "generic": [
+          376.6285,
+          377.9119,
+          376.476
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.0016101176292078402,
+      "baseline_median_ns": 563.7304,
+      "correct": true,
+      "element_count": 32,
+      "generated_cv": 0.005983740779829198,
+      "generated_median_ns": 299.2444,
+      "generated_speedup": 1.883846113745153,
+      "generic_cv": 0.002260107434141037,
+      "generic_median_ns": 396.3012,
+      "generic_speedup": 1.4224796695039026,
+      "process_medians_ns": {
+        "baseline": [
+          563.1187,
+          563.7304,
+          564.9053
+        ],
+        "generated": [
+          299.6261,
+          296.3602,
+          299.2444
+        ],
+        "generic": [
+          396.3012,
+          396.8977,
+          395.1374
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.0007861154817077828,
+      "baseline_median_ns": 563.5574,
+      "correct": true,
+      "element_count": 64,
+      "generated_cv": 0.005864063397388798,
+      "generated_median_ns": 301.6817,
+      "generated_speedup": 1.8680529843208922,
+      "generic_cv": 0.0041141087925404335,
+      "generic_median_ns": 441.5332,
+      "generic_speedup": 1.2763647218374519,
+      "process_medians_ns": {
+        "baseline": [
+          563.2353,
+          563.5574,
+          564.1113
+        ],
+        "generated": [
+          303.2311,
+          299.7033,
+          301.6817
+        ],
+        "generic": [
+          443.5202,
+          441.5332,
+          439.8917
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.006435134833489383,
+      "baseline_median_ns": 591.106,
+      "correct": true,
+      "element_count": 128,
+      "generated_cv": 0.0032412240426521084,
+      "generated_median_ns": 319.5195,
+      "generated_speedup": 1.8499841167753455,
+      "generic_cv": 0.0027250751198494797,
+      "generic_median_ns": 545.9956,
+      "generic_speedup": 1.0826204460255724,
+      "process_medians_ns": {
+        "baseline": [
+          595.4912,
+          587.9094,
+          591.106
+        ],
+        "generated": [
+          319.6606,
+          317.8034,
+          319.5195
+        ],
+        "generic": [
+          547.5322,
+          545.9956,
+          544.5568
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.006845383503160111,
+      "baseline_median_ns": 641.7837941628264,
+      "correct": true,
+      "element_count": 256,
+      "generated_cv": 0.0014140555920185921,
+      "generated_median_ns": 360.8358934971838,
+      "generated_speedup": 1.7786029763910816,
+      "generic_cv": 0.0051533467891940275,
+      "generic_median_ns": 795.1290322580645,
+      "generic_speedup": 0.807144209462762,
+      "process_medians_ns": {
+        "baseline": [
+          648.9087301587301,
+          640.8516385048644,
+          641.7837941628264
+        ],
+        "generated": [
+          360.8358934971838,
+          361.15220174091144,
+          360.1541218637993
+        ],
+        "generic": [
+          795.1290322580645,
+          795.3530465949821,
+          788.1665386584741
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.012791506927733641,
+      "baseline_median_ns": 775.8300051203277,
+      "correct": true,
+      "element_count": 512,
+      "generated_cv": 0.002551513756717516,
+      "generated_median_ns": 396.1246799795187,
+      "generated_speedup": 1.958550033187635,
+      "generic_cv": 0.00848178248931795,
+      "generic_median_ns": 1215.005120327701,
+      "generic_speedup": 0.6385405231140732,
+      "process_medians_ns": {
+        "baseline": [
+          792.6756272401434,
+          774.941884280594,
+          775.8300051203277
+        ],
+        "generated": [
+          397.51536098310294,
+          396.1246799795187,
+          395.5478750640041
+        ],
+        "generic": [
+          1221.3069636456732,
+          1215.005120327701,
+          1201.199948796723
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.011475380047918255,
+      "baseline_median_ns": 958.7572964669739,
+      "correct": true,
+      "element_count": 1024,
+      "generated_cv": 0.0016586621514688505,
+      "generated_median_ns": 448.06656426011267,
+      "generated_speedup": 2.139765322704137,
+      "generic_cv": 0.005307590221453573,
+      "generic_median_ns": 1997.678443420379,
+      "generic_speedup": 0.4799357472293748,
+      "process_medians_ns": {
+        "baseline": [
+          958.7572964669739,
+          954.5468509984639,
+          975.4403481822836
+        ],
+        "generated": [
+          447.2273425499232,
+          448.06656426011267,
+          448.70916538658474
+        ],
+        "generic": [
+          1997.678443420379,
+          1998.9610855094727,
+          1980.0389144905273
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.01459421633122852,
+      "baseline_median_ns": 1329.609631147541,
+      "correct": true,
+      "element_count": 2048,
+      "generated_cv": 0.00908573378701799,
+      "generated_median_ns": 622.4129098360655,
+      "generated_speedup": 2.136217951356023,
+      "generic_cv": 0.013093476979456795,
+      "generic_median_ns": 3608.4784836065573,
+      "generic_speedup": 0.3684682165039929,
+      "process_medians_ns": {
+        "baseline": [
+          1362.9272540983607,
+          1328.5092213114754,
+          1329.609631147541
+        ],
+        "generated": [
+          622.4129098360655,
+          632.1639344262295,
+          622.2274590163935
+        ],
+        "generic": [
+          3622.120901639344,
+          3608.4784836065573,
+          3534.780737704918
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.004712024841666783,
+      "baseline_median_ns": 2277.1004098360654,
+      "correct": true,
+      "element_count": 4096,
+      "generated_cv": 0.0051825375975121995,
+      "generated_median_ns": 928.1782786885246,
+      "generated_speedup": 2.453300688153906,
+      "generic_cv": 0.009361748580238081,
+      "generic_median_ns": 6763.690573770492,
+      "generic_speedup": 0.33666537299423965,
+      "process_medians_ns": {
+        "baseline": [
+          2277.995901639344,
+          2277.1004098360654,
+          2259.026639344262
+        ],
+        "generated": [
+          928.1782786885246,
+          930.4487704918033,
+          921.2315573770492
+        ],
+        "generic": [
+          6782.0327868852455,
+          6763.690573770492,
+          6664.7848360655735
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.004133717522666829,
+      "baseline_median_ns": 3495.8278688524592,
+      "correct": true,
+      "element_count": 8192,
+      "generated_cv": 0.0019909502737165876,
+      "generated_median_ns": 1472.672131147541,
+      "generated_speedup": 2.373799160664789,
+      "generic_cv": 0.013516554940926937,
+      "generic_median_ns": 13105.290983606557,
+      "generic_speedup": 0.2667493513288182,
+      "process_medians_ns": {
+        "baseline": [
+          3505.2663934426228,
+          3476.9139344262294,
+          3495.8278688524592
+        ],
+        "generated": [
+          1469.9262295081967,
+          1475.7868852459017,
+          1472.672131147541
+        ],
+        "generic": [
+          13105.290983606557,
+          13159.045081967213,
+          12830.651639344262
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.0077748900035937265,
+      "baseline_median_ns": 6095.94262295082,
+      "correct": true,
+      "element_count": 16384,
+      "generated_cv": 0.007977898233349417,
+      "generated_median_ns": 2632.590163934426,
+      "generated_speedup": 2.3155684110892474,
+      "generic_cv": 0.010424281614276732,
+      "generic_median_ns": 25484.139344262294,
+      "generic_speedup": 0.2392053559510657,
+      "process_medians_ns": {
+        "baseline": [
+          6020.877049180328,
+          6095.94262295082,
+          6108.073770491803
+        ],
+        "generated": [
+          2669.090163934426,
+          2632.590163934426,
+          2632.5
+        ],
+        "generic": [
+          25490.377049180326,
+          25484.139344262294,
+          25029.860655737706
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.020070219324764972,
+      "baseline_median_ns": 12320.0,
+      "correct": true,
+      "element_count": 32768,
+      "generated_cv": 0.0016971979922870623,
+      "generated_median_ns": 5938.0,
+      "generated_speedup": 2.0747726507241495,
+      "generic_cv": 0.016157406803120118,
+      "generic_median_ns": 51340.04918032787,
+      "generic_speedup": 0.23996860534213693,
+      "process_medians_ns": {
+        "baseline": [
+          12320.0,
+          12117.622950819672,
+          12610.704918032787
+        ],
+        "generated": [
+          5951.88524590164,
+          5932.2786885245905,
+          5938.0
+        ],
+        "generic": [
+          51340.04918032787,
+          51401.11475409836,
+          49947.2131147541
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    },
+    {
+      "baseline_cv": 0.030888870912594523,
+      "baseline_median_ns": 33002.833333333336,
+      "correct": true,
+      "element_count": 65536,
+      "generated_cv": 0.01824322517952228,
+      "generated_median_ns": 13741.4,
+      "generated_speedup": 2.401708219929071,
+      "generic_cv": 0.014031206642197654,
+      "generic_median_ns": 99747.06666666667,
+      "generic_speedup": 0.3308652017168759,
+      "process_medians_ns": {
+        "baseline": [
+          33002.833333333336,
+          34782.066666666666,
+          32968.2
+        ],
+        "generated": [
+          13859.033333333333,
+          13741.4,
+          13380.766666666666
+        ],
+        "generic": [
+          99747.06666666667,
+          100024.6,
+          97489.76666666666
+        ]
+      },
+      "signature_hash": "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb"
+    }
+  ],
+  "schema_version": 1
+}

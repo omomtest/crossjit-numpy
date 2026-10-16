@@ -17,4 +17,8 @@ NPY_NO_EXPORT PyObject *
 array_function_method_impl(PyObject *func, PyObject *types, PyObject *args,
                            PyObject *kwargs);
 
+/* Borrowed internal fields, with exact dispatcher type validation. */
+NPY_NO_EXPORT int
+numpy_crossjit_dispatcher_parts(PyObject *, PyObject **, PyObject **);
+
 #endif  /* NUMPY_CORE_SRC_MULTIARRAY_ARRAYFUNCTION_OVERRIDE_H_ */

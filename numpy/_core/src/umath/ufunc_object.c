@@ -2538,7 +2538,7 @@ try_reduce_contiguous(
         PyArrayObject *out, PyArrayObject *wheremask, PyObject *initial,
         int ndim, int naxes, int keepdims,
         int errormask,
-        PyArrayObject **out_result)
+        PyArrayObject **out_result, int hold_gil)
 {
     NPY_BEGIN_THREADS_DEF;
     *out_result = NULL;
@@ -2614,7 +2614,7 @@ try_reduce_contiguous(
     if (needs_fperr) {
         npy_clear_floatstatus_barrier((char *)context);
     }
-    if (!(flags & NPY_METH_REQUIRES_PYAPI)) {
+    if (!hold_gil && !(flags & NPY_METH_REQUIRES_PYAPI)) {
         NPY_BEGIN_THREADS_THRESHOLDED(count);
     }
     char *data[3] = {accum, src, accum};
@@ -2624,7 +2624,7 @@ try_reduce_contiguous(
     if (res == 0 && PyErr_Occurred()) {
         res = -1;
     }
-    if (res == 0 && needs_fperr) {
+    if (res == 0 && needs_fperr && !hold_gil) {
         res = _check_ufunc_fperr(errormask, "reduce");
     }
     if (res < 0) {
@@ -2640,7 +2640,7 @@ static PyArrayObject *
 PyUFunc_Reduce(PyUFuncObject *ufunc,
         PyArrayObject *arr, PyArrayObject *out,
         int naxes, int *axes, PyArray_DTypeMeta *signature[3], int keepdims,
-        PyObject *initial, PyArrayObject *wheremask)
+        PyObject *initial, PyArrayObject *wheremask, int hold_gil)
 {
     int iaxes, ndim;
     npy_bool axis_flags[NPY_MAXDIMS];
@@ -2685,12 +2685,12 @@ PyUFunc_Reduce(PyUFuncObject *ufunc,
 
     int fast_status = try_reduce_contiguous(
             &context, arr, descrs, out, wheremask, initial,
-            ndim, naxes, keepdims, errormask, &result);
+            ndim, naxes, keepdims, errormask, &result, hold_gil);
     if (fast_status == 0) {
         /* Fast path did not apply; run the full reduction. */
         result = PyUFunc_ReduceWrapper(&context,
                 arr, out, wheremask, axis_flags, keepdims,
-                initial, reduce_loop, buffersize, ufunc_name, errormask);
+                initial, reduce_loop, buffersize, ufunc_name, errormask, hold_gil);
     }
     /* Fall through to shared cleanup of `descrs`. */
     for (int i = 0; i < 3; i++) {
@@ -2699,6 +2699,22 @@ PyUFunc_Reduce(PyUFuncObject *ufunc,
     return result;
 }
 
+
+NPY_NO_EXPORT PyArrayObject *
+numpy_crossjit_reduce_no_callbacks(PyUFuncObject *ufunc, PyArrayObject *arr,
+    PyArrayObject *out, int naxes, int *axes, int keepdims)
+{
+    /* Provider guards builtin real floating dtype, exact arrays and nonempty
+     * reduction axes. Preserve NumPy's existing iterator and pairwise order. */
+    if (!PyArray_CheckExact(arr) || !PyArray_CheckExact(out) ||
+        (PyArray_TYPE(arr)!=NPY_FLOAT && PyArray_TYPE(arr)!=NPY_DOUBLE) ||
+        PyArray_TYPE(arr)!=PyArray_TYPE(out)) {
+        PyErr_SetString(PyExc_TypeError,"unsupported CrossJIT reduction domain");
+        return NULL;
+    }
+    PyArray_DTypeMeta *signature[3]={NULL,NULL,NULL};
+    return PyUFunc_Reduce(ufunc,arr,out,naxes,axes,signature,keepdims,NULL,NULL,1);
+}
 
 static PyObject *
 PyUFunc_Accumulate(PyUFuncObject *ufunc, PyArrayObject *arr, PyArrayObject *out,
@@ -3829,7 +3845,7 @@ PyUFunc_GenericReduction(PyUFuncObject *ufunc,
     switch(operation) {
     case UFUNC_REDUCE:
         ret = PyUFunc_Reduce(ufunc,
-                mp, out, naxes, axes, signature, keepdims, initial, wheremask);
+                mp, out, naxes, axes, signature, keepdims, initial, wheremask, 0);
         Py_XSETREF(wheremask, NULL);
         break;
     case UFUNC_ACCUMULATE:

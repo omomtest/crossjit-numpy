@@ -1,0 +1,51 @@
+{
+  "case_identifier": "linear_4",
+  "decision": "retain ORIGINAL conservatively",
+  "element_count": 65536,
+  "formal_npbench_evaluation": false,
+  "independent_processes": 5,
+  "max_cv": 0.15,
+  "purpose": "G13 confidence audit of the sole high-variance G12 boundary cell",
+  "row": {
+    "baseline_cv": 0.0036493479051080335,
+    "baseline_median_ns": 88332.6,
+    "candidate": true,
+    "case_identifier": "linear_4",
+    "correct": true,
+    "element_count": 65536,
+    "generated_cv": 0.018185781894219363,
+    "generated_median_ns": 39726.566666666666,
+    "generated_speedup": 2.2235145750492746,
+    "generic_cv": 0.0713223427442129,
+    "generic_median_ns": 155909.3,
+    "generic_speedup": 0.5665640215176388,
+    "process_medians_ns": {
+      "baseline": [
+        88418.9,
+        87629.2,
+        88332.6,
+        88131.86666666667,
+        88348.5
+      ],
+      "generated": [
+        40721.333333333336,
+        39301.5,
+        39726.566666666666,
+        40716.066666666666,
+        39272.63333333333
+      ],
+      "generic": [
+        152882.66666666666,
+        176637.93333333332,
+        172597.2,
+        152612.1,
+        155909.3
+      ]
+    }
+  },
+  "samples_per_process": 7,
+  "schema_version": 1,
+  "source_generator_commit": "0af6b1be0bc2fbab499eb97e60b650182ae843b7",
+  "source_numpy_commit": "ddecef61131d74d08c67601150433f9f66ab1a66",
+  "speedup_threshold": 1.05
+}

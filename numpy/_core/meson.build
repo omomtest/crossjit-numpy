@@ -725,6 +725,112 @@ src_ufunc_api = custom_target('__ufunc_api',
   install_tag: 'devel'
 )
 
+# Generate CrossJIT Provider kernels at build time.  The Generator is a
+# sibling build tool; generated code is compiled into NumPy and is not needed
+# at runtime.
+crossjit_generator_root = meson.project_source_root() / '..' / 'crossjit-generator'
+if not fs.exists(crossjit_generator_root / 'pyproject.toml')
+  error('CrossJIT Generator sibling repository not found: ' + crossjit_generator_root)
+endif
+crossjit_affine_args = []
+crossjit_affine_inputs = []
+crossjit_execution_args = [
+  '--execution-decision-db', '@INPUT8@',
+  '--execution-decision-db', '@INPUT9@',
+]
+if get_option('crossjit-execution-policy') != ''
+  if get_option('crossjit-affine-policy') != ''
+    error('A consolidated execution policy cannot be combined with an affine policy')
+  endif
+  crossjit_affine_inputs += files(get_option('crossjit-execution-policy'))
+  crossjit_execution_args = ['--execution-decision-db', get_option('crossjit-execution-policy')]
+endif
+if get_option('crossjit-affine-profile') == ''
+  crossjit_affine_args += ['--production-selection', '@INPUT10@']
+else
+  crossjit_affine_inputs += files(get_option('crossjit-affine-profile'))
+  crossjit_affine_args += [
+    '--enable-affine',
+    '--profiled-coverage', get_option('crossjit-affine-profile'),
+    '--profiled-layout-class', 'FIXED_AFFINE_STRIDE',
+    '--profiled-layout-class', 'TRULY_GENERAL_STRIDED',
+    '--profiled-layout-class', 'FULL_CONTIGUOUS',
+    '--profiled-layout-class', 'INNER_CONTIGUOUS',
+    '--profiled-layout-class', 'SCALAR_OPERAND',
+    '--profiled-layout-class', 'ZERO_STRIDE_BROADCAST',
+  ]
+  if get_option('crossjit-affine-policy') != ''
+    crossjit_affine_inputs += files(get_option('crossjit-affine-policy'))
+    crossjit_affine_args += ['--execution-decision-db', get_option('crossjit-affine-policy')]
+  endif
+  if get_option('crossjit-production-selection') != ''
+    crossjit_affine_inputs += files(get_option('crossjit-production-selection'))
+    crossjit_affine_args += ['--production-selection', get_option('crossjit-production-selection')]
+  endif
+endif
+src_crossjit_execution = custom_target('generated_crossjit_execution',
+  output: ['generated_crossjit_execution.h', 'generated_crossjit_loops.h',
+           'generated_crossjit_backend.h'],
+  input: 'code_generators/generate_crossjit_execution.py',
+  command: [py, '@INPUT@', '--generator-root', crossjit_generator_root,
+            '--output-plan', '@OUTPUT0@', '--output-loops', '@OUTPUT1@',
+            '--output-backend', '@OUTPUT2@'],
+  depend_files: [
+    crossjit_generator_root / 'crossjit_generator/execution/__init__.py',
+    crossjit_generator_root / 'crossjit_generator/execution/model.py',
+    crossjit_generator_root / 'crossjit_generator/execution/c.py',
+    crossjit_generator_root / 'crossjit_generator/execution/loops.c.in',
+    crossjit_generator_root / 'crossjit_generator/execution/plan.c.in',
+    crossjit_generator_root / 'crossjit_generator/execution/backend.c.in',
+  ],
+)
+src_crossjit_generated = custom_target('generated_crossjit_kernels',
+  output : [
+    'generated_crossjit_kernels.c',
+    'generated_crossjit_kernels.h',
+    'generated_crossjit_kernels.json',
+  ],
+  input : [
+    'code_generators/generate_crossjit_kernels.py',
+    'code_generators/crossjit_kernel_manifest.json',
+    'code_generators/crossjit_lowering.py',
+    'code_generators/crossjit_recipes.py',
+    '../../benchmarks/benchmarks/crossjit/results/g14/g14_decision_db.json',
+    'code_generators/crossjit_decision_environment.json',
+    '../../benchmarks/benchmarks/crossjit/results/profiled/pf6_coverage/pf6_observed_signatures.json',
+    '../../benchmarks/benchmarks/crossjit/results/profiled/pf6_coverage/opportunity/coverage_report.json',
+    '../../benchmarks/benchmarks/crossjit/results/profiled/pf4_inner_contiguous/execution_decision_db.json',
+    '../../benchmarks/benchmarks/crossjit/results/profiled/pf5_scalar_zero_stride/execution_decision_db.json',
+    'code_generators/crossjit_production_selection.json',
+  ] + crossjit_affine_inputs,
+  command : [
+    py, '@INPUT0@',
+    '--generator-root', crossjit_generator_root,
+    '--manifest', '@INPUT1@',
+    '--output-c', '@OUTPUT0@',
+    '--output-h', '@OUTPUT1@',
+    '--output-json', '@OUTPUT2@',
+    '--decision-db', '@INPUT4@',
+    '--decision-environment', '@INPUT5@',
+    '--observations', '@INPUT6@',
+    '--profiled-coverage', '@INPUT7@',
+    '--profiled-layout-class', 'INNER_CONTIGUOUS',
+    '--profiled-layout-class', 'SCALAR_OPERAND',
+    '--profiled-inner-validation-seed', 'linear_2_add_multiply',
+    '--profiled-zero-stride-validation-seed', 'linear_2_add_multiply',
+  ] + crossjit_execution_args + crossjit_affine_args,
+  depend_files : [
+    crossjit_generator_root / 'crossjit_generator/__init__.py',
+    crossjit_generator_root / 'crossjit_generator/backend/c/backend.py',
+    crossjit_generator_root / 'crossjit_generator/candidate/model.py',
+    crossjit_generator_root / 'crossjit_generator/domains/elementwise/optimizer.py',
+    crossjit_generator_root / 'crossjit_generator/ir/elementwise.py',
+    crossjit_generator_root / 'crossjit_generator/iteration/model.py',
+    crossjit_generator_root / 'crossjit_generator/recipe/model.py',
+    crossjit_generator_root / 'crossjit_generator/signature/model.py',
+  ],
+)
+
 # Write out pkg-config file
 # -------------------------
 
@@ -1255,7 +1361,23 @@ src_multiarray = multiarray_gen_headers + [
   'src/multiarray/fnv.c',
 ]
 
+crossjit_native_args = []
+crossjit_native_inputs = files('code_generators/generate_crossjit_native_policy.py')
+if get_option('crossjit-native-policy') != ''
+  crossjit_native_inputs += files(get_option('crossjit-native-policy'))
+  crossjit_native_args += ['--policy', get_option('crossjit-native-policy')]
+endif
+src_crossjit_native = custom_target('generated_crossjit_native_policy',
+  output: 'generated_crossjit_native_policy.h',
+  input: crossjit_native_inputs,
+  command: [py, '@INPUT0@', '--output', '@OUTPUT@'] + crossjit_native_args,
+)
+
 src_umath = umath_gen_headers + [
+  src_crossjit_native,
+  src_crossjit_execution,
+  src_crossjit_generated[0],
+  src_crossjit_generated[1],
   src_file.process('src/umath/funcs.inc.src'),
   src_file.process('src/umath/loops.c.src'),
   src_file.process('src/umath/matmul.c.src'),
@@ -1265,6 +1387,8 @@ src_umath = umath_gen_headers + [
   'src/umath/clip.h',
   'src/umath/dispatching.cpp',
   'src/umath/extobj.c',
+  'src/umath/jit_provider.c',
+  'src/umath/jit_kernel.c',
   'src/umath/legacy_array_method.c',
   'src/umath/override.c',
   'src/umath/reduction.c',

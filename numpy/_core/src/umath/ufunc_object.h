@@ -13,6 +13,10 @@ ufunc_get_name_cstr(PyUFuncObject *ufunc);
 NPY_NO_EXPORT PyObject *
 PyUFunc_GetDefaultIdentity(PyUFuncObject *ufunc, npy_bool *reorderable);
 
+NPY_NO_EXPORT PyArrayObject *
+numpy_crossjit_reduce_no_callbacks(PyUFuncObject *ufunc, PyArrayObject *arr,
+    PyArrayObject *out, int naxes, int *axes, int keepdims);
+
 #ifdef __cplusplus
 }
 #endif

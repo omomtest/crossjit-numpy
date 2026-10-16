@@ -1,0 +1,155 @@
+{
+  "provider": "numpy",
+  "schema_version": 1,
+  "signatures": [
+    {
+      "id": "linear_2_add_multiply",
+      "mode": "AUTO",
+      "source": "validation",
+      "region": {
+        "host_semantic_proof_digest": "validation-linear-2",
+        "inputs": ["a", "b", "c"],
+        "materialized_values": ["out"],
+        "operations": [
+          {"id": "n0", "operation": "add", "operands": ["a", "b"], "result": "t0"},
+          {"id": "n1", "operation": "mul", "operands": ["t0", "c"], "result": "out"}
+        ],
+        "outputs": ["out"],
+        "provider": "numpy",
+        "specialization": {
+          "contract_digest": "numpy-fp64-contiguous-same-shape-v1",
+          "dtype_class": "float64",
+          "error_mode": "numpy_fpe_fallback",
+          "layout_class": "contiguous_same_shape"
+        },
+        "virtual_values": ["t0"]
+      }
+    },
+    {
+      "id": "linear_3_add_multiply_subtract",
+      "mode": "AUTO",
+      "source": "validation",
+      "region": {
+        "host_semantic_proof_digest": "validation-linear-3",
+        "inputs": ["a", "b", "c", "d"],
+        "materialized_values": ["out"],
+        "operations": [
+          {"id": "n0", "operation": "add", "operands": ["a", "b"], "result": "t0"},
+          {"id": "n1", "operation": "mul", "operands": ["t0", "c"], "result": "t1"},
+          {"id": "n2", "operation": "sub", "operands": ["t1", "d"], "result": "out"}
+        ],
+        "outputs": ["out"],
+        "provider": "numpy",
+        "specialization": {
+          "contract_digest": "numpy-fp64-contiguous-same-shape-v1",
+          "dtype_class": "float64",
+          "error_mode": "numpy_fpe_fallback",
+          "layout_class": "contiguous_same_shape"
+        },
+        "virtual_values": ["t0", "t1"]
+      }
+    },
+    {
+      "id": "linear_4_add_multiply_subtract_divide",
+      "mode": "AUTO",
+      "source": "validation",
+      "region": {
+        "host_semantic_proof_digest": "validation-linear-4",
+        "inputs": ["a", "b", "c", "d", "e"],
+        "materialized_values": ["out"],
+        "operations": [
+          {"id": "n0", "operation": "add", "operands": ["a", "b"], "result": "t0"},
+          {"id": "n1", "operation": "mul", "operands": ["t0", "c"], "result": "t1"},
+          {"id": "n2", "operation": "sub", "operands": ["t1", "d"], "result": "t2"},
+          {"id": "n3", "operation": "true_divide", "operands": ["t2", "e"], "result": "out"}
+        ],
+        "outputs": ["out"],
+        "provider": "numpy",
+        "specialization": {
+          "contract_digest": "numpy-fp64-contiguous-same-shape-v1",
+          "dtype_class": "float64",
+          "error_mode": "numpy_fpe_fallback",
+          "layout_class": "contiguous_same_shape"
+        },
+        "virtual_values": ["t0", "t1", "t2"]
+      }
+    },
+    {
+      "id": "linear_5_add_multiply_subtract_divide_add",
+      "mode": "AUTO",
+      "source": "validation",
+      "region": {
+        "host_semantic_proof_digest": "validation-linear-5",
+        "inputs": ["a", "b", "c", "d", "e", "f"],
+        "materialized_values": ["out"],
+        "operations": [
+          {"id": "n0", "operation": "add", "operands": ["a", "b"], "result": "t0"},
+          {"id": "n1", "operation": "mul", "operands": ["t0", "c"], "result": "t1"},
+          {"id": "n2", "operation": "sub", "operands": ["t1", "d"], "result": "t2"},
+          {"id": "n3", "operation": "true_divide", "operands": ["t2", "e"], "result": "t3"},
+          {"id": "n4", "operation": "add", "operands": ["t3", "f"], "result": "out"}
+        ],
+        "outputs": ["out"],
+        "provider": "numpy",
+        "specialization": {
+          "contract_digest": "numpy-fp64-contiguous-same-shape-v1",
+          "dtype_class": "float64",
+          "error_mode": "numpy_fpe_fallback",
+          "layout_class": "contiguous_same_shape"
+        },
+        "virtual_values": ["t0", "t1", "t2", "t3"]
+      }
+    },
+    {
+      "id": "linear_6_add_multiply_subtract_divide_add_multiply",
+      "mode": "AUTO",
+      "source": "validation",
+      "region": {
+        "host_semantic_proof_digest": "validation-linear-6",
+        "inputs": ["a", "b", "c", "d", "e", "f", "g"],
+        "materialized_values": ["out"],
+        "operations": [
+          {"id": "n0", "operation": "add", "operands": ["a", "b"], "result": "t0"},
+          {"id": "n1", "operation": "mul", "operands": ["t0", "c"], "result": "t1"},
+          {"id": "n2", "operation": "sub", "operands": ["t1", "d"], "result": "t2"},
+          {"id": "n3", "operation": "true_divide", "operands": ["t2", "e"], "result": "t3"},
+          {"id": "n4", "operation": "add", "operands": ["t3", "f"], "result": "t4"},
+          {"id": "n5", "operation": "mul", "operands": ["t4", "g"], "result": "out"}
+        ],
+        "outputs": ["out"],
+        "provider": "numpy",
+        "specialization": {
+          "contract_digest": "numpy-fp64-contiguous-same-shape-v1",
+          "dtype_class": "float64",
+          "error_mode": "numpy_fpe_fallback",
+          "layout_class": "contiguous_same_shape"
+        },
+        "virtual_values": ["t0", "t1", "t2", "t3", "t4"]
+      }
+    },
+    {
+      "id": "branched_3_multiply_multiply_add",
+      "mode": "AUTO",
+      "source": "validation",
+      "region": {
+        "host_semantic_proof_digest": "validation-branched-3",
+        "inputs": ["a", "b", "c", "d"],
+        "materialized_values": ["out"],
+        "operations": [
+          {"id": "n0", "operation": "mul", "operands": ["a", "b"], "result": "t0"},
+          {"id": "n1", "operation": "mul", "operands": ["c", "d"], "result": "t1"},
+          {"id": "n2", "operation": "add", "operands": ["t0", "t1"], "result": "out"}
+        ],
+        "outputs": ["out"],
+        "provider": "numpy",
+        "specialization": {
+          "contract_digest": "numpy-fp64-contiguous-same-shape-v1",
+          "dtype_class": "float64",
+          "error_mode": "numpy_fpe_fallback",
+          "layout_class": "contiguous_same_shape"
+        },
+        "virtual_values": ["t0", "t1"]
+      }
+    }
+  ]
+}

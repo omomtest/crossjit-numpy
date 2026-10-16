@@ -1,4 +1,12 @@
 # BLAS / LAPACK selection
+option('crossjit-affine-profile', type: 'string', value: '',
+       description: 'Separate normalized affine coverage input (empty preserves frozen selection)')
+option('crossjit-affine-policy', type: 'string', value: '',
+       description: 'Measured affine execution DecisionDB; never a runtime learning input')
+option('crossjit-execution-policy', type: 'string', value: '',
+       description: 'Consolidated measured execution DecisionDB replacing the frozen inner/scalar/affine inputs')
+option('crossjit-native-policy', type: 'string', value: '',
+       description: 'Measured complete-region Provider native decisions (empty disables new admission)')
 option('blas', type: 'string', value: 'auto',
        description: 'BLAS library to use (default: autodetect based on `blas-order`)')
 option('lapack', type: 'string', value: 'auto',
@@ -51,3 +59,5 @@ option('test-simd', type: 'array',
        description: 'CPU SIMD feature sets to be tested by the NumPy SIMD test module')
 option('test-simd-args', type: 'string', value: '',
        description: 'Extra arguments passed to the internal `_simd` test module')
+option('crossjit-production-selection', type: 'string', value: '',
+       description: 'New measured production artifact selection manifest')

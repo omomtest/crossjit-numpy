@@ -66,6 +66,6 @@ PyUFunc_ReduceWrapper(PyArrayMethod_Context *context,
         PyArrayObject *operand, PyArrayObject *out, PyArrayObject *wheremask,
         npy_bool *axis_flags, int keepdims,
         PyObject *initial, PyArray_ReduceLoopFunc *loop,
-        npy_intp buffersize, const char *funcname, int errormask);
+        npy_intp buffersize, const char *funcname, int errormask, int hold_gil);
 
 #endif

@@ -1,0 +1,41 @@
+[
+  {
+    "admitted": true,
+    "baseline_median_ns": 89425.3,
+    "candidate_hash": "00b95b8ea902bf834c62861c7630b7aab6035ab7d99c3d3e130b30977d1182f0",
+    "execution_specialization_hash": "732456821daf7183a47349d366895c970d1bfeaabf083f0401daebe5e17dddd5",
+    "generated_median_ns": 62467.42,
+    "generated_speedup": 1.4315510389255712,
+    "generic_median_ns": 348431.08,
+    "max_cv": 0.01826527955523148,
+    "measured_cells": 6,
+    "reason": "measured Provider value classes and exact iteration cells constrain runtime admission",
+    "scalar_combinations": 3
+  },
+  {
+    "admitted": true,
+    "baseline_median_ns": 577675.04,
+    "candidate_hash": "3ece78f7c49506fbe955dcbd9aea2fb52d2e49a9d9a3fdc9e10b2ead4aa4bfde",
+    "execution_specialization_hash": "5600ff0f8c1ca5be63b16ea3edde436a3c8b3aa83aa015815c57b1bb36b712d3",
+    "generated_median_ns": 123648.23,
+    "generated_speedup": 4.671923245484388,
+    "generic_median_ns": 429441.97,
+    "max_cv": 0.016635959323918623,
+    "measured_cells": 2,
+    "reason": "measured Provider value classes and exact iteration cells constrain runtime admission",
+    "scalar_combinations": 1
+  },
+  {
+    "admitted": true,
+    "baseline_median_ns": 214576.74,
+    "candidate_hash": "6d0925e849ad432b9d5b154b4db93e95ad54fe04f0d9b7ebbce955d5bd231060",
+    "execution_specialization_hash": "c8ddeaaa1da40b7427ecbda3c80935c9fd0d839afd43b4ab8abaabff1e074dd3",
+    "generated_median_ns": 107641.61,
+    "generated_speedup": 1.9934367388224683,
+    "generic_median_ns": 394352.45,
+    "max_cv": 0.13057869640357658,
+    "measured_cells": 2,
+    "reason": "measured Provider value classes and exact iteration cells constrain runtime admission",
+    "scalar_combinations": 1
+  }
+]

@@ -1,0 +1,529 @@
+{
+  "candidate_universe_hash": "e7e1e1e2d3b15d9795df417e16ff584d55da118c13c9e20aff563009d94b0cf0",
+  "measurement_inputs": [
+    {
+      "path": "results/v3-affine-gate-cells-stride2/execution_specialization_tuning.json",
+      "sha256": "cc66326358b6428d5262356623e76ef732590ece411e8932b921ae356770aa36"
+    },
+    {
+      "path": "results/v3-affine-gate-cells-stride100/execution_specialization_tuning.json",
+      "sha256": "7197313b7fcf8900848d232492175d823be0f8af313c1b21a0f00385977b9735"
+    }
+  ],
+  "policy_name": "CROSSJIT-V3-AFFINE-V2",
+  "preserved_legacy_selection_sha256": "0c47c85fd321e6bed46dcf8551c97f78f2fd6ed8d3b2b7423b8ba3e0998a85c7",
+  "records": [
+    {
+      "candidate_hash": "229b6ec6b8fa69bd1db832b09f14e39d5c8d974ed54290a26c5e22aa3973abb8",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "26884510b22fd5e64160daaa8ca19f90e45ce9a42cdaa233f7c3a2b5ea96404c",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 60,
+          "outer_count": 60
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "382f9b85b79af2e8b80a4e9cabe2b60aa70123d44ddf009ecdad139578e771e7",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 60,
+          "outer_count": 60
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "4360377e28635931e2f7866499ba0b9c4df4c42df6823e0553f42a83056a1f4a",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 60,
+          "outer_count": 60
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "581f9f7655198d9b7cb2b9b3f998fa2ded8a9765e92b5f483dba424c85f2a019",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "66c77782a7d4c20d83f16ec7ccb6cc17cda037dbb9985c3ebedf703a49547d9c",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "686e789df267a3671d1e667d9424a088ef5c9dc4b5d76214dd6cf6d0898a72e2",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "7459fa72b53d1702a590014a57545a6d63da79e71c8203abbc1faa69d8842e26",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "898fa1a8409a7c851e7d2465fe9d0288ab3f4eebbf6311c047dcb033db00e335",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "94a8af0280e6a10826b2174587457d7f737558c5a49880cdc78dc486808d14cb",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 60,
+          "outer_count": 60
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "a00c9a1661bc1f2882c9c7780c58b3727130ae83804f712e7645418ce94b5f8c",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "adfbfa2dc8c5059c349eec7a80355ca018911b3de408bdb5ba30747bd84eb4ea",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 60,
+          "outer_count": 60
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "b86349afc39e6269b56c2c7051286e87fcda1762acd13f3c3867942e3b218705",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "da040c57ab68ab5e018840c2f54c9d115453c31d74d778ffbbadcd082b7849af",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "e25f2c39a3844d6e450ff226badec35a45e60c7b17097c6c0e9b69234c2d858e",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 60,
+          "outer_count": 60
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "f8c7e4a63fb3dda86767483a10d529cd2fb81aeb4e3e8c57dbe62507b39e11dd",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "fa66c8715ba1e01e111f9156dfda3a0310bb582b2b256f34a749622f21df3314",
+      "measured_iteration_cells": [
+        {
+          "inner_extent": 59,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 98,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 200,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 400,
+          "outer_count": 1
+        },
+        {
+          "inner_extent": 60,
+          "outer_count": 60
+        }
+      ],
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "106b926c3235fd5a624aa1bcf9577e3acb0869b94bcbc92967c744bbd502a25b",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "3236896b62eabf58721aef4ccc1fe508c6ea7d606239dc526a5cb07112ba81e2",
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "36b680597b4756a461551a28321dec04011057c7513cb0fee18e6266373301de",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "411a936a680b48a174e16d534c8d508c9a0f99a66a93806edd09b8a9a41eccec",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "4203d7ed1e3861f12560dc788fb7d0755b70bf6ba3b06723673802a4b666a51f",
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "56838e3cc11845bb8b8bd63d2952d8b82f8959cc2367de0c41a24d07ac399593",
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "62f13e00cbe94df7ee07d3386a767dbab1eaf8af79b64168b7c6d27d31cf7e33",
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "88f121fe93db193be625b885eede4fe1d55defc331bc80248c48222deb38a49c",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "95d5c193ff0708db40bfee899d3ce79f9de9dd0290e30632957d6597ba73d5d1",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "a4b3d38d79928d214f03feeb98f1e0b19b4b2936c571261ed3a70552ff27166e",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "ad1f0c9833791f666b537b0bc223a27fb680e73af6f58b13442dda5feda3e02b",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "b0adc4bb8d87bef570eeee91d5db583662358313cb470fa4caa269099e57fe8a",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "ba1e01e61b7deb3e7f4647574fb06ebf7de601cd6ca9af0e679245461e813cd6",
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "d2e22049f6a6fc7224b3a50e96ed46141917957c0cb9cedfb8b5af91c50bf396",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "f38779fb5ae76533c79dcbe6e5dfc8240700180d30ab1f5a627cb8c1ddaa9f7f",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "f9207fc71894f3d1d04f3b5634578de3987cccf33905c6c185106c4cb9161676",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "fe184d62e570bdee25f352d7562320d35f165a764d1b65547ac9f7c2cc80f9df",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "26bb9778d1288654b71a351490c740c1018ed8b461608d7ac4776612908e1606",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "373cdc061ab53a834a7705fc8c0a92c757ccd47ff857f29288366de0ad29285b",
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "47e306cb193d45f327810c8ab3040fd27a6657cee5d4768f94a775bf4e88bf33",
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "53ed9592b1c2325ba08c407141ba55d83d187833c1c3f2fc308b6227faf5474c",
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "55fd552621b6f1894915e11b5cea5d91c598c3bdb32b76cd09c4b2f04c81716a",
+      "production_artifact_decision": "SELECT"
+    },
+    {
+      "candidate_hash": "c914b7b18ba9e6dd678b2bc89c151d2f964688ffa4b066e03a531e5a866b9043",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "d2b7cfa13a016c4dcdffc25287d9156745bc27a200dba4d2a256d3a7b0a97a4f",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "eec520f3d39a047433b0e26cdd8b3a5293511edb4e870d955d42e6c793d95c89",
+      "production_artifact_decision": "REJECT"
+    },
+    {
+      "candidate_hash": "f5fde18410c60e441a4c704ff5e16cae8caeae4169dfaa9f4b21d02fd94fcbf0",
+      "production_artifact_decision": "REJECT"
+    }
+  ],
+  "runtime_profitability_retuned": true,
+  "schema_version": 2,
+  "summary": {
+    "production_rejected_artifact_count": 17,
+    "production_selected_artifact_count": 26
+  }
+}

@@ -1,0 +1,15 @@
+[
+  {
+    "admitted": true,
+    "baseline_median_ns": 1049.7180659915061,
+    "candidate_hash": "8b4b4a6447844674c7d85e96845431bf3357cb88eb4d4c65bb4c015077483e5d",
+    "execution_specialization_hash": "8a01c03ac396f38aa7565b18a8395208e435a2a3959521ddf90e2c0ac5cd78a7",
+    "generated_median_ns": 210.17902646194054,
+    "generated_speedup": 4.994399696591945,
+    "generic_median_ns": 1567.2201894805619,
+    "max_cv": 0.015497497123747098,
+    "measured_cells": 54,
+    "reason": "measured Provider value classes and exact iteration cells constrain runtime admission",
+    "scalar_combinations": 27
+  }
+]

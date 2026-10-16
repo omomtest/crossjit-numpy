@@ -13,6 +13,7 @@
 #include "numpy/npy_math.h"
 #include "numpy/halffloat.h"
 #include "lowlevel_strided_loops.h"
+#include "jit_provider.h"
 
 
 
@@ -505,6 +506,7 @@ NPY_NO_EXPORT void
             return;
         }    
     
+        numpy_crossjit_native_record_packing((size_t)total_size);
         tmp_ip1 = tmp_ip12op;
         tmp_ip2 = tmp_ip12op + ip1_size;
         tmp_op = tmp_ip12op + ip1_size + ip2_size;    

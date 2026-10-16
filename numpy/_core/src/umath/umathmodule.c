@@ -34,6 +34,7 @@
 #include "real_imag_ufuncs.h"
 #include "extobj.h"  /* for _extobject_contextvar exposure */
 #include "ufunc_type_resolution.h"
+#include "jit_provider.h"
 
 /* Automatically generated code to define all ufuncs: */
 #include "funcs.inc"
@@ -288,6 +289,10 @@ int initumath(PyObject *m)
     }
 
     if (init_argparse_mutex() < 0) {
+        return -1;
+    }
+
+    if (numpy_crossjit_init(m) < 0) {
         return -1;
     }
 

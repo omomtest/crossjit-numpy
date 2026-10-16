@@ -417,6 +417,16 @@ typedef struct {
 } PyArray_ArrayFunctionDispatcherObject;
 
 
+NPY_NO_EXPORT int
+numpy_crossjit_dispatcher_parts(PyObject *object,PyObject **relevant,PyObject **impl)
+{
+    if (!Py_IS_TYPE(object,&PyArrayFunctionDispatcher_Type)) return 0;
+    PyArray_ArrayFunctionDispatcherObject *self=(PyArray_ArrayFunctionDispatcherObject *)object;
+    *relevant=self->relevant_arg_func;
+    *impl=self->default_impl;
+    return 1;
+}
+
 static void
 dispatcher_dealloc(PyArray_ArrayFunctionDispatcherObject *self)
 {

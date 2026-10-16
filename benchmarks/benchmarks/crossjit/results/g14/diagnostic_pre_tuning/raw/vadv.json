@@ -1,0 +1,632 @@
+{
+  "candidate_distributions": {
+    "dtype": {
+      "float64": 8
+    },
+    "element_count": {
+      "3600": 8
+    },
+    "layout": {
+      "GENERAL_STRIDED": 8
+    },
+    "region_length": {
+      "2": 6,
+      "3": 2
+    },
+    "rejection_reason": {
+      "unprofitable": 8
+    }
+  },
+  "candidate_record_count": 8,
+  "candidate_records_dropped": 0,
+  "detailed_diagnostics": true,
+  "funnel": {
+    "exec_error": 0,
+    "exec_hit": 0,
+    "exec_miss": 0,
+    "executed_regions": 0,
+    "guard_hit": 0,
+    "guard_miss": 0,
+    "host_proven_regions": 9,
+    "provider_accepted_regions": 0,
+    "provider_guard_error": 0,
+    "provider_prepare_calls": 8,
+    "published_regions": 0,
+    "recognized_nodes": 31
+  },
+  "host_counters": {
+    "assumptions_after_dedup": 0,
+    "assumptions_before_dedup": 0,
+    "exec_hits": 0,
+    "exec_misses": 0,
+    "formed_regions": 9,
+    "guard_hits": 0,
+    "guard_misses": 0,
+    "host_proof_created": 7,
+    "host_proof_reused": 2,
+    "host_regions_considered": 9,
+    "host_regions_proven": 9,
+    "materialized_values": 9,
+    "physical_proof_attempted": 9,
+    "physical_proof_validated": 8,
+    "provider_specialization_created": 0,
+    "provider_specialization_rebuilt": 0,
+    "published_regions": 0,
+    "recognized_nodes": 31,
+    "reject_unprofitable": 8,
+    "reject_unsupported_contract": 0,
+    "reject_unsupported_node": 0,
+    "rejected_regions": 9,
+    "rewritten_regions": 0,
+    "semantic_class_created": 7,
+    "semantic_class_hit": 2,
+    "semantic_class_miss": 7,
+    "semantic_class_reused": 2,
+    "virtual_values": 12
+  },
+  "provider_counters": {
+    "allocation_time_ns": 0,
+    "candidate_records_dropped": 0,
+    "candidates": [
+      {
+        "dtype_class": 2,
+        "element_count": 3600,
+        "eliminable_materialization_count": 1,
+        "guard_count": 3,
+        "internal_value_count": 1,
+        "layout_class": 5,
+        "operand_count": 3,
+        "prepare_decision": 4,
+        "profitability_score": 3600,
+        "profitability_threshold": 0,
+        "region_length": 2,
+        "rejection_reason": 10,
+        "result_count": 1,
+        "unique_guard_count": 0
+      },
+      {
+        "dtype_class": 2,
+        "element_count": 3600,
+        "eliminable_materialization_count": 1,
+        "guard_count": 3,
+        "internal_value_count": 1,
+        "layout_class": 5,
+        "operand_count": 3,
+        "prepare_decision": 4,
+        "profitability_score": 3600,
+        "profitability_threshold": 0,
+        "region_length": 2,
+        "rejection_reason": 10,
+        "result_count": 1,
+        "unique_guard_count": 0
+      },
+      {
+        "dtype_class": 2,
+        "element_count": 3600,
+        "eliminable_materialization_count": 1,
+        "guard_count": 3,
+        "internal_value_count": 1,
+        "layout_class": 5,
+        "operand_count": 3,
+        "prepare_decision": 4,
+        "profitability_score": 3600,
+        "profitability_threshold": 0,
+        "region_length": 2,
+        "rejection_reason": 10,
+        "result_count": 1,
+        "unique_guard_count": 0
+      },
+      {
+        "dtype_class": 2,
+        "element_count": 3600,
+        "eliminable_materialization_count": 1,
+        "guard_count": 3,
+        "internal_value_count": 1,
+        "layout_class": 5,
+        "operand_count": 3,
+        "prepare_decision": 4,
+        "profitability_score": 3600,
+        "profitability_threshold": 0,
+        "region_length": 2,
+        "rejection_reason": 10,
+        "result_count": 1,
+        "unique_guard_count": 0
+      },
+      {
+        "dtype_class": 2,
+        "element_count": 3600,
+        "eliminable_materialization_count": 1,
+        "guard_count": 3,
+        "internal_value_count": 1,
+        "layout_class": 5,
+        "operand_count": 3,
+        "prepare_decision": 4,
+        "profitability_score": 3600,
+        "profitability_threshold": 0,
+        "region_length": 2,
+        "rejection_reason": 10,
+        "result_count": 1,
+        "unique_guard_count": 0
+      },
+      {
+        "dtype_class": 2,
+        "element_count": 3600,
+        "eliminable_materialization_count": 1,
+        "guard_count": 3,
+        "internal_value_count": 1,
+        "layout_class": 5,
+        "operand_count": 3,
+        "prepare_decision": 4,
+        "profitability_score": 3600,
+        "profitability_threshold": 0,
+        "region_length": 2,
+        "rejection_reason": 10,
+        "result_count": 1,
+        "unique_guard_count": 0
+      },
+      {
+        "dtype_class": 2,
+        "element_count": 3600,
+        "eliminable_materialization_count": 2,
+        "guard_count": 4,
+        "internal_value_count": 2,
+        "layout_class": 5,
+        "operand_count": 4,
+        "prepare_decision": 4,
+        "profitability_score": 7200,
+        "profitability_threshold": 0,
+        "region_length": 3,
+        "rejection_reason": 10,
+        "result_count": 1,
+        "unique_guard_count": 0
+      },
+      {
+        "dtype_class": 2,
+        "element_count": 3600,
+        "eliminable_materialization_count": 2,
+        "guard_count": 4,
+        "internal_value_count": 2,
+        "layout_class": 5,
+        "operand_count": 4,
+        "prepare_decision": 4,
+        "profitability_score": 7200,
+        "profitability_threshold": 0,
+        "region_length": 3,
+        "rejection_reason": 10,
+        "result_count": 1,
+        "unique_guard_count": 0
+      }
+    ],
+    "diagnostics_enabled": true,
+    "dtype_histogram": [
+      0,
+      0,
+      8,
+      0,
+      0
+    ],
+    "exec_error": 0,
+    "exec_hit": 0,
+    "exec_miss": 0,
+    "execution_lower_time_ns": 0,
+    "execution_plans_destroyed": 0,
+    "execution_plans_lowered": 0,
+    "fixed_fast_path_hit": 0,
+    "fixed_fast_plans_built": 0,
+    "fixed_generic_path_hit": 0,
+    "fixed_generic_plans_built": 0,
+    "generated_exec_hit": 0,
+    "generated_registry_hit": 0,
+    "generated_registry_miss": 8,
+    "generic_fallback_hit": 0,
+    "guard_checks": 0,
+    "guard_error": 0,
+    "guard_hit": 0,
+    "guard_lower_time_ns": 0,
+    "guard_metadata_reads": 0,
+    "guard_miss": 0,
+    "guard_plans_destroyed": 0,
+    "guard_plans_lowered": 0,
+    "guard_time_ns": 0,
+    "internal_allocations": 0,
+    "kernel_time_ns": 0,
+    "last_candidate": {
+      "dtype_class": 2,
+      "element_count": 3600,
+      "eliminable_materialization_count": 2,
+      "guard_count": 4,
+      "internal_value_count": 2,
+      "layout_class": 5,
+      "operand_count": 4,
+      "prepare_decision": 4,
+      "profitability_score": 7200,
+      "profitability_threshold": 0,
+      "region_length": 3,
+      "rejection_reason": 10,
+      "result_count": 1,
+      "unique_guard_count": 0
+    },
+    "layout_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      8
+    ],
+    "nodes_recognized": 31,
+    "observed_signature_records_dropped": 0,
+    "observed_signatures": [
+      {
+        "accepted_count": 0,
+        "dtype_class": 2,
+        "element_buckets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "execution_count": 0,
+        "generated_hit_count": 0,
+        "generic_fallback_count": 0,
+        "input_count": 3,
+        "layout_class": 5,
+        "max_elements": 3600,
+        "min_elements": 3600,
+        "node_count": 2,
+        "nodes": [
+          {
+            "left": 0,
+            "op": 2,
+            "output": 3,
+            "right": 1
+          },
+          {
+            "left": 2,
+            "op": 1,
+            "output": 4,
+            "right": 3
+          }
+        ],
+        "prepare_count": 1,
+        "scalar_mask": 0
+      },
+      {
+        "accepted_count": 0,
+        "dtype_class": 2,
+        "element_buckets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "execution_count": 0,
+        "generated_hit_count": 0,
+        "generic_fallback_count": 0,
+        "input_count": 3,
+        "layout_class": 5,
+        "max_elements": 3600,
+        "min_elements": 3600,
+        "node_count": 2,
+        "nodes": [
+          {
+            "left": 0,
+            "op": 1,
+            "output": 3,
+            "right": 1
+          },
+          {
+            "left": 2,
+            "op": 2,
+            "output": 4,
+            "right": 3
+          }
+        ],
+        "prepare_count": 1,
+        "scalar_mask": 4
+      },
+      {
+        "accepted_count": 0,
+        "dtype_class": 2,
+        "element_buckets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "execution_count": 0,
+        "generated_hit_count": 0,
+        "generic_fallback_count": 0,
+        "input_count": 3,
+        "layout_class": 5,
+        "max_elements": 3600,
+        "min_elements": 3600,
+        "node_count": 2,
+        "nodes": [
+          {
+            "left": 0,
+            "op": 0,
+            "output": 3,
+            "right": 1
+          },
+          {
+            "left": 2,
+            "op": 2,
+            "output": 4,
+            "right": 3
+          }
+        ],
+        "prepare_count": 2,
+        "scalar_mask": 4
+      },
+      {
+        "accepted_count": 0,
+        "dtype_class": 2,
+        "element_buckets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "execution_count": 0,
+        "generated_hit_count": 0,
+        "generic_fallback_count": 0,
+        "input_count": 3,
+        "layout_class": 5,
+        "max_elements": 3600,
+        "min_elements": 3600,
+        "node_count": 2,
+        "nodes": [
+          {
+            "left": 0,
+            "op": 1,
+            "output": 3,
+            "right": 1
+          },
+          {
+            "left": 2,
+            "op": 2,
+            "output": 4,
+            "right": 3
+          }
+        ],
+        "prepare_count": 1,
+        "scalar_mask": 0
+      },
+      {
+        "accepted_count": 0,
+        "dtype_class": 2,
+        "element_buckets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "execution_count": 0,
+        "generated_hit_count": 0,
+        "generic_fallback_count": 0,
+        "input_count": 3,
+        "layout_class": 5,
+        "max_elements": 3600,
+        "min_elements": 3600,
+        "node_count": 2,
+        "nodes": [
+          {
+            "left": 0,
+            "op": 0,
+            "output": 3,
+            "right": 1
+          },
+          {
+            "left": 3,
+            "op": 0,
+            "output": 4,
+            "right": 2
+          }
+        ],
+        "prepare_count": 1,
+        "scalar_mask": 0
+      },
+      {
+        "accepted_count": 0,
+        "dtype_class": 2,
+        "element_buckets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "execution_count": 0,
+        "generated_hit_count": 0,
+        "generic_fallback_count": 0,
+        "input_count": 4,
+        "layout_class": 5,
+        "max_elements": 3600,
+        "min_elements": 3600,
+        "node_count": 3,
+        "nodes": [
+          {
+            "left": 0,
+            "op": 2,
+            "output": 4,
+            "right": 1
+          },
+          {
+            "left": 2,
+            "op": 1,
+            "output": 5,
+            "right": 4
+          },
+          {
+            "left": 3,
+            "op": 3,
+            "output": 6,
+            "right": 5
+          }
+        ],
+        "prepare_count": 1,
+        "scalar_mask": 8
+      },
+      {
+        "accepted_count": 0,
+        "dtype_class": 2,
+        "element_buckets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "execution_count": 0,
+        "generated_hit_count": 0,
+        "generic_fallback_count": 0,
+        "input_count": 4,
+        "layout_class": 5,
+        "max_elements": 3600,
+        "min_elements": 3600,
+        "node_count": 3,
+        "nodes": [
+          {
+            "left": 0,
+            "op": 2,
+            "output": 4,
+            "right": 1
+          },
+          {
+            "left": 2,
+            "op": 1,
+            "output": 5,
+            "right": 4
+          },
+          {
+            "left": 5,
+            "op": 2,
+            "output": 6,
+            "right": 3
+          }
+        ],
+        "prepare_count": 1,
+        "scalar_mask": 0
+      }
+    ],
+    "output_allocations": 0,
+    "prepare_time_ns": 0,
+    "region_length_histogram": [
+      0,
+      0,
+      6,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "region_time_ns": 0,
+    "regions_executed": 0,
+    "regions_prepare_called": 8,
+    "regions_provider_accepted": 0,
+    "regions_rejected_other": 0,
+    "regions_rejected_unprofitable": 8,
+    "regions_rejected_unsupported_contract": 0,
+    "regions_rejected_unsupported_node": 0,
+    "rejection_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      0,
+      0,
+      0
+    ],
+    "timing_enabled": false
+  },
+  "rejections": {
+    "other": 0,
+    "unprofitable": 8,
+    "unsupported_contract": 0,
+    "unsupported_node": 0
+  },
+  "schema_version": 1,
+  "workload_id": "vadv"
+}

@@ -1,0 +1,1393 @@
+{
+  "records": [
+    {
+      "canonical_elementwise_ir": {
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "host_semantic_proof_digest": "observed:072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b",
+        "inputs": [
+          "input_0",
+          "input_1",
+          "input_2"
+        ],
+        "layout_class": "contiguous_same_shape",
+        "materialized_values": [
+          "value_1"
+        ],
+        "operations": [
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_0",
+            "operands": [
+              "input_0",
+              "input_1"
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+            "result": "value_0",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "multiply"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_1",
+            "operands": [
+              "input_2",
+              "value_0"
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+            "result": "value_1",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "subtract"
+            }
+          }
+        ],
+        "outputs": [
+          "value_1"
+        ],
+        "provider": "numpy",
+        "provider_contract_digest": "signature:072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b",
+        "schema_version": 1,
+        "specialization_attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 1
+          }
+        ],
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "canonical_elementwise_ir_hash": "9c4be8c5b2a88ba11ee7ebe4946c56feca0573afb4ef2a5a80855878a3d074be",
+      "iteration_descriptor": {
+        "descriptor_status": "PF2_REPLAY_FACTS_PRE_PF3",
+        "inner_extent": "runtime_element_count",
+        "iteration_rank_class": "FLAT",
+        "operand_access": [
+          "SCALAR",
+          "CONTIGUOUS",
+          "CONTIGUOUS"
+        ],
+        "outer_count": 1
+      },
+      "logical_input_slots": [
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 0,
+          "value_id": "input_0"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 1,
+          "value_id": "input_1"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 2,
+          "value_id": "input_2"
+        }
+      ],
+      "materialization_assumptions": {
+        "materialized_values": [
+          "value_1"
+        ],
+        "output_ownership": "fresh_provider_output",
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "operation_dependencies": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "output_map": [
+        4
+      ],
+      "provider_specialization": {
+        "attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 1
+          }
+        ],
+        "contract_digest": "signature:072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "layout_class": "contiguous_same_shape"
+      },
+      "schema_version": 1
+    },
+    {
+      "canonical_elementwise_ir": {
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "host_semantic_proof_digest": "observed:2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4",
+        "inputs": [
+          "input_0",
+          "input_1",
+          "input_2"
+        ],
+        "layout_class": "contiguous_same_shape",
+        "materialized_values": [
+          "value_1"
+        ],
+        "operations": [
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_0",
+            "operands": [
+              "input_0",
+              "input_1"
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+            "result": "value_0",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "multiply"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_1",
+            "operands": [
+              "input_2",
+              "value_0"
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+            "result": "value_1",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "add"
+            }
+          }
+        ],
+        "outputs": [
+          "value_1"
+        ],
+        "provider": "numpy",
+        "provider_contract_digest": "signature:2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4",
+        "schema_version": 1,
+        "specialization_attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 2
+          }
+        ],
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "canonical_elementwise_ir_hash": "e1d2f5fc8670edccf71607d39a44be3a3d6288b8eef10037a26899599bc41ba1",
+      "iteration_descriptor": {
+        "descriptor_status": "PF2_REPLAY_FACTS_PRE_PF3",
+        "inner_extent": "runtime_element_count",
+        "iteration_rank_class": "FLAT",
+        "operand_access": [
+          "CONTIGUOUS",
+          "SCALAR",
+          "CONTIGUOUS"
+        ],
+        "outer_count": 1
+      },
+      "logical_input_slots": [
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 0,
+          "value_id": "input_0"
+        },
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 1,
+          "value_id": "input_1"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 2,
+          "value_id": "input_2"
+        }
+      ],
+      "materialization_assumptions": {
+        "materialized_values": [
+          "value_1"
+        ],
+        "output_ownership": "fresh_provider_output",
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "operation_dependencies": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "output_map": [
+        4
+      ],
+      "provider_specialization": {
+        "attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 2
+          }
+        ],
+        "contract_digest": "signature:2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "layout_class": "contiguous_same_shape"
+      },
+      "schema_version": 1
+    },
+    {
+      "canonical_elementwise_ir": {
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "host_semantic_proof_digest": "observed:3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278",
+        "inputs": [
+          "input_0",
+          "input_1",
+          "input_2"
+        ],
+        "layout_class": "contiguous_same_shape",
+        "materialized_values": [
+          "value_1"
+        ],
+        "operations": [
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_0",
+            "operands": [
+              "input_0",
+              "input_1"
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+            "result": "value_0",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "multiply"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_1",
+            "operands": [
+              "input_2",
+              "value_0"
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+            "result": "value_1",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "multiply"
+            }
+          }
+        ],
+        "outputs": [
+          "value_1"
+        ],
+        "provider": "numpy",
+        "provider_contract_digest": "signature:3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278",
+        "schema_version": 1,
+        "specialization_attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 4
+          }
+        ],
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "canonical_elementwise_ir_hash": "79081be500b8852d2696822346dfb1b08f3085098d6125f9a65b50e8e2ef37b6",
+      "iteration_descriptor": {
+        "descriptor_status": "PF2_REPLAY_FACTS_PRE_PF3",
+        "inner_extent": "runtime_element_count",
+        "iteration_rank_class": "FLAT",
+        "operand_access": [
+          "CONTIGUOUS",
+          "CONTIGUOUS",
+          "SCALAR"
+        ],
+        "outer_count": 1
+      },
+      "logical_input_slots": [
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 0,
+          "value_id": "input_0"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 1,
+          "value_id": "input_1"
+        },
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 2,
+          "value_id": "input_2"
+        }
+      ],
+      "materialization_assumptions": {
+        "materialized_values": [
+          "value_1"
+        ],
+        "output_ownership": "fresh_provider_output",
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "operation_dependencies": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "output_map": [
+        4
+      ],
+      "provider_specialization": {
+        "attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 4
+          }
+        ],
+        "contract_digest": "signature:3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "layout_class": "contiguous_same_shape"
+      },
+      "schema_version": 1
+    },
+    {
+      "canonical_elementwise_ir": {
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "host_semantic_proof_digest": "observed:472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448",
+        "inputs": [
+          "input_0",
+          "input_1",
+          "input_2"
+        ],
+        "layout_class": "contiguous_same_shape",
+        "materialized_values": [
+          "value_1"
+        ],
+        "operations": [
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_0",
+            "operands": [
+              "input_0",
+              "input_1"
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+            "result": "value_0",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "subtract"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_1",
+            "operands": [
+              "input_2",
+              "value_0"
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+            "result": "value_1",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "multiply"
+            }
+          }
+        ],
+        "outputs": [
+          "value_1"
+        ],
+        "provider": "numpy",
+        "provider_contract_digest": "signature:472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448",
+        "schema_version": 1,
+        "specialization_attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 4
+          }
+        ],
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "canonical_elementwise_ir_hash": "65b5b253394e826b4fbc02c1e93e988c00cb0d9b4ef7632fee3624fbfb07c23f",
+      "iteration_descriptor": {
+        "descriptor_status": "PF2_REPLAY_FACTS_PRE_PF3",
+        "inner_extent": "runtime_element_count",
+        "iteration_rank_class": "FLAT",
+        "operand_access": [
+          "CONTIGUOUS",
+          "CONTIGUOUS",
+          "SCALAR"
+        ],
+        "outer_count": 1
+      },
+      "logical_input_slots": [
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 0,
+          "value_id": "input_0"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 1,
+          "value_id": "input_1"
+        },
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 2,
+          "value_id": "input_2"
+        }
+      ],
+      "materialization_assumptions": {
+        "materialized_values": [
+          "value_1"
+        ],
+        "output_ownership": "fresh_provider_output",
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "operation_dependencies": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "output_map": [
+        4
+      ],
+      "provider_specialization": {
+        "attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 4
+          }
+        ],
+        "contract_digest": "signature:472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "layout_class": "contiguous_same_shape"
+      },
+      "schema_version": 1
+    },
+    {
+      "canonical_elementwise_ir": {
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "host_semantic_proof_digest": "observed:73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367",
+        "inputs": [
+          "input_0",
+          "input_1",
+          "input_2",
+          "input_3"
+        ],
+        "layout_class": "contiguous_same_shape",
+        "materialized_values": [
+          "value_2"
+        ],
+        "operations": [
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_0",
+            "operands": [
+              "input_0",
+              "input_1"
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697",
+            "result": "value_0",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "true_divide"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_1",
+            "operands": [
+              "input_2",
+              "value_0"
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+            "result": "value_1",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "multiply"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_2",
+            "operands": [
+              "input_3",
+              "value_1"
+            ],
+            "operation_id": "numpy.subtract",
+            "recipe_hash": "6ca557bca5b492181b23f0a76c3b21bf057b3a8afee58ceed13aa8d1fa99f404",
+            "result": "value_2",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "subtract"
+            }
+          }
+        ],
+        "outputs": [
+          "value_2"
+        ],
+        "provider": "numpy",
+        "provider_contract_digest": "signature:73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367",
+        "schema_version": 1,
+        "specialization_attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 6
+          }
+        ],
+        "virtual_intermediates": [
+          "value_0",
+          "value_1"
+        ]
+      },
+      "canonical_elementwise_ir_hash": "f4762d49ea8715381301013d60d5499ac2fc2078356504a7174b71d5ef1f33b2",
+      "iteration_descriptor": {
+        "descriptor_status": "PF2_REPLAY_FACTS_PRE_PF3",
+        "inner_extent": "runtime_element_count",
+        "iteration_rank_class": "FLAT",
+        "operand_access": [
+          "CONTIGUOUS",
+          "SCALAR",
+          "SCALAR",
+          "CONTIGUOUS"
+        ],
+        "outer_count": 1
+      },
+      "logical_input_slots": [
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 0,
+          "value_id": "input_0"
+        },
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 1,
+          "value_id": "input_1"
+        },
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 2,
+          "value_id": "input_2"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 3,
+          "value_id": "input_3"
+        }
+      ],
+      "materialization_assumptions": {
+        "materialized_values": [
+          "value_2"
+        ],
+        "output_ownership": "fresh_provider_output",
+        "virtual_intermediates": [
+          "value_0",
+          "value_1"
+        ]
+      },
+      "operation_dependencies": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          5
+        ]
+      ],
+      "output_map": [
+        6
+      ],
+      "provider_specialization": {
+        "attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 6
+          }
+        ],
+        "contract_digest": "signature:73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "layout_class": "contiguous_same_shape"
+      },
+      "schema_version": 1
+    },
+    {
+      "canonical_elementwise_ir": {
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "host_semantic_proof_digest": "observed:b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb",
+        "inputs": [
+          "input_0",
+          "input_1",
+          "input_2"
+        ],
+        "layout_class": "contiguous_same_shape",
+        "materialized_values": [
+          "value_1"
+        ],
+        "operations": [
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_0",
+            "operands": [
+              "input_0",
+              "input_1"
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+            "result": "value_0",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "add"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_1",
+            "operands": [
+              "input_2",
+              "value_0"
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+            "result": "value_1",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "multiply"
+            }
+          }
+        ],
+        "outputs": [
+          "value_1"
+        ],
+        "provider": "numpy",
+        "provider_contract_digest": "signature:b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb",
+        "schema_version": 1,
+        "specialization_attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 4
+          }
+        ],
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "canonical_elementwise_ir_hash": "a1526aad8c05b9f1f922ad20087982f7416c7952502f538cd6b304937f1ce925",
+      "iteration_descriptor": {
+        "descriptor_status": "PF2_REPLAY_FACTS_PRE_PF3",
+        "inner_extent": "runtime_element_count",
+        "iteration_rank_class": "FLAT",
+        "operand_access": [
+          "CONTIGUOUS",
+          "CONTIGUOUS",
+          "SCALAR"
+        ],
+        "outer_count": 1
+      },
+      "logical_input_slots": [
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 0,
+          "value_id": "input_0"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 1,
+          "value_id": "input_1"
+        },
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 2,
+          "value_id": "input_2"
+        }
+      ],
+      "materialization_assumptions": {
+        "materialized_values": [
+          "value_1"
+        ],
+        "output_ownership": "fresh_provider_output",
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "operation_dependencies": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "output_map": [
+        4
+      ],
+      "provider_specialization": {
+        "attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 4
+          }
+        ],
+        "contract_digest": "signature:b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "layout_class": "contiguous_same_shape"
+      },
+      "schema_version": 1
+    },
+    {
+      "canonical_elementwise_ir": {
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "host_semantic_proof_digest": "observed:be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb",
+        "inputs": [
+          "input_0",
+          "input_1",
+          "input_2"
+        ],
+        "layout_class": "contiguous_same_shape",
+        "materialized_values": [
+          "value_1"
+        ],
+        "operations": [
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_0",
+            "operands": [
+              "input_0",
+              "input_1"
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+            "result": "value_0",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "multiply"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_1",
+            "operands": [
+              "input_2",
+              "value_0"
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+            "result": "value_1",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "add"
+            }
+          }
+        ],
+        "outputs": [
+          "value_1"
+        ],
+        "provider": "numpy",
+        "provider_contract_digest": "signature:be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb",
+        "schema_version": 1,
+        "specialization_attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 1
+          }
+        ],
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "canonical_elementwise_ir_hash": "db33c1472b96fd0d27909d7027a8cc026042c08e2c8a1be3934dc49bbfc9e2b2",
+      "iteration_descriptor": {
+        "descriptor_status": "PF2_REPLAY_FACTS_PRE_PF3",
+        "inner_extent": "runtime_element_count",
+        "iteration_rank_class": "FLAT",
+        "operand_access": [
+          "SCALAR",
+          "CONTIGUOUS",
+          "CONTIGUOUS"
+        ],
+        "outer_count": 1
+      },
+      "logical_input_slots": [
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 0,
+          "value_id": "input_0"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 1,
+          "value_id": "input_1"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 2,
+          "value_id": "input_2"
+        }
+      ],
+      "materialization_assumptions": {
+        "materialized_values": [
+          "value_1"
+        ],
+        "output_ownership": "fresh_provider_output",
+        "virtual_intermediates": [
+          "value_0"
+        ]
+      },
+      "operation_dependencies": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "output_map": [
+        4
+      ],
+      "provider_specialization": {
+        "attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 1
+          }
+        ],
+        "contract_digest": "signature:be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "layout_class": "contiguous_same_shape"
+      },
+      "schema_version": 1
+    },
+    {
+      "canonical_elementwise_ir": {
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "host_semantic_proof_digest": "observed:c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94",
+        "inputs": [
+          "input_0",
+          "input_1",
+          "input_2",
+          "input_3"
+        ],
+        "layout_class": "contiguous_same_shape",
+        "materialized_values": [
+          "value_2"
+        ],
+        "operations": [
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_0",
+            "operands": [
+              "input_0",
+              "input_1"
+            ],
+            "operation_id": "numpy.true_divide",
+            "recipe_hash": "0820937da9f6cf4eacc31fbbd7099cf563a812aaba51ee4ee5bf68e279db2697",
+            "result": "value_0",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "true_divide"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_1",
+            "operands": [
+              "input_2",
+              "value_0"
+            ],
+            "operation_id": "numpy.add",
+            "recipe_hash": "e7cbfdf3a3d2747bbda1c949a3c7eeb707bd3551c0f99d15949e844f89014f33",
+            "result": "value_1",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "add"
+            }
+          },
+          {
+            "effects": {
+              "effect": "pure",
+              "may_call_host": false,
+              "mutation": "none",
+              "result_alias": "fresh"
+            },
+            "errors": {
+              "floating_point": "provider_defined",
+              "may_report": true,
+              "preserve_operation_order": true
+            },
+            "node_id": "node_2",
+            "operands": [
+              "input_3",
+              "value_1"
+            ],
+            "operation_id": "numpy.multiply",
+            "recipe_hash": "46f22c2a16bd650edd3b6955d40a75cf43fdc26513eec4d15245133267b39f9b",
+            "result": "value_2",
+            "semantic_expression": {
+              "operands": [
+                {
+                  "argument": 0
+                },
+                {
+                  "argument": 1
+                }
+              ],
+              "operator": "multiply"
+            }
+          }
+        ],
+        "outputs": [
+          "value_2"
+        ],
+        "provider": "numpy",
+        "provider_contract_digest": "signature:c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94",
+        "schema_version": 1,
+        "specialization_attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 10
+          }
+        ],
+        "virtual_intermediates": [
+          "value_0",
+          "value_1"
+        ]
+      },
+      "canonical_elementwise_ir_hash": "70081954367e4c95fe1a3522feaeccfa8812bc8c680c0c9b8cc8a515c7db50d5",
+      "iteration_descriptor": {
+        "descriptor_status": "PF2_REPLAY_FACTS_PRE_PF3",
+        "inner_extent": "runtime_element_count",
+        "iteration_rank_class": "FLAT",
+        "operand_access": [
+          "CONTIGUOUS",
+          "SCALAR",
+          "CONTIGUOUS",
+          "SCALAR"
+        ],
+        "outer_count": 1
+      },
+      "logical_input_slots": [
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 0,
+          "value_id": "input_0"
+        },
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 1,
+          "value_id": "input_1"
+        },
+        {
+          "access_kind": "CONTIGUOUS",
+          "logical_slot": 2,
+          "value_id": "input_2"
+        },
+        {
+          "access_kind": "SCALAR",
+          "logical_slot": 3,
+          "value_id": "input_3"
+        }
+      ],
+      "materialization_assumptions": {
+        "materialized_values": [
+          "value_2"
+        ],
+        "output_ownership": "fresh_provider_output",
+        "virtual_intermediates": [
+          "value_0",
+          "value_1"
+        ]
+      },
+      "operation_dependencies": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          5
+        ]
+      ],
+      "output_map": [
+        6
+      ],
+      "provider_specialization": {
+        "attributes": [
+          {
+            "name": "scalar_mask",
+            "value": 10
+          }
+        ],
+        "contract_digest": "signature:c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94",
+        "dtype_class": "float64",
+        "error_mode": "numpy_fpe_fallback",
+        "layout_class": "contiguous_same_shape"
+      },
+      "schema_version": 1
+    }
+  ],
+  "schema_version": 1,
+  "signature_to_candidate_hash": {
+    "072e79dc6d3ed09628b6724cf72236524136cba4b9da96616a714babe5a5c87b": "62f13e00cbe94df7ee07d3386a767dbab1eaf8af79b64168b7c6d27d31cf7e33",
+    "2bd3ab14eb768096b2fb9fe7fddab2432828fe17ffbb1d547542fab5f024a4c4": "56838e3cc11845bb8b8bd63d2952d8b82f8959cc2367de0c41a24d07ac399593",
+    "3efa05faa3576b9524e9668dfdd227cd9ecb8a9e241830df4fdc9f9b09438278": "4203d7ed1e3861f12560dc788fb7d0755b70bf6ba3b06723673802a4b666a51f",
+    "472e6ded60c3a75282b6581b67a22b04a19fc6483913c0c77761c5da180f9448": "ba1e01e61b7deb3e7f4647574fb06ebf7de601cd6ca9af0e679245461e813cd6",
+    "73213d44f41e2bbc6d6169962c2ff1f77caed9009359b5ccb42028b46bbb7367": "41284a9a11a5a028600ffd41f744d29a7978e167d9c6ed75bcef7a33c2d5ed94",
+    "b31365f25de3abbde35b95ed55297c98ad6bd11205268dbb015e1ea62fa78deb": "ef2773fa5accaee49851993669218bd2b06af40b465195fd2d2f3a40e41a5ae2",
+    "be93e9a6b31c3a03defad96339eb72bb919ac864bc35911b17f88d5b2a7c96fb": "3236896b62eabf58721aef4ccc1fe508c6ea7d606239dc526a5cb07112ba81e2",
+    "c79aa989763762989d820e80042404be2e3f84872aaa2575557bcf8357907d94": "088cd2015d64026eb039fe5c7c04bdb46260f5f922203e59e6bb383eccc66bb8"
+  }
+}

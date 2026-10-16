@@ -1741,3 +1741,8 @@ def datetime_as_string(arr, unit=None, timezone="naive", casting="same_kind"):
     datetime with units 'm' according to the rule 'safe'
     """
     return (arr,)
+
+
+# Register bundled intrinsic identities only in CrossJIT-enabled builds.
+if hasattr(_multiarray_umath, '_crossjit_register_intrinsic'):
+    _multiarray_umath._crossjit_register_intrinsic(dot, 23)

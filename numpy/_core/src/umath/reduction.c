@@ -179,7 +179,7 @@ PyUFunc_ReduceWrapper(PyArrayMethod_Context *context,
         PyArrayObject *operand, PyArrayObject *out, PyArrayObject *wheremask,
         npy_bool *axis_flags, int keepdims,
         PyObject *initial, PyArray_ReduceLoopFunc *loop,
-        npy_intp buffersize, const char *funcname, int errormask)
+        npy_intp buffersize, const char *funcname, int errormask, int hold_gil)
 {
     assert(loop != NULL);
     PyArrayObject *result = NULL;
@@ -356,7 +356,7 @@ PyUFunc_ReduceWrapper(PyArrayMethod_Context *context,
     }
     flags = PyArrayMethod_COMBINED_FLAGS(flags, NpyIter_GetTransferFlags(iter));
 
-    int needs_api = (flags & NPY_METH_REQUIRES_PYAPI) != 0;
+    int needs_api = hold_gil || (flags & NPY_METH_REQUIRES_PYAPI) != 0;
     if (!(flags & NPY_METH_NO_FLOATINGPOINT_ERRORS)) {
         /* Start with the floating-point exception flags cleared */
         npy_clear_floatstatus_barrier((char*)&iter);
@@ -422,7 +422,7 @@ PyUFunc_ReduceWrapper(PyArrayMethod_Context *context,
         }
     }
 
-    if (!(flags & NPY_METH_NO_FLOATINGPOINT_ERRORS)) {
+    if (!hold_gil && !(flags & NPY_METH_NO_FLOATINGPOINT_ERRORS)) {
         /* NOTE: We could check float errors even on error */
         if (_check_ufunc_fperr(errormask, "reduce") < 0) {
             goto fail;
